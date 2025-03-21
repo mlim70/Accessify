@@ -1,21 +1,25 @@
 {
-    "manifest_version": 3,
-    "name": "Background Color Changer",
-    "version": "1.0",
-    "description": "Changes the background color of web pages",
-    "icons": {
-      "48": "icon.png"
-    },
-    "action": {
-      "default_popup": "popup.html",
-      "default_icon": "icon.png"
-    },
-    "content_scripts": [
-      {
-        "matches": ["<all_urls>"],
-        "js": ["content.js"]
-      }
-    ],
-    "permissions": ["activeTab"]
-  }
-  
+  "manifest_version": 3,
+  "name": "Font Changer",
+  "version": "1.0",
+  "description": "Changes the font of web pages to your preferred Google Web Font",
+  "icons": {
+    "48": "icon.png"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs",
+    "tts"
+  ],
+  "action": {
+    "default_popup": "popup.html" 
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}
