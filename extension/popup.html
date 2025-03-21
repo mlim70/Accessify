@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Font Changer</title>
+  <link href="utils/select2.min.css" rel="stylesheet" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      width: 300px;
+      height: 400px;
+    }
+    .select2-container {
+      width: 100% !important;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Select Font</h1>
+  <select id="fontSelect" style="width: 100%"></select>
+  <button id="applyFont">Apply Font</button>
+  <script src="utils/jquery-3.6.0.min.js"></script>
+  <script src="utils/select2.min.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
