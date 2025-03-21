@@ -19,5 +19,3 @@ style.innerHTML = `
 
 // Append the style element to the head of the document
 document.head.appendChild(style);
-
-
