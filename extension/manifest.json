@@ -6,11 +6,16 @@
     "icons": {
       "48": "icon.png"
     },
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": "icon.png"
+    },
     "content_scripts": [
       {
         "matches": ["<all_urls>"],
         "js": ["content.js"]
       }
-    ]
+    ],
+    "permissioins": ["activeTab"]
   }
   
