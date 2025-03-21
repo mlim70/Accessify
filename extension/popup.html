@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      width: 300px;
+      padding: 10px;
+    }
+    .button {
+      margin: 5px;
+      padding: 8px;
+      width: 100%;
+      cursor: pointer;
+    }
+    select {
+      width: 100%;
+      margin: 5px 0;
+      padding: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h3>Color Blindness Settings</h3>
+  <select id="colorblindType">
+    <option value="normal">Normal Vision</option>
+    <option value="protanopia">Protanopia (Red-Blind)</option>
+    <option value="deuteranopia">Deuteranopia (Green-Blind)</option>
+    <option value="tritanopia">Tritanopia (Blue-Blind)</option>
+  </select>
+  <button id="applyFilter" class="button">Apply Filter</button>
+  <script src="popup.js"></script>
+</body>
+</html>
