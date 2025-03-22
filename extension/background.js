@@ -54,7 +54,10 @@ async function readSelectedText(text) {
     const data = await response.json();
     const audioContent = data.audioContent;
     
-    const audio = new Audio(`data:audio/mp3;base64,${audioContent}`);
+    const audioBlob = new Blob([Uint8Array.from(atob(audioContent), c => c.charCodeAt(0))], { type: 'audio/mp3' });
+    const audioUrl = URL.createObjectURL(audioBlob);
+    
+    const audio = new Audio(audioUrl);
     audio.play();
   } catch (error) {
     console.error('Error with Google Cloud Text-to-Speech API:', error);
