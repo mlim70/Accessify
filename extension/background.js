@@ -33,33 +33,35 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 async function readSelectedText(text) {
   console.log("Reading text:", text);
   
-  const apiKey = 'AIzaSyAfqgTUcYd1iHQ83YuPGebXnxJZz1DizGc'; // Replace with your Google Cloud API key
-  const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
+  const apiKey = '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'; // Replace with your OpenAI API key
+  const url = 'https://api.openai.com/v1/audio/speech'; // Correct endpoint for TTS
   
   const requestBody = {
-    input: { text: text },
-    voice: { languageCode: 'en-US', name: 'en-US-Wavenet-D' },
-    audioConfig: { audioEncoding: 'MP3' }
+    model: "gpt-4o-mini-tts", // Replace with the correct model name
+    input: text,
+    voice: "alloy"
   };
   
   try {
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify(requestBody)
     });
-    
-    const data = await response.json();
-    const audioContent = data.audioContent;
-    
-    const audioBlob = new Blob([Uint8Array.from(atob(audioContent), c => c.charCodeAt(0))], { type: 'audio/mp3' });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const audioBlob = await response.blob();
     const audioUrl = URL.createObjectURL(audioBlob);
     
     const audio = new Audio(audioUrl);
     audio.play();
   } catch (error) {
-    console.error('Error with Google Cloud Text-to-Speech API:', error);
+    console.error('Error with OpenAI Text-to-Speech API:', error);
   }
 }
