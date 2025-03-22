@@ -1,5 +1,14 @@
 import config from '../config.js';
 
+// Add authentication check function
+async function checkAuthentication() {
+    return new Promise((resolve) => {
+        chrome.storage.sync.get(['userEmail'], function(result) {
+            resolve(!!result.userEmail);
+        });
+    });
+}
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "readText",
@@ -9,8 +18,15 @@ chrome.runtime.onInstalled.addListener(() => {
   console.log("Context menu item 'Read' created");
 });
 
-chrome.contextMenus.onClicked.addListener((info, tab) => {
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === "readText") {
+    // Check authentication before proceeding
+    const isAuthenticated = await checkAuthentication();
+    if (!isAuthenticated) {
+      console.log("User not authenticated");
+      return;
+    }
+
     console.log("Read context menu item clicked");
     console.log("Selected text:", info.selectionText);
     console.log("Tab ID:", tab.id);

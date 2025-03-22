@@ -1,98 +1,69 @@
+// backend/UserInput.js
 const dynamoClient = require('./dynamoClient');
-const { PutCommand, ScanCommand, QueryCommand } = require('@aws-sdk/lib-dynamodb');
+const { PutCommand, GetCommand, ScanCommand, QueryCommand } = require('@aws-sdk/lib-dynamodb');
 
-const TABLE_NAME = 'EmoryHacks'; //DynamoDB table name
+const TABLE_NAME = 'EmoryHacks'; // Table name
 
 class UserInputService {
-    static async create(input, userEmail) {
-        const TTL_DAYS = 30; // Keep enhancements for 30 days
-        const ttl = Math.floor(Date.now() / 1000) + (TTL_DAYS * 24 * 60 * 60);
-        
-        // Create composite key including preferences
-        const emailUrlKey = `${userEmail}#${input.url}#${input.preferences.colorBlindness || 'none'}#${input.preferences.dyslexia || 'false'}`;
-        
-        const newInput = {
-            id: Date.now().toString(),
-            userEmail,
-            emailUrlKey,
-            input,
-            createdAt: new Date().toISOString(),
-            ttl: ttl // Add TTL field
+    static async create(preferences, userEmail) {
+        const timestamp = new Date().toISOString();
+        const newPreferenceRecord = {
+            EmoryHacks: userEmail, // Primary key for the table
+            userEmail: userEmail, // Needed for the GSI "EmailIndex"
+            preferences, // The preferences data
+            createdAt: timestamp, // Helps with sorting in the GSI
+            updatedAt: timestamp // Last update time
         };
 
         const params = {
             TableName: TABLE_NAME,
-            Item: newInput
+            Item: newPreferenceRecord
         };
 
         await dynamoClient.send(new PutCommand(params));
-        return newInput;
+        return newPreferenceRecord;
     }
 
-    static async find() {
+    /**
+     * Retrieves a record by the primary key.
+     * This will return the item where the primary key "EmoryHacks" matches the userEmail
+     */
+    static async findOne(userEmail) {
         const params = {
-            TableName: TABLE_NAME
+            TableName: TABLE_NAME,
+            Key: { EmoryHacks: userEmail }
         };
+
+        const result = await dynamoClient.send(new GetCommand(params));
+        return result.Item || null;
+    }
+
+    /**
+     * Retrieves all stored items (for debugging or admin use)
+     */
+    static async find() {
+        const params = { TableName: TABLE_NAME };
 
         const result = await dynamoClient.send(new ScanCommand(params));
         return result.Items || [];
     }
 
-    static async findOne(query) {
-        if (!query.userEmail) {
-            throw new Error('userEmail is required');
-        }
-
-        if (query['input.url']) {
-            // Create composite key with preferences
-            const emailUrlKey = `${query.userEmail}#${query['input.url']}#${query['input.preferences.colorBlindness'] || 'none'}#${query['input.preferences.dyslexia'] || 'false'}`;
-            
-            const params = {
-                TableName: TABLE_NAME,
-                IndexName: 'EmailUrlIndex',
-                KeyConditionExpression: 'emailUrlKey = :emailUrlKey',
-                ExpressionAttributeValues: {
-                    ':emailUrlKey': emailUrlKey
-                }
-            };
-
-            const result = await dynamoClient.send(new QueryCommand(params));
-            return result.Items?.[0] || null;
-        }
-
-        return this.findByEmail(query.userEmail);
-    }
-
-    static async findByEmail(userEmail) {
+    /**
+     * Example: Retrieve items using the global secondary index "EmailIndex"
+     * This method can be useful if you ever store multiple items per email
+     */
+    static async queryByEmail(userEmail) {
         const params = {
             TableName: TABLE_NAME,
             IndexName: 'EmailIndex',
             KeyConditionExpression: 'userEmail = :email',
             ExpressionAttributeValues: {
                 ':email': userEmail
-            },
-            ScanIndexForward: false // Get most recent first
+            }
         };
 
         const result = await dynamoClient.send(new QueryCommand(params));
         return result.Items || [];
-    }
-
-    static async findMultiple(queries) {
-        const batchParams = queries.map(query => ({
-            TableName: TABLE_NAME,
-            IndexName: 'EmailUrlIndex',
-            KeyConditionExpression: 'emailUrlKey = :emailUrlKey',
-            ExpressionAttributeValues: {
-                ':emailUrlKey': `${query.userEmail}#${query.url}#${query.preferences.colorBlindness || 'none'}#${query.preferences.dyslexia || 'false'}`
-            }
-        }));
-
-        // Execute queries in parallel
-        const results = await Promise.all(
-            batchParams.map(params => dynamoClient.send(new QueryCommand(params)))
-        );
-        return results.map(result => result.Items?.[0] || null);
     }
 }
 

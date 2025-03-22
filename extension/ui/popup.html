@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html>
-    <title> Accessibility Extension </title>
-    <head>
-        <link rel="stylesheet" href="popup.css">
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <title>Accessibility Extension</title>
+    <link rel="stylesheet" href="popup.css">
+    <link href="../utils/select2.min.css" rel="stylesheet" />
+</head>
     <body>
-        <h2 class="title"> Accessibility Settings </h2>
+        <div id="loginWarning" style="display: none; color: red; text-align: center; padding: 10px;">
+            Please log in to the web app first at <a href="http://localhost:3000" target="_blank">http://localhost:3000</a>
+        </div>
 
-        <h3> Color-Blindedness </h3>
+        <h2 class="title">Accessibility Settings</h2>
+
+        <h3>Color-Blindedness</h3>
         <div class="disability-bg">
             <button class="color-blind-option" id="color-blind-none"> None </button>
             <button class="color-blind-option" id="color-blind-r"> Protanopia </button>
@@ -16,7 +22,7 @@
             <button class="color-blind-option" id="color-blind-c"> Full </button>
         </div>
 
-        <h3> Dyslexia? </h3>
+        <h3>Dyslexia?</h3>
         <div class="disability-bg">
             <button class="dyslexia-option" id="dyslexia-none"> None </button>
             <button class="dyslexia-option" id="dyslexia-visual"> Visual </button>
@@ -25,9 +31,9 @@
             <button class="dyslexia-option" id="dyslexia-attentional"> Attentional </button>
         </div>
 
-        <h3> Translator </h3>
+        <h3>Translator</h3>
         <div class="translation-bg">
-            <label> Target Language: </label>
+            <label for="target-languages">Target Language:</label>
             <select id="target-languages" name="languages">
                 <option value="en">English</option>
                 <option value="zh">Chinese</option>
@@ -47,43 +53,43 @@
             </select>
         </div>
 
-        <h3> Screen Reader </h3>
+        <h3>Screen Reader</h3>
         <div class="screen-reader-bg">
-            <label class="input-label"> Enabled: </label>
+            <label class="input-label" for="screen-reader-input">Enabled:</label>
             <label class="switch">
                 <input id="screen-reader-input" type="checkbox">
                 <span class="slider round"></span>
             </label>
         </div>
 
-        <h3> Image Captioning </h3>
+        <h3>Image Captioning</h3>
         <div class="image-captioning-bg">
-            <label class="input-label"> Enabled: </label>
+            <label class="input-label" for="image-captioning-input">Enabled:</label>
             <label class="switch">
-                <input id="screen-reader-input" type="checkbox">
+                <input id="image-captioning-input" type="checkbox">
                 <span class="slider round"></span>
             </label>
         </div>
 
-        <h3> Additional Conditions </h3>
-        <div class="additional-conditions-bg">
-            <p> Describe any additional conditions: </p>
-            <input class="conditions-input" type="text">
-        </div>
+        <h3>Additional Conditions</h3>
+            <div class="additional-conditions-bg">
+                <p>Describe any additional conditions:</p>
+                <input class="conditions-input" type="text">
+            </div>
 
-        <div class="save-button">
-            <button> Save </button>
-        </div>
-        <script src="popup.js"></script>
-        <script src="sourceGrabber.js"></script>
+            <div class="save-button">
+                <button id="savePreferences">Save</button>
+            </div>
 
-        <body>
-            <h1>Select Font</h1>
+        <h1>Select Font</h1>
+        <div>
             <select id="fontSelect" style="width: 100%"></select>
             <button id="applyFont">Apply Font</button>
-            <script src="../utils/jquery-3.6.0.min.js"></script>
-            <script src="../utils/select2.min.js"></script>
-            <script src="popup.js"></script>
-          </body>
+        </div>
+    
+        <script src="../utils/jquery-3.6.0.min.js"></script>
+        <script src="../utils/select2.min.js"></script>
+        <script src="popup.js"></script>
+        <script src="sourceGrabber.js"></script>
     </body>
 </html>
