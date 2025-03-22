@@ -22,6 +22,12 @@
       "storage",
       "tabs",
       "tts"
+    ],
+    "web_accessible_resources": [
+      {
+        "resources": ["fonts/OpenDyslexic-Regular.otf", "fonts/OpenDyslexic-Bold.otf"],
+        "matches": ["<all_urls>"]
+      }
     ]
   }
   

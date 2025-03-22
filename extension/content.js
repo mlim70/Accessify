@@ -42,6 +42,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             console.error('Error applying colorblind filter:', error);
             sendResponse({ success: false, error: error.message });
         }
+    } else if (request.action === 'applyDyslexiaTreatment') {
+        applyDyslexiaTreatment(request.dyslexiaType);
+        sendResponse({ success: true });
     }
     return true; // Keep the message channel open for async response
 });
@@ -60,6 +63,69 @@ function applyColorBlindFilter(filterType) {
     if (filterType !== 'none') {
         document.body.style.filter = colorBlindFilters[filterType];
         console.log('Applied new filter:', colorBlindFilters[filterType]);
+    }
+}
+
+let additionalStyles = null;
+
+function applyDyslexiaTreatment(dyslexiaType) {
+    console.log(`Applying ${dyslexiaType}`);
+    if (additionalStyles) {
+        document.head.removeChild(additionalStyles);
+        additionalStyles = null;
+    }
+
+    if (dyslexiaType === 'dyslexia-none') {
+
+    } else if (dyslexiaType === 'dyslexia-visual') {
+        const styleEl = document.createElement('style');
+        styleEl.id = 'dyslexia-style-override';
+        styleEl.innerHTML = `
+            @font-face {
+                font-family: 'OpenDyslexic';
+                src: url('${chrome.runtime.getURL('fonts/OpenDyslexic-Regular.otf')}') format('opentype');
+                font-weight: normal;
+                font-style: normal;
+            }
+            
+            body, p, h1, h2, h3, h4, h5, h6, a, span, div, li, td, th, input, button, textarea, blockquote, label, figcaption {
+                font-family: 'OpenDyslexic';
+                src: url('${chrome.runtime.getURL('fonts/OpenDyslexic-Bold.otf')}') format('opentype');
+                font-weight: bold;
+                font-style: normal;
+            }
+            
+            [class*="fa-"], 
+            [class*="icon-"], 
+            [class*="material-icons"],
+            [class*="glyphicon"],
+            .material-symbols-outlined,
+            i[class*="fa"],
+            i[class*="icon"],
+            i[class*="material"] {
+                font-family: inherit !important;
+            }
+        `;
+        
+        document.head.appendChild(styleEl);
+        additionalStyles = styleEl;
+    } else if (dyslexiaType === 'dyslexia-surface') {
+        // Text-to-speech features can read content aloud, helping those who struggle with decoding words
+        // Font adjustments to more dyslexia-friendly options like OpenDyslexic or Comic Sans
+        // Word prediction and spell-check tools assist with writing
+        
+    } else if (dyslexiaType === 'dyslexia-directional') {
+        // Page orientation controls
+        // Simplified layouts through reader view
+    } else if (dyslexiaType === 'dyslexia-attentional') {
+        // Reader mode removes distracting elements from webpages
+        // Focus highlighting tools that isolate individual words or sentences
+        // Dark mode to reduce visual fatigue
+        console.log(document.body.innerHTML);
+    } else if (dyslexiaType === 'dyslexia-phonological') {
+
+    } else {
+        console.error("Unrecognized dyslexia option: " + dyslexiaType);
     }
 }
 
@@ -88,7 +154,6 @@ chrome.storage.sync.get(['colorBlindFilter'], function(result) {
         }
     }
 });
-
 
 // Add this to verify the script is loaded
 console.log('Content script initialization complete!');
