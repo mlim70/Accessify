@@ -25,7 +25,9 @@ const colorBlindnessFilters = {
   // Green-Blind
   deuteranopia: '0.625 0.375 0 0 0   0.7 0.3 0 0 0   0 0.3 0.7 0 0   0 0 0 1 0',
   // Blue-Blind
-  tritanopia: '0.95 0.05 0 0 0   0 0.433 0.567 0 0   0 0.475 0.525 0 0   0 0 0 1 0'
+  tritanopia: '0.95 0.05 0 0 0   0 0.433 0.567 0 0   0 0.475 0.525 0 0   0 0 0 1 0',
+  // Complete Color Blindness (Grayscale)
+  grayscale: '0.333 0.333 0.333 0 0   0.333 0.333 0.333 0 0   0.333 0.333 0.333 0 0   0 0 0 1 0'
 };
 
 // Function to apply color blindness filter
