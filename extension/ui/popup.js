@@ -62,8 +62,7 @@ document.addEventListener("DOMContentLoaded", function() {
         'dyslexia-visual',
         'dyslexia-surface',
         'dyslexia-directional',
-        'dyslexia-attentional',
-        'dyslexia-phonological'
+        'dyslexia-attentional'
     ];
 
     // Set up event listeners for all colorblind buttons
