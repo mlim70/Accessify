@@ -1,3 +1,5 @@
+import config from '../config.js';
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "readText",
@@ -33,7 +35,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 async function readSelectedText(text) {
   console.log("Reading text:", text);
   
-  const apiKey = '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'; // Replace with your OpenAI API key
+  const apiKey = config.OPENAI_API_KEY;
   const url = 'https://api.openai.com/v1/audio/speech'; // Correct endpoint for TTS
   
   const requestBody = {
