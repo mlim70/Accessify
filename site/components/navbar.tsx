@@ -10,7 +10,7 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 interface NavbarProps {
-  session: Session | null
+  session?: Session | null
 }
 
 const Navbar: React.FC<NavbarProps> = ({ session }) => {

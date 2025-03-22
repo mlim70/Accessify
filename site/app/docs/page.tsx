@@ -5,11 +5,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BookOpen, FileText, Headphones, Image, Palette, Type } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "../authOptions"
 
-export default function DocsPage() {
+export default async function DocsPage() {
+  const session = await getServerSession(authOptions)
+
   return (
     <main className="min-h-screen flex flex-col">
-      <Navbar />
+      <Navbar session={session} />
 
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
@@ -36,9 +40,9 @@ export default function DocsPage() {
 
                 <h3>Installation</h3>
                 <ol>
-                  <li>Click the "Add to Chrome" button on our website</li>
+                  <li>Click the &quot;Add to Chrome&quot; button on our website</li>
                   <li>Confirm the installation when prompted by Chrome</li>
-                  <li>Once installed, you'll see the Accessify icon in your browser toolbar</li>
+                  <li>Once installed, you&apos;ll see the Accessify icon in your browser toolbar</li>
                 </ol>
 
                 <h3>Creating an Account</h3>
@@ -244,7 +248,7 @@ console.log(settings);`}
                 <div>
                   <h3 className="text-xl font-semibold mb-2">Can I use Accessify on mobile devices?</h3>
                   <p className="text-gray-600">
-                    Currently, Accessify is only available as a Chrome extension for desktop browsers. We're working on
+                    Currently, Accessify is only available as a Chrome extension for desktop browsers. We&apos;re working on
                     mobile solutions for the future.
                   </p>
                 </div>
