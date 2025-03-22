@@ -12,7 +12,8 @@
     "contextMenus",
     "scripting",
     "tabs",
-    "tts"
+    "tts",
+    "tabCapture"
   ],
   "content_scripts": [
     {

@@ -200,3 +200,13 @@ chrome.storage.sync.get(['colorBlindFilter'], function(result) {
 
 // Add this to verify the script is loaded
 console.log('Content script initialization complete!');
+
+let zoomEnabled = false;
+
+// Listen for messages from the background script
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'toggleZoom') {
+    zoomEnabled = request.enabled;
+    sendResponse({ success: true });
+  }
+});
