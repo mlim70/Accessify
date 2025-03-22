@@ -1,14 +1,41 @@
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from './authOptions'
-import LoginButton from './components/LoginButton'
-import Features from './components/Features'
-import { Session } from 'next-auth'
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from './authOptions';
+import LoginButton from './components/LoginButton';
+import LogoutButton from './components/LogoutButton';
+import Features from './components/Features';
+import { Session } from 'next-auth';
 
 export default async function Home() {
-  const session: Session | null = await getServerSession(authOptions)
+  const session: Session | null = await getServerSession(authOptions);
+
+  // Add console log to verify session
+  console.log('Session:', session?.user?.email);
+
+  const scriptContent = session?.user?.email ? 
+    `
+    function storeEmail() {
+      window.postMessage(
+        { 
+          type: 'STORE_USER_EMAIL', 
+          email: '${session.user.email}' 
+        }, 
+        'http://localhost:3000'
+      );
+      console.log('Attempting to store email: ' + '${session.user.email}');
+    }
+
+    // Try immediately and also after a delay
+    storeEmail();
+    setTimeout(storeEmail, 500);
+    setTimeout(storeEmail, 1000);
+    setTimeout(storeEmail, 2000);
+    ` : '';
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+      {session?.user?.email && (
+        <script dangerouslySetInnerHTML={{ __html: scriptContent }} />
+      )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl">
@@ -30,6 +57,9 @@ export default async function Home() {
               <p className="mt-2 text-gray-600">
                 Manage your accessibility preferences and settings here.
               </p>
+              <div className="mt-4">
+                <LogoutButton />
+              </div>
             </div>
           )}
         </div>
@@ -37,5 +67,5 @@ export default async function Home() {
         <Features />
       </div>
     </main>
-  )
+  );
 }

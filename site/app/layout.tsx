@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import ClientSessionProvider from "./components/ClientSessionProvider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -8,12 +9,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ClientSessionProvider>{children}</ClientSessionProvider>
+      </body>
     </html>
   );
 }
