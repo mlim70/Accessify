@@ -66,7 +66,21 @@ function applyColorBlindFilter(filterType) {
     }
 }
 
+let originalHTML = null;
 let additionalStyles = null;
+
+const restoreOriginalHTML = () => {
+    while (document.body.firstChild) {
+        document.body.removeChild(document.body.firstChild);
+    }
+
+    const children = originalHTML.childNodes;
+    for (let i = children.length - 1; i >= 0; --i) {
+        const child = children[i];
+        document.body.appendChild(child);
+    }
+    originalHTML = document.body.cloneNode(true);
+}
 
 function applyDyslexiaTreatment(dyslexiaType) {
     console.log(`Applying ${dyslexiaType}`);
@@ -75,9 +89,14 @@ function applyDyslexiaTreatment(dyslexiaType) {
         additionalStyles = null;
     }
 
-    if (dyslexiaType === 'dyslexia-none') {
+    if (!originalHTML) {
+        // Save the original HTML BEFORE any additional transformations have been applied.
+        originalHTML = document.body.cloneNode(true);
+    } else {
+        restoreOriginalHTML();
+    }
 
-    } else if (dyslexiaType === 'dyslexia-visual') {
+    if (dyslexiaType === 'dyslexia-visual') {
         const styleEl = document.createElement('style');
         styleEl.id = 'dyslexia-style-override';
         styleEl.innerHTML = `
@@ -121,9 +140,33 @@ function applyDyslexiaTreatment(dyslexiaType) {
         // Reader mode removes distracting elements from webpages
         // Focus highlighting tools that isolate individual words or sentences
         // Dark mode to reduce visual fatigue
-        console.log(document.body.innerHTML);
-    } else if (dyslexiaType === 'dyslexia-phonological') {
+        const removeImages = (domNode) => {
+            const children = domNode.childNodes;
+            for (const child of children) {
+                if (!child || !(child.nodeType === 1)) {
+                    continue;
+                }
+                console.log(child.tagName);
+                if (child.tagName === 'IMG' || child.tagName === 'svg' || child.tagName === 'VIDEO') {
+                    domNode.removeChild(child);
+                } else {
+                    removeImages(child);
+                }
+            }
+        }
 
+        const increaseSpacing = (domNode) => {
+            const children = domNode.childNodes;
+            for (const child of children) {
+                if (!child || child.nodeType !== 1) {
+                    continue;
+                }
+                child.style.wordSpacing = '10px';
+                increaseSpacing(child);
+            }
+        }
+        removeImages(document.body);
+        increaseSpacing(document.body);
     } else {
         console.error("Unrecognized dyslexia option: " + dyslexiaType);
     }
