@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const userInputSchema = new mongoose.Schema({
     input: {
-        type: String,
+        type: mongoose.Schema.Types.Mixed,
         required: true
     },
     timestamp: {
