@@ -1,5 +1,16 @@
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
+    // Add this debug code at the top
+    chrome.storage.sync.get(['userEmail'], function(result) {
+        console.log('Current userEmail in storage:', result.userEmail);
+        const loginWarning = document.getElementById('loginWarning');
+        if (!result.userEmail) {
+            loginWarning.style.display = 'block';
+        } else {
+            loginWarning.style.display = 'none';
+        }
+    });
+
     console.log('Popup DOM loaded, setting up event listeners for colorblind buttons');
 
     // Color blindness options mapping
@@ -52,11 +63,8 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
-});
 
-document.addEventListener("DOMContentLoaded", function() {
-    console.log('Popup DOM loaded, setting up event listeners for dyslexia buttons');
-
+    // Set up event listeners for dyslexia treatment buttons
     const dyslexiaButtons = [
         'dyslexia-none',
         'dyslexia-visual',
@@ -72,12 +80,9 @@ document.addEventListener("DOMContentLoaded", function() {
             console.error(`Button not found: ${dyslexiaType}`);
             return;
         }
-
         console.log(`Setting up listener for button: ${dyslexiaType}`);
         button.addEventListener('click', function() {
-            console.log(`Button clicked: ${dyslexiaType}, applying filter: ${dyslexiaType}`);
-            
-            // Query for the active tab
+            console.log(`Button clicked: ${dyslexiaType}, applying treatment: ${dyslexiaType}`);
             chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
                 if (!tabs[0]) {
                     console.error('No active tab found');
@@ -95,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         if (chrome.runtime.lastError) {
                             console.error('Error:', chrome.runtime.lastError);
                         } else if (response && response.success) {
-                            console.log('Filter applied successfully');
+                            console.log('Dyslexia treatment applied successfully');
                         } else {
                             console.error('Failed to apply filter:', response?.error);
                         }
@@ -142,8 +147,58 @@ document.addEventListener("DOMContentLoaded", function() {
     } else {
         console.error('Translation language selector not found');
     }
+
+    // Save button -> write to preferences (DynamoDB)
+    const saveButton = document.getElementById('savePreferences');
+    if (saveButton) {
+        saveButton.addEventListener('click', async function() {
+            const userEmail = await new Promise((resolve) => {
+                chrome.storage.sync.get(['userEmail'], (result) => {
+                    resolve(result.userEmail);
+                });
+            });
+
+            if (!userEmail) {
+                console.error('Please log in to the web app first');
+                // TODO: Show error message to user
+                return;
+            }
+
+            // Get current preferences from storage
+            chrome.storage.sync.get(
+                ['colorBlindFilter', 'preferredFont', 'dyslexiaPreference'],
+                function(result) {
+                    const preferences = {
+                        colorBlindFilter: result.colorBlindFilter || 'none',
+                        preferredFont: result.preferredFont || 'default',
+                        dyslexia: result.dyslexiaPreference || 'none'
+                    };
+
+                    // Send to backend
+                    fetch('http://localhost:3001/api/input', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            userEmail,
+                            preferences
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Preferences saved to backend:', data);
+                    })
+                    .catch(error => {
+                        console.error('Error saving preferences:', error);
+                    });
+                }
+            );
+        });
+    }
 });
 
+// Font dropdown
 $(document).ready(function() {
     const fonts = [
       { name: 'OpenDyslexic', comment: ' (Dyslexic-friendly)' },
