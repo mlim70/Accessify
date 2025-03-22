@@ -36,6 +36,16 @@ export default async function Home() {
       icon: <Palette className="h-8 w-8 text-primary" />,
     },
     {
+      title: "Translation",
+      description: "Translates web content into the user's preferred language.",
+      icon: <Languages className="h-8 w-8 text-primary" />,
+    },
+    {
+      title: "Magnification Tool",
+      description: "Enlarges portions of the screen for users with visual impairments.",
+      icon: <Maximize className="h-8 w-8 text-primary" />,
+    },
+    {
       title: "LLM Input Modification",
       description: "Uses AI to modify website code in real-time for better accessibility.",
       icon: <FileText className="h-8 w-8 text-primary" />,
@@ -60,16 +70,6 @@ export default async function Home() {
       description: "Recommends other helpful extensions and resources based on specific disabilities.",
       icon: <Chrome className="h-8 w-8 text-primary" />,
     },
-    {
-      title: "Translation",
-      description: "Translates web content into the user's preferred language.",
-      icon: <Languages className="h-8 w-8 text-primary" />,
-    },
-    {
-      title: "Magnification Tool",
-      description: "Enlarges portions of the screen for users with visual impairments.",
-      icon: <Maximize className="h-8 w-8 text-primary" />,
-    },
   ]
 
   return (
@@ -86,12 +86,13 @@ export default async function Home() {
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="dyslexic">Dyslexic Font</TabsTrigger>
               <TabsTrigger value="colorblind">Color Blindness</TabsTrigger>
+              <TabsTrigger value="translate">Translator</TabsTrigger>
+              <TabsTrigger value="magnify">Magnification</TabsTrigger>
               <TabsTrigger value="llm">LLM Input</TabsTrigger>
               <TabsTrigger value="tts">Text to Speech</TabsTrigger>
               <TabsTrigger value="caption">Image Captioning</TabsTrigger>
               <TabsTrigger value="ocr">OCR</TabsTrigger>
-              <TabsTrigger value="translate">Translator</TabsTrigger>
-              <TabsTrigger value="magnify">Magnification</TabsTrigger>
+              
             </TabsList>
 
             <TabsContent value="overview" className="space-y-4">

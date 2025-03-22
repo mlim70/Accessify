@@ -4,7 +4,7 @@ import Providers from "./providers";
 
 export const metadata: Metadata = {
   title: "Accessify - Web Accessibility Made Easy",
-  description: "Make the web accessible for everyone with Accessify's powerful Chrome extension.",
+  description: "EmoryHacks2025 Hackathon Project",
 };
 
 export default function RootLayout({

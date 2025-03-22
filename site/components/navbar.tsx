@@ -33,7 +33,7 @@ const Navbar: React.FC<NavbarProps> = ({ session }) => {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="font-bold text-2xl text-primary">Accessify</span>
+            <img src="/accessify-logo.png" alt="Accessify" className="h-8" />
           </Link>
         </div>
 
@@ -56,18 +56,12 @@ const Navbar: React.FC<NavbarProps> = ({ session }) => {
         <div className="hidden md:flex items-center gap-4">
           {session ? (
             <div className="flex items-center space-x-4">
-              <span className="text-gray-700">Welcome, {session.user?.name}</span>
+              <span className="text-gray-700">{session.user?.name}</span>
               <LoginButton />
             </div>
           ) : (
             <LoginButton />
           )}
-          <Link href="https://chrome.google.com/webstore" target="_blank">
-            <Button size="sm">
-              <Chrome className="mr-2 h-4 w-4" />
-              Add to Chrome
-            </Button>
-          </Link>
         </div>
 
         {/* Mobile Menu Button */}
@@ -96,18 +90,12 @@ const Navbar: React.FC<NavbarProps> = ({ session }) => {
             <div className="flex flex-col gap-4 mt-4">
               {session ? (
                 <div className="flex items-center space-x-4">
-                  <span className="text-gray-700">Welcome, {session.user?.name}</span>
+                  <span className="text-gray-700">{session.user?.name}</span>
                   <LoginButton />
                 </div>
               ) : (
                 <LoginButton />
               )}
-              <Link href="https://chrome.google.com/webstore" target="_blank" onClick={() => setIsMenuOpen(false)}>
-                <Button className="w-full">
-                  <Chrome className="mr-2 h-5 w-5" />
-                  Add to Chrome
-                </Button>
-              </Link>
             </div>
           </div>
         </div>
