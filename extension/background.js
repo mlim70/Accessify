@@ -107,7 +107,19 @@ async function readSelectedText(text) {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'toggleZoom') {
-      sendResponse({ success: true });
+      if (request.enabled) {
+        chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataUrl) => {
+          chrome.storage.local.set({ screenshotUrl: dataUrl }, () => {
+            chrome.tabs.create({ url: dataUrl });
+            sendResponse({ success: true });
+          });
+        });
+      } else {
+        chrome.storage.local.remove('screenshotUrl', () => {
+          sendResponse({ success: true });
+        });
+      }
+      return true; // Keep the message channel open for sendResponse
     }
   });
   

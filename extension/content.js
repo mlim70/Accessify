@@ -198,17 +198,19 @@ chrome.storage.sync.get(['colorBlindFilter'], function(result) {
     }
 });
 
-// Add this to verify the script is loaded
-console.log('Content script initialization complete!');
 
 let zoomEnabled = false;
+let screenshotUrl = null;
 
 // Listen for messages from the background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'toggleZoom') {
-    zoomEnabled = request.enabled;
-    if (zoomEnabled) {
-      injectZoomedImage();
+    if (request.enabled) {
+      chrome.storage.local.get('screenshotUrl', (data) => {
+        screenshotUrl = data.screenshotUrl;
+        console.log('Screenshot URL:', screenshotUrl);
+        injectZoomedImage();
+      });
     } else {
       removeZoomedImage();
     }
@@ -218,11 +220,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // Function to inject the zoomed image
 function injectZoomedImage() {
-    const imagePath = chrome.runtime.getURL('./test.png');
-    console.log('Loading image from path:', imagePath);
+  if (!screenshotUrl) {
+    console.error('No screenshot URL available');
+    return;
+  }
 
-  const zoomedImage = document.createElement("img");
-  zoomedImage.src = imagePath;
+  const zoomedImage = document.createElement('img');
+  zoomedImage.src = chrome.runtime.getURL('test.png');
   zoomedImage.alt = "Zoomed Image";
   zoomedImage.style.position = 'absolute';
   zoomedImage.style.width = '200px';
@@ -254,6 +258,3 @@ function removeZoomedImage() {
     document.body.removeChild(zoomedImage);
   }
 }
-
-// Add this to verify the script is loaded
-console.log('Content script initialization complete!');

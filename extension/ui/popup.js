@@ -145,50 +145,49 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Enable Zoom functionality
+document.addEventListener('DOMContentLoaded', function () {
+    const enableZoomCheckbox = document.getElementById('enableZoom');
+
+    chrome.storage.sync.get('enableZoom', (data) => {
+        enableZoomCheckbox.checked = data.enableZoom || false;
+    });
+
+    enableZoomCheckbox.addEventListener('change', () => {
+        const isEnabled = enableZoomCheckbox.checked;
+        chrome.storage.sync.set({ enableZoom: isEnabled }, () => {
+            chrome.runtime.sendMessage({ action: 'toggleZoom', enabled: isEnabled }, (response) => {
+                if (response && response.success) {
+                    console.log('Zoom toggled and screenshot displayed in new tab');
+                } else {
+                    console.error('Failed to toggle zoom and display screenshot');
+                }
+            });
+        });
+    });
+});
+
 // document.addEventListener('DOMContentLoaded', function () {
 //     const enableZoomCheckbox = document.getElementById('enableZoom');
-  
+
 //     chrome.storage.sync.get('enableZoom', (data) => {
 //       enableZoomCheckbox.checked = data.enableZoom || false;
 //     });
-  
+
 //     enableZoomCheckbox.addEventListener('change', () => {
 //       const isEnabled = enableZoomCheckbox.checked;
 //       chrome.storage.sync.set({ enableZoom: isEnabled }, () => {
-//         chrome.runtime.sendMessage({ action: 'toggleZoom', enabled: isEnabled }, (response) => {
-//           if (response && response.success) {
-//             console.log('Zoom toggled and screenshot displayed in new tab');
-//           } else {
-//             console.error('Failed to toggle zoom and display screenshot');
-//           }
+//         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+//           chrome.tabs.sendMessage(tabs[0].id, { action: 'toggleZoom', enabled: isEnabled }, (response) => {
+//             if (response && response.success) {
+//               console.log('Zoom toggled');
+//             } else {
+//               console.error('Failed to toggle zoom', chrome.runtime.lastError);
+//             }
+//           });
 //         });
 //       });
 //     });
 //   });
-
-document.addEventListener('DOMContentLoaded', function () {
-    const enableZoomCheckbox = document.getElementById('enableZoom');
-  
-    chrome.storage.sync.get('enableZoom', (data) => {
-      enableZoomCheckbox.checked = data.enableZoom || false;
-    });
-  
-    enableZoomCheckbox.addEventListener('change', () => {
-      const isEnabled = enableZoomCheckbox.checked;
-      chrome.storage.sync.set({ enableZoom: isEnabled }, () => {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          chrome.tabs.sendMessage(tabs[0].id, { action: 'toggleZoom', enabled: isEnabled }, (response) => {
-            if (response && response.success) {
-              console.log('Zoom toggled');
-            } else {
-              console.error('Failed to toggle zoom');
-            }
-          });
-        });
-      });
-    });
-  });
-
 
 // Font selection functionality
 $(document).ready(function () {
