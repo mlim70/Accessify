@@ -1,4 +1,4 @@
-importScripts('loadEnv.js');
+import { config } from './config.js';
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
@@ -34,11 +34,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
 async function readSelectedText(text) {
   console.log("Reading text:", text);
-    console.log("asdf")
-    loadEnv().then(env => console.log('Test loadEnv call:', env)).catch(error => console.error('Test loadEnv error:', error));
-  const env = await loadEnv();
-  console.log("Environment variables loaded:", env);
-  const apiKey = env.OPENAI_API; // Load API key from .env file
+  const apiKey = config.OPENAI_API;
 console.log("API key:", apiKey);
   const url = 'https://api.openai.com/v1/audio/speech'; // Correct endpoint for TTS
 
