@@ -1,3 +1,5 @@
+importScripts('loadEnv.js');
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "readText",
@@ -32,16 +34,20 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
 async function readSelectedText(text) {
   console.log("Reading text:", text);
-  
-  const apiKey = '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'; // Replace with your OpenAI API key
+    console.log("asdf")
+    loadEnv().then(env => console.log('Test loadEnv call:', env)).catch(error => console.error('Test loadEnv error:', error));
+  const env = await loadEnv();
+  console.log("Environment variables loaded:", env);
+  const apiKey = env.OPENAI_API; // Load API key from .env file
+console.log("API key:", apiKey);
   const url = 'https://api.openai.com/v1/audio/speech'; // Correct endpoint for TTS
-  
+
   const requestBody = {
     model: "gpt-4o-mini-tts", // Replace with the correct model name
     input: text,
     voice: "alloy"
   };
-  
+
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -58,7 +64,7 @@ async function readSelectedText(text) {
 
     const audioBlob = await response.blob();
     const audioUrl = URL.createObjectURL(audioBlob);
-    
+
     const audio = new Audio(audioUrl);
     audio.play();
   } catch (error) {
