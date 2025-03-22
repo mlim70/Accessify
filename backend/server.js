@@ -1,9 +1,15 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { 
+    DynamoDBDocumentClient, 
+    PutCommand, 
+    GetCommand, 
+    QueryCommand 
+} = require('@aws-sdk/lib-dynamodb');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const UserInput = require('./UserInput');
+const UserInputService = require('./UserInput');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,15 +21,13 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 
-// Initialize MongoDB
-mongoose.connect('mongodb+srv://kmmatthew8:<db_password>@emoryhax.yewqq.mongodb.net/?retryWrites=true&w=majority&appName=EmoryHax', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-db.once('open', () => {
-    console.log('Connected to MongoDB');
+// DynamoDB
+const client = new DynamoDBClient({
+    region: process.env.AWS_REGION,
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    }
 });
 
 // Helper function to generate Gemini AI PROMPT!!!
@@ -104,12 +108,7 @@ async function generatePrompt(preferences, html) {
 app.post('/api/input', async (req, res) => {
     try {
         const { input } = req.body;
-        const newUserInput = new UserInput({
-            input: input,
-            timestamp: new Date()
-        });
-        
-        await newUserInput.save();
+        const newUserInput = await UserInputService.create(input);
         res.status(201).json({ message: 'Input saved successfully', data: newUserInput });
     } catch (error) {
         res.status(500).json({ message: 'Error saving input', error: error.message });
@@ -120,16 +119,15 @@ app.post('/api/enhance-accessibility', async (req, res) => {
     try {
         const { html, preferences, url, title, forceRegenerate = false } = req.body;
 
-        // Check for cached version only if not forcing regeneration
         let enhancedHTML;
         let isFromCache = false;
 
         if (!forceRegenerate) {
-            const existingEnhancement = await UserInput.findOne({
+            const existingEnhancement = await UserInputService.findOne({
                 'input.url': url,
                 'input.preferences.colorBlindness': preferences.colorBlindness,
                 'input.preferences.dyslexia': preferences.dyslexia
-            }).sort({ timestamp: -1 });
+            });
 
             if (existingEnhancement) {
                 console.log('Using cached enhancement for URL:', url);
@@ -138,7 +136,6 @@ app.post('/api/enhance-accessibility', async (req, res) => {
             }
         }
 
-        // Generate new enhancement if no cache or regeneration requested
         if (!enhancedHTML || forceRegenerate) {
             console.log(forceRegenerate ? 'Regenerating enhancement...' : 'Generating new enhancement...');
             
@@ -147,20 +144,15 @@ app.post('/api/enhance-accessibility', async (req, res) => {
             const result = await model.generateContent(prompt);
             enhancedHTML = result.response.text();
 
-            // Store the new enhancement in MongoDB
-            const newUserInput = new UserInput({
-                input: {
-                    original: html,
-                    enhanced: enhancedHTML,
-                    url: url,
-                    title: title,
-                    preferences: preferences,
-                    lastUpdated: new Date(),
-                    isRegenerated: forceRegenerate
-                },
-                timestamp: new Date()
+            await UserInputService.create({
+                original: html,
+                enhanced: enhancedHTML,
+                url: url,
+                title: title,
+                preferences: preferences,
+                lastUpdated: new Date().toISOString(),
+                isRegenerated: forceRegenerate
             });
-            await newUserInput.save();
         }
 
         res.status(200).json({ 
@@ -181,10 +173,8 @@ app.post('/api/enhance-accessibility', async (req, res) => {
 
 app.get('/api/inputs', async (req, res) => {
     try {
-        // GET QUERY RESULT
-        const inputs = await UserInput.find().sort({ timestamp: -1 });
+        const inputs = await UserInputService.find();
         res.status(200).json(inputs);
-    // ERROR
     } catch (error) {
         res.status(500).json({ message: 'Error fetching inputs', error: error.message });
     }
