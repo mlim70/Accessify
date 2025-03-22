@@ -20,4 +20,6 @@ chrome.storage.sync.get('preferredFont', (data) => {
 
   // Append the style element to the head of the document
   document.head.appendChild(style);
+  
+  console.log(`Font successfully changed to ${preferredFont.replace(/\+/g, ' ')}`);
 });
