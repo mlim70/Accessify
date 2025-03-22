@@ -17,7 +17,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             console.log('Attempting to apply filter:', request.filterType);
             applyColorBlindFilter(request.filterType);
             saveFilterPreference(request.filterType);
-            console.log('Successfully applied filter:', request.filterType);
+            console.log('Successfully applied filter: ', request.filterType);
             sendResponse({ success: true });
         } catch (error) {
             console.error('Error applying colorblind filter:', error);
@@ -26,9 +26,102 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     } else if (request.action === 'applyDyslexiaTreatment') {
         applyDyslexiaTreatment(request.dyslexiaType);
         sendResponse({ success: true });
+    } else if (request.action === 'translatePage') {
+        translatePage(request.targetLanguage);
+        sendResponse({ success: true });
+    } else if (request.action === 'restore-original') {
+        restoreOriginalHTML();
     }
     return true; // Keep the message channel open for async response
 });
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    console.log('Received message:', request);
+    if (request.action === 'translatePage') {
+        console.log(`Starting translation to ${request.targetLanguage}`);
+        translatePageContent(request.targetLanguage).then(() => {
+            console.log('Translation completed successfully');
+            sendResponse({ success: true });
+        }).catch(error => {
+            console.error('Translation failed:', error);
+            sendResponse({ success: false, error: error.message });
+        });
+        return true; // Keep the message channel open for async response
+    }
+});
+
+// Function to translate text content
+async function translateText(text, targetLanguage) {
+    try {
+        console.log(`Attempting to translate: "${text}" to ${targetLanguage}`);
+        const response = await fetch('http://localhost:3001/api/translate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                text,
+                targetLanguage
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Translation failed');
+        }
+
+        const data = await response.json();
+        console.log(`Translation result: "${data.translatedText}"`);
+        return data.translatedText;
+    } catch (error) {
+        console.error('Translation error:', error);
+        return text; // Return original text if translation fails
+    }
+}
+
+// Function to translate all text content in the page
+async function translatePageContent(targetLanguage) {
+    console.log(`Starting page translation to ${targetLanguage}`);
+    const elements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span, a');
+    console.log(`Found ${elements.length} elements to translate`);
+    
+    for (const element of elements) {
+        if (element.textContent.trim()) {
+            try {
+                const translatedText = await translateText(element.textContent, targetLanguage);
+                element.textContent = translatedText;
+            } catch (error) {
+                console.error(`Error translating element: ${error}`);
+            }
+        }
+    }
+    console.log('Page translation completed');
+}
+
+async function generatePronunciationHints(text) {
+    try {
+        console.log(`Attempting to generate hints for: "${text}"`);
+        const response = await fetch('http://localhost:3001/api/pronunciation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                text
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Pronunciation hints failed');
+        }
+
+        const data = await response.json();
+        console.log(`Hint results: "${data.revisedText}"`);
+        return data.revisedText;
+    } catch (error) {
+        console.error('Translation error:', error);
+        return text; // Return original text if translation fails
+    }
+}
 
 function applyColorBlindFilter(filterType) {
     console.log('Applying filter type:', filterType);
@@ -123,32 +216,6 @@ const restoreOriginalHTML = () => {
     originalHTML = document.body.cloneNode(true);
 }
 
-async function generatePronunciationHints(text) {
-    try {
-        console.log(`Attempting to generate hints for: "${text}"`);
-        const response = await fetch('http://localhost:3001/api/pronunciation', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                text
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('Pronunciation hints failed');
-        }
-
-        const data = await response.json();
-        console.log(`Hint results: "${data.revisedText}"`);
-        return data.revisedText;
-    } catch (error) {
-        console.error('Translation error:', error);
-        return text; // Return original text if translation fails
-    }
-}
-
 function applyDyslexiaTreatment(dyslexiaType) {
     console.log(`Applying ${dyslexiaType}`);
     if (additionalStyles) {
@@ -201,6 +268,33 @@ function applyDyslexiaTreatment(dyslexiaType) {
         removeImages(document.body);
         increaseSpacing(document.body);
     }
+}
+
+async function translatePage(targetLanguage) {
+    console.log(`Translating page to ${targetLanguage}`);
+    if (additionalStyles) {
+        document.head.removeChild(additionalStyles);
+        additionalStyles = null;
+    }
+
+    if (!originalHTML) {
+        // Save the original HTML BEFORE any additional transformations have been applied.
+        originalHTML = document.body.cloneNode(true);
+    } else {
+        restoreOriginalHTML();
+    }
+
+    for (const element of elements) {
+        if (element.textContent.trim()) {
+            try {
+                const translatedText = await translateText(element.textContent, targetLanguage);
+                element.textContent = translatedText;
+            } catch (error) {
+                console.error(`Error translating element: ${error}`);
+            }
+        }
+    }
+    console.log('Page translation completed');
 }
 
 // Store the filter preference
