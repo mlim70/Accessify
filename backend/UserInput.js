@@ -1,51 +1,31 @@
-const { PutCommand, QueryCommand } = require('@aws-sdk/lib-dynamodb');
-const { docClient } = require('./dynamoClient');
+// Temporary in-memory storage until DynamoDB is set up
+const inMemoryStorage = [];
 
-const TABLE_NAME = 'UserInputs';
-
-const UserInputService = {
-    async create(input) {
-        const item = {
-            id: Date.now().toString(), // Using timestamp as ID
-            input: input,
-            timestamp: new Date().toISOString()
+class UserInputService {
+    static async create(input) {
+        const newInput = {
+            id: Date.now().toString(),
+            input,
+            createdAt: new Date().toISOString()
         };
-
-        await docClient.send(new PutCommand({
-            TableName: TABLE_NAME,
-            Item: item
-        }));
-
-        return item;
-    },
-
-    async findOne(conditions) {
-        const { Items } = await docClient.send(new QueryCommand({
-            TableName: TABLE_NAME,
-            IndexName: 'UrlPreferencesIndex',
-            KeyConditionExpression: 'input.url = :url AND input.preferences.colorBlindness = :colorBlindness',
-            FilterExpression: 'input.preferences.dyslexia = :dyslexia',
-            ExpressionAttributeValues: {
-                ':url': conditions['input.url'],
-                ':colorBlindness': conditions['input.preferences.colorBlindness'],
-                ':dyslexia': conditions['input.preferences.dyslexia']
-            },
-            Limit: 1,
-            ScanIndexForward: false // This will get the most recent first
-        }));
-
-        return Items?.[0] || null;
-    },
-
-    async find() {
-        const { Items } = await docClient.send(new QueryCommand({
-            TableName: TABLE_NAME,
-            IndexName: 'TimestampIndex',
-            ScanIndexForward: false // This will sort by timestamp descending
-        }));
-
-        return Items || [];
+        inMemoryStorage.push(newInput);
+        return newInput;
     }
-};
+
+    static async find() {
+        return inMemoryStorage;
+    }
+
+    static async findOne(query) {
+        return inMemoryStorage.find(item => {
+            if (query['input.url'] && item.input.url !== query['input.url']) return false;
+            if (query['input.preferences.colorBlindness'] && 
+                item.input.preferences.colorBlindness !== query['input.preferences.colorBlindness']) return false;
+            if (query['input.preferences.dyslexia'] && 
+                item.input.preferences.dyslexia !== query['input.preferences.dyslexia']) return false;
+            return true;
+        });
+    }
+}
 
 module.exports = UserInputService;

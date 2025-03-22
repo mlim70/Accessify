@@ -57,4 +57,42 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error(`Button not found: ${buttonId}`);
         }
     });
+
+    // Translation functionality
+    const targetLanguageSelect = document.getElementById('target-languages');
+    if (targetLanguageSelect) {
+        console.log('Setting up translation listener');
+        targetLanguageSelect.addEventListener('change', function() {
+            const selectedLanguage = this.value;
+            console.log(`Language selected: ${selectedLanguage}`);
+            
+            // Query for the active tab
+            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+                if (!tabs[0]) {
+                    console.error('No active tab found');
+                    return;
+                }
+                
+                // Send message to content script
+                chrome.tabs.sendMessage(
+                    tabs[0].id,
+                    {
+                        action: 'translatePage',
+                        targetLanguage: selectedLanguage
+                    },
+                    function(response) {
+                        if (chrome.runtime.lastError) {
+                            console.error('Translation error:', chrome.runtime.lastError);
+                        } else if (response && response.success) {
+                            console.log('Translation applied successfully');
+                        } else {
+                            console.error('Failed to apply translation:', response?.error);
+                        }
+                    }
+                );
+            });
+        });
+    } else {
+        console.error('Translation language selector not found');
+    }
 });

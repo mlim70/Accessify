@@ -1,6 +1,5 @@
 const dyslexiaOptionButtons = document.getElementsByClassName("dyslexia-option");
 let selectedDyslexiaButton = "dyslexia-none";
-
 for (let dyslexiaOptionButton of dyslexiaOptionButtons) {
     console.log(dyslexiaOptionButton);
 }
@@ -57,4 +56,41 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error(`Button not found: ${buttonId}`);
         }
     });
+});
+
+// Translation functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const targetLanguageSelect = document.getElementById('target-languages');
+  
+  if (targetLanguageSelect) {
+      targetLanguageSelect.addEventListener('change', function() {
+          const selectedLanguage = this.value;
+          
+          // Query for the active tab
+          chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+              if (!tabs[0]) {
+                  console.error('No active tab found');
+                  return;
+              }
+              
+              // Send message to content script
+              chrome.tabs.sendMessage(
+                  tabs[0].id,
+                  {
+                      action: 'translatePage',
+                      targetLanguage: selectedLanguage
+                  },
+                  function(response) {
+                      if (chrome.runtime.lastError) {
+                          console.error('Error:', chrome.runtime.lastError);
+                      } else if (response && response.success) {
+                          console.log('Translation applied successfully');
+                      } else {
+                          console.error('Failed to apply translation:', response?.error);
+                      }
+                  }
+              );
+          });
+      });
+  }
 });
