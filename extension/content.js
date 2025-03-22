@@ -126,7 +126,7 @@ const restoreOriginalHTML = () => {
 async function generatePronunciationHints(text) {
     try {
         console.log(`Attempting to generate hints for: "${text}"`);
-        const response = await fetch('http://localhost:3000/api/pronunciation', {
+        const response = await fetch('http://localhost:3001/api/pronunciation', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

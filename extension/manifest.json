@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "Background Color Changer",
+    "name": "All in one accessibility",
     "version": "1.0",
-    "description": "Changes the background color of web pages",
+    "description": "Changes the font of web pages to your preferred Google Web Font",
     "icons": {
       "48": "icon.png"
     },
@@ -13,22 +13,28 @@
     "content_scripts": [
       {
         "matches": ["<all_urls>"],
-        "js": ["content.js", "utils/translator.js"]
+        "js": ["content.js", "features/font-changer.js", "utils/translator.js"]
 
       }
     ],
     "permissions": [
       "activeTab",
-      "scripting",
       "storage",
+      "contextMenus",
+      "scripting",
       "tabs",
       "tts"
     ],
+    "content_security_policy": {
+      "extension_pages": "script-src 'self'; object-src 'self'; media-src 'self' blob:;"
+    },
+    "background": {
+      "service_worker": "background.js"
+    },
     "web_accessible_resources": [
       {
         "resources": ["fonts/OpenDyslexic-Regular.otf", "fonts/OpenDyslexic-Bold.otf", "generative-ai.umd.js"],
         "matches": ["<all_urls>"]
       }
     ]
-  }
-  
+}

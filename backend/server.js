@@ -7,7 +7,7 @@ const { Translate } = require('@google-cloud/translate').v2;
 const UserInputService = require('./UserInput');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);

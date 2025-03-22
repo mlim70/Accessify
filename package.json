@@ -5,5 +5,15 @@
     "express": "^4.21.2",
     "mongodb": "^6.15.0",
     "mongoose": "^8.12.2"
+  },
+  "name": "emoryhax",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd site && npm run dev\"",
+    "install-all": "npm install && cd backend && npm install && cd ../site && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }
