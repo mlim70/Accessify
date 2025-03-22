@@ -17,26 +17,23 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js", "features/font-changer.js", "utils/translator.js"]
+      "js": ["content.js", "features/font-changer.js", "utils/translator.js", "features/hover-zoom.js"]
     }
   ],
-"content_security_policy": {
-  "extension_pages": "script-src 'self'; object-src 'self'; media-src 'self' blob:;"
-},
-"background": {
-  "service_worker": "background.js"
-},
-"action": {
-  "default_popup": "ui/popup.html",
-  "default_icon": "icon.png"
-},
-"web_accessible_resources": [
-      {
-        "resources": ["fonts/OpenDyslexic-Regular.otf", "fonts/OpenDyslexic-Bold.otf"],
-        "matches": ["<all_urls>"]
-      }
-    ]
-
-
-  
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; media-src 'self' blob:;"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "ui/popup.html",
+    "default_icon": "icon.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["fonts/OpenDyslexic-Regular.otf", "fonts/OpenDyslexic-Bold.otf"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }

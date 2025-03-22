@@ -189,3 +189,15 @@ $(document).ready(function() {
       });
     });
   });
+
+  document.getElementById('enableHoverZoom').addEventListener('click', () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, { action: 'enableHoverZoom' });
+    });
+  });
+  
+  document.getElementById('disableHoverZoom').addEventListener('click', () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, { action: 'disableHoverZoom' });
+    });
+  });
