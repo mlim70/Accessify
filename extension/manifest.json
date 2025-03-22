@@ -33,7 +33,7 @@
 },
 "web_accessible_resources": [
       {
-        "resources": ["fonts/OpenDyslexic-Regular.otf", "fonts/OpenDyslexic-Bold.otf"],
+        "resources": ["fonts/OpenDyslexic-Regular.otf", "fonts/OpenDyslexic-Bold.otf", "test.png"],
         "matches": ["<all_urls>"]
       }
     ]

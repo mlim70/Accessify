@@ -207,6 +207,53 @@ let zoomEnabled = false;
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'toggleZoom') {
     zoomEnabled = request.enabled;
+    if (zoomEnabled) {
+      injectZoomedImage();
+    } else {
+      removeZoomedImage();
+    }
     sendResponse({ success: true });
   }
 });
+
+// Function to inject the zoomed image
+function injectZoomedImage() {
+    const imagePath = chrome.runtime.getURL('./test.png');
+    console.log('Loading image from path:', imagePath);
+
+  const zoomedImage = document.createElement("img");
+  zoomedImage.src = imagePath;
+  zoomedImage.alt = "Zoomed Image";
+  zoomedImage.style.position = 'absolute';
+  zoomedImage.style.width = '200px';
+  zoomedImage.style.height = '200px';
+  zoomedImage.style.top = '50px';
+  zoomedImage.style.left = '50px';
+  zoomedImage.style.zIndex = '1000';
+  zoomedImage.style.border = '1px solid black';
+  zoomedImage.style.borderRadius = '10px';
+  zoomedImage.style.pointerEvents = 'none';
+  zoomedImage.id = 'zoomedImage';
+
+  // Add error handling to check if the image loads correctly
+  zoomedImage.onerror = function(event) {
+    console.error('Failed to load image:', event);
+  };
+
+  zoomedImage.onload = function() {
+    console.log('Image loaded successfully:', zoomedImage.src);
+  };
+
+  document.body.appendChild(zoomedImage);
+}
+
+// Function to remove the zoomed image
+function removeZoomedImage() {
+  const zoomedImage = document.getElementById('zoomedImage');
+  if (zoomedImage) {
+    document.body.removeChild(zoomedImage);
+  }
+}
+
+// Add this to verify the script is loaded
+console.log('Content script initialization complete!');

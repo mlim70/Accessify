@@ -67,18 +67,47 @@ async function readSelectedText(text) {
   }
 }
 
+// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+//     if (request.action === 'captureScreenshot') {
+//       chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataUrl) => {
+//         sendResponse({ screenshotUrl: dataUrl });
+//       });
+//       return true; // Keep the message channel open for sendResponse
+//     } else if (request.action === 'toggleZoom') {
+//       chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataUrl) => {
+//         // chrome.tabs.create({ url: dataUrl });
+//         sendResponse({ success: true });
+//       });
+//       return true; // Keep the message channel open for sendResponse
+//     }
+//   });
+  
+//   chrome.tabs.onActivated.addListener((activeInfo) => {
+//     chrome.tabs.get(activeInfo.tabId, (tab) => {
+//       if (!tab.active) {
+//         chrome.storage.sync.set({ enableZoom: false }, () => {
+//           chrome.tabs.sendMessage(tab.id, { action: 'toggleZoom', enabled: false });
+//         });
+//       }
+//     });
+//   });
+  
+//   chrome.windows.onFocusChanged.addListener((windowId) => {
+//     if (windowId === chrome.windows.WINDOW_ID_NONE) {
+//       chrome.storage.sync.set({ enableZoom: false }, () => {
+//         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+//           if (tabs[0]) {
+//             chrome.tabs.sendMessage(tabs[0].id, { action: 'toggleZoom', enabled: false });
+//           }
+//         });
+//       });
+//     }
+//   });
+
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'captureScreenshot') {
-      chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataUrl) => {
-        sendResponse({ screenshotUrl: dataUrl });
-      });
-      return true; // Keep the message channel open for sendResponse
-    } else if (request.action === 'toggleZoom') {
-      chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataUrl) => {
-        chrome.tabs.create({ url: dataUrl });
-        sendResponse({ success: true });
-      });
-      return true; // Keep the message channel open for sendResponse
+    if (request.action === 'toggleZoom') {
+      sendResponse({ success: true });
     }
   });
   
