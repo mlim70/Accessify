@@ -26,7 +26,7 @@ function applyColorBlindFilter(filterType) {
             filterType: filterType
         }, function(response) {
             if (response && !response.success) {
-                console.error('Error applying filter:', response.error);
+              console.error('Error applying filter:', response.error);
             }
         });
     });
