@@ -5,17 +5,18 @@
         <link rel="stylesheet" href="popup.css">
     </head>
     <body>
-        <h3 class="title"> Accessibility Settings </h3>
+        <h2 class="title"> Accessibility Settings </h2>
 
-        <p> Color-Blindedness </p>
+        <h3> Color-Blindedness </h3>
         <div class="disability-bg">
             <button class="color-blind-option" id="color-blind-none"> None </button>
-            <button class="color-blind-option" id="color-blind-rg"> Red-Green </button>
-            <button class="color-blind-option" id="color-blind-by"> Blue-Yellow </button>
-            <button class="color-blind-option" id="color-blind-c"> Complete </button>
+            <button class="color-blind-option" id="color-blind-r"> Protanopia </button>
+            <button class="color-blind-option" id="color-blind-g"> Deuteranopia </button>
+            <button class="color-blind-option" id="color-blind-b"> Tritanopia </button>
+            <button class="color-blind-option" id="color-blind-c"> Full </button>
         </div>
 
-        <p> Dyslexia? </p>
+        <h3> Dyslexia? </h3>
         <div class="disability-bg">
             <button class="dyslexia-option" id="dyslexia-none"> None </button>
             <button class="dyslexia-option" id="dyslexia-visual"> Visual </button>
@@ -23,6 +24,56 @@
             <button class="dyslexia-option" id="dyslexia-directional"> Directional </button>
             <button class="dyslexia-option" id="dyslexia-attentional"> Attentional </button>
             <button class="dyslexia-option" id="dyslexia-phonological"> Phonological </button>
+        </div>
+
+        <h3> Translator </h3>
+        <div class="translation-bg">
+            <label> Target Language: </label>
+            <select id="target-languages" name="languages">
+                <option value="volvo">English</option>
+                <option value="saab">Chinese</option>
+                <option value="fiat">Spanish</option>
+                <option value="audi">Arabic</option>
+                <option value="audi">Hindi</option>
+                <option value="audi">Telugu</option>
+                <option value="audi">Korean</option>
+                <option value="audi">Japanese</option>
+                <option value="audi">German</option>
+                <option value="audi">French</option>
+                <option value="audi">Russian</option>
+                <option value="audi">Italian</option>
+                <option value="audi">Swedish</option>
+                <option value="audi">Finnish</option>
+                <option value="audi">Viet</option>
+              </select>
+        </div>
+
+        <h3> Screen Reader </h3>
+        <div class="screen-reader-bg">
+            <label class="input-label"> Enabled: </label>
+            <label class="switch">
+                <input id="screen-reader-input" type="checkbox">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <h3> Image Captioning </h3>
+        <div class="image-captioning-bg">
+            <label class="input-label"> Enabled: </label>
+            <label class="switch">
+                <input id="screen-reader-input" type="checkbox">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <h3> Additional Conditions </h3>
+        <div class="additional-conditions-bg">
+            <p> Describe any additional conditions: </p>
+            <input class="conditions-input" type="text">
+        </div>
+
+        <div class="save-button">
+            <button> Save </button>
         </div>
         <script src="popup.js"></script>
     </body>
