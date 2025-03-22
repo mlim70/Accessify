@@ -48,6 +48,25 @@ app.get('/api/inputs', async (req, res) => {
     }
 });
 
+// ... existing code ...
+
+// Translation endpoint
+app.post('/api/translate', async (req, res) => {
+    try {
+        const { text, targetLanguage } = req.body;
+        
+        // Here you would integrate with a translation service
+        // For example, Google Cloud Translation API, DeepL, or other translation services
+        // For now, we'll return a mock response
+        const translatedText = `[${targetLanguage}] ${text}`;
+        
+        res.status(200).json({ translatedText });
+    } catch (error) {
+        console.error('Translation error:', error);
+        res.status(500).json({ error: 'Translation failed' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 }); 
