@@ -114,6 +114,34 @@ app.post('/api/translate', async (req, res) => {
     }
 });
 
+app.post('/api/pronunciation', async (req, res) => {
+    try {
+        let { text } = req.body;
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        let prompt = `Which of the following words would someone with surface dyslexia struggle with pronouncing? (Only list the words separated by commas. If there are none, output "None". "${text}"`;
+        let result = await model.generateContent(prompt);
+        const response = result.response.text();
+    
+        if (response.includes('None')) {
+            console.log("No revisions made");
+            return res.status(200).json({ revisedText: text });
+        }
+    
+        const challengingWords = response.split(',');
+        for (const word of challengingWords) {
+            prompt = `Generate a pronunciation guide using only the English alphabet on how to pronounce "${word}". Only provide the pronunciation guide.`;
+            let result = await model.generateContent(prompt);
+            const pronunciation = result.response.text().replace('\n', '');
+            text = text.replace(word, `${word} (${pronunciation})`)
+        }
+        console.log(`Made ${challengingWords.length} revisions`)
+        return res.status(200).json({ revisedText: text });
+    } catch (error) {
+        console.error('Erorr generating pronunciation guide: ', error);
+        res.status(500).json({ error: 'Erorr generating pronunciation guide: ', details: error.message });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

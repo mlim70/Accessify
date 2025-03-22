@@ -1,22 +1,3 @@
-// // Specify your preferred Google Web Font here
-// const preferredFont = 'Comic+Sans+MS';
-
-// // Create a link element to load the Google Web Font
-// const link = document.createElement('link');
-// link.href = `https://fonts.googleapis.com/css2?family=${preferredFont}&display=swap`;
-// link.rel = 'stylesheet';
-
-// // Append the link element to the head of the document
-// document.head.appendChild(link);
-
-// // Create a style element to apply the font to all elements
-// const style = document.createElement('style');
-// style.innerHTML = `
-//   * {
-//     font-family: '${preferredFont.replace(/\+/g, ' ')}', sans-serif !important;
-//   }
-// `;
-
 // Color blindness filter styles
 const colorBlindFilters = {
     'none': 'none',
@@ -66,6 +47,66 @@ function applyColorBlindFilter(filterType) {
     }
 }
 
+const applyOpenDyslexicFont = () => {
+    const styleEl = document.createElement('style');
+    styleEl.id = 'dyslexia-style-override';
+    styleEl.innerHTML = `
+        @font-face {
+            font-family: 'OpenDyslexic';
+            src: url('${chrome.runtime.getURL('fonts/OpenDyslexic-Regular.otf')}') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        body, p, h1, h2, h3, h4, h5, h6, a, span, div, li, td, th, input, button, textarea, blockquote, label, figcaption {
+            font-family: 'OpenDyslexic';
+            src: url('${chrome.runtime.getURL('fonts/OpenDyslexic-Bold.otf')}') format('opentype');
+            font-weight: bold;
+            font-style: normal;
+        }
+        
+        [class*="fa-"], 
+        [class*="icon-"], 
+        [class*="material-icons"],
+        [class*="glyphicon"],
+        .material-symbols-outlined,
+        i[class*="fa"],
+        i[class*="icon"],
+        i[class*="material"] {
+            font-family: inherit !important;
+        }
+    `;
+    
+    document.head.appendChild(styleEl);
+    additionalStyles = styleEl;
+}
+
+const increaseSpacing = (domNode) => {
+    const children = domNode.childNodes;
+    for (const child of children) {
+        if (!child || child.nodeType !== 1) {
+            continue;
+        }
+        child.style.wordSpacing = '10px';
+        increaseSpacing(child);
+    }
+}
+
+const removeImages = (domNode) => {
+    const children = domNode.childNodes;
+    for (const child of children) {
+        if (!child || !(child.nodeType === 1)) {
+            continue;
+        }
+        console.log(child.tagName);
+        if (child.tagName === 'IMG' || child.tagName === 'svg' || child.tagName === 'VIDEO') {
+            domNode.removeChild(child);
+        } else {
+            removeImages(child);
+        }
+    }
+}
+
 let originalHTML = null;
 let additionalStyles = null;
 
@@ -80,6 +121,32 @@ const restoreOriginalHTML = () => {
         document.body.appendChild(child);
     }
     originalHTML = document.body.cloneNode(true);
+}
+
+async function generatePronunciationHints(text) {
+    try {
+        console.log(`Attempting to generate hints for: "${text}"`);
+        const response = await fetch('http://localhost:3000/api/pronunciation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                text
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Pronunciation hints failed');
+        }
+
+        const data = await response.json();
+        console.log(`Hint results: "${data.revisedText}"`);
+        return data.revisedText;
+    } catch (error) {
+        console.error('Translation error:', error);
+        return text; // Return original text if translation fails
+    }
 }
 
 function applyDyslexiaTreatment(dyslexiaType) {
@@ -97,78 +164,42 @@ function applyDyslexiaTreatment(dyslexiaType) {
     }
 
     if (dyslexiaType === 'dyslexia-visual') {
-        const styleEl = document.createElement('style');
-        styleEl.id = 'dyslexia-style-override';
-        styleEl.innerHTML = `
-            @font-face {
-                font-family: 'OpenDyslexic';
-                src: url('${chrome.runtime.getURL('fonts/OpenDyslexic-Regular.otf')}') format('opentype');
-                font-weight: normal;
-                font-style: normal;
-            }
-            
-            body, p, h1, h2, h3, h4, h5, h6, a, span, div, li, td, th, input, button, textarea, blockquote, label, figcaption {
-                font-family: 'OpenDyslexic';
-                src: url('${chrome.runtime.getURL('fonts/OpenDyslexic-Bold.otf')}') format('opentype');
-                font-weight: bold;
-                font-style: normal;
-            }
-            
-            [class*="fa-"], 
-            [class*="icon-"], 
-            [class*="material-icons"],
-            [class*="glyphicon"],
-            .material-symbols-outlined,
-            i[class*="fa"],
-            i[class*="icon"],
-            i[class*="material"] {
-                font-family: inherit !important;
-            }
-        `;
-        
-        document.head.appendChild(styleEl);
-        additionalStyles = styleEl;
+        applyOpenDyslexicFont();
     } else if (dyslexiaType === 'dyslexia-surface') {
         // Text-to-speech features can read content aloud, helping those who struggle with decoding words
         // Font adjustments to more dyslexia-friendly options like OpenDyslexic or Comic Sans
         // Word prediction and spell-check tools assist with writing
         
+        const simplifyWords = async (domNode) => {
+            // Process direct text child nodes
+            for (let i = 0; i < domNode.childNodes.length; i++) {
+                const node = domNode.childNodes[i];
+                if (node.tagName !== 'P') {
+                    continue;
+                }
+
+                const result = await generatePronunciationHints(node.textContent);
+                node.textContent = result;
+            }
+            
+            // Then recursively process element children
+            for (let i = 0; i < domNode.children.length; i++) {
+                simplifyWords(domNode.children[i]);
+            }
+        }
+        applyOpenDyslexicFont();
+        simplifyWords(document.body);
+        increaseSpacing(document.body);
     } else if (dyslexiaType === 'dyslexia-directional') {
         // Page orientation controls
         // Simplified layouts through reader view
+
     } else if (dyslexiaType === 'dyslexia-attentional') {
         // Reader mode removes distracting elements from webpages
         // Focus highlighting tools that isolate individual words or sentences
         // Dark mode to reduce visual fatigue
-        const removeImages = (domNode) => {
-            const children = domNode.childNodes;
-            for (const child of children) {
-                if (!child || !(child.nodeType === 1)) {
-                    continue;
-                }
-                console.log(child.tagName);
-                if (child.tagName === 'IMG' || child.tagName === 'svg' || child.tagName === 'VIDEO') {
-                    domNode.removeChild(child);
-                } else {
-                    removeImages(child);
-                }
-            }
-        }
-
-        const increaseSpacing = (domNode) => {
-            const children = domNode.childNodes;
-            for (const child of children) {
-                if (!child || child.nodeType !== 1) {
-                    continue;
-                }
-                child.style.wordSpacing = '10px';
-                increaseSpacing(child);
-            }
-        }
         removeImages(document.body);
         increaseSpacing(document.body);
-    } else {
-        console.error("Unrecognized dyslexia option: " + dyslexiaType);
     }
 }
 

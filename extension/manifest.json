@@ -14,6 +14,7 @@
       {
         "matches": ["<all_urls>"],
         "js": ["content.js", "utils/translator.js"]
+
       }
     ],
     "permissions": [
@@ -25,7 +26,7 @@
     ],
     "web_accessible_resources": [
       {
-        "resources": ["fonts/OpenDyslexic-Regular.otf", "fonts/OpenDyslexic-Bold.otf"],
+        "resources": ["fonts/OpenDyslexic-Regular.otf", "fonts/OpenDyslexic-Bold.otf", "generative-ai.umd.js"],
         "matches": ["<all_urls>"]
       }
     ]

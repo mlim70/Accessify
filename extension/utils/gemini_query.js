@@ -1,3 +1,4 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { generateContent } from '@/services/gemini';
 
 export default async function handler(req, res) {
@@ -26,4 +27,24 @@ export default async function handler(req, res) {
     console.error("Error generating Gemini explanation:", error);
     return res.status(500).json({ error: "Error generating explanation" });
   }
+}
+
+export const generatePronunciationHints = async (text) => {
+    const model = gemini.getGenerativeModel({ model: "gemini-2.0-flash" });
+    let prompt = `Which of the following words would someone with surface dyslexia struggle with pronouncing? (Only list the words separated by commas. If there are none, output "None". "${text}"`;
+    let result = await model.generateContent(prompt);
+    const response = result.response.text();
+
+    if (response.includes('None')) {
+        return text;
+    }
+
+    const challengingWords = response.split(',');
+    for (const word of challengingWords) {
+        prompt = `Generate a pronunciation guide using only the English alphabet on how to pronounce "${word}". Only provide the pronunciation guide.`;
+        let result = await model.generateContent(prompt);
+        const pronunciation = result.response.text();
+        text = text.replace(word, `${word} (${pronunciation})`)
+    }
+    return text;
 }
