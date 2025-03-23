@@ -309,6 +309,43 @@ h2 {
     border-radius: 50%;
 }
 
+
+.confirm-email-button {
+    flex: 1;
+    padding: 3px 10px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.confirm-email-button:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+
+.reset-language-button {
+        flex: 1;
+        padding: 3px 10px;
+        background-color: var(--danger);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        width: 100%;
+}
+
+
+.reset-language-button:hover {
+    background-color: var(--danger-hover);
+    transform: translateY(-1px);
+}
+
 /* Reset Button */
 .reset-button {
     flex: 1;
@@ -354,6 +391,8 @@ h2 {
     flex-direction: row;
     justify-content: right;
 }
+
+
 
 /* Focus states for buttons */
 .save-button:focus,
