@@ -34,7 +34,7 @@ const Navbar: React.FC<NavbarProps> = () => {
         howItWorks: document.getElementById('how-it-works'),
       }
 
-      const scrollPosition = window.scrollY + 100 // Offset for better trigger point
+      const scrollPosition = window.scrollY + 100
 
       if (scrollPosition < (sections.features?.offsetTop || 0)) {
         setActiveSection("")
@@ -46,7 +46,7 @@ const Navbar: React.FC<NavbarProps> = () => {
     }
 
     window.addEventListener('scroll', handleScroll)
-    handleScroll() // Initial check
+    handleScroll()
 
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])

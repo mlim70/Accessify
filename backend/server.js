@@ -20,28 +20,28 @@ if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Initialize Anthropic Claude
+//anthropic Claude
 const anthropic = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-// Initialize Google Cloud Translation
+//google cloud translation
 const translate = new Translate({
     projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
     keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS
 });
 
-// Initialize Google AI
+//google AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// CORS and body parser middleware
+//CORS and body parser middleware
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 
-// Routes
+//routes
 app.post('/api/input', async (req, res) => {
     try {
-        const { userEmail, preferences } = req.body; // Email & Preferences
+        const { userEmail, preferences } = req.body; //email preferences
         if (!userEmail || !preferences) {
             return res.status(400).json({ message: 'Both userEmail and preferences are required' });
         }
@@ -78,8 +78,8 @@ app.post('/api/enhance-accessibility', async (req, res) => {
         if (!enhancedHTML || forceRegenerate) {
             console.log(forceRegenerate ? 'Regenerating enhancement...' : 'Generating new enhancement...');
             
-            const prompt = await generateAccessibilityPrompt(preferences, html); //Get prompt using claude-prompt.js
-            const message = await anthropic.messages.create({ //Send prompt to claude
+            const prompt = await generateAccessibilityPrompt(preferences, html); //get prompt claude-prompt.js
+            const message = await anthropic.messages.create({ //send prompt to claude
                 model: "claude-3-7-sonnet-latest",
                 max_tokens: 4096,
                 messages: [
@@ -90,7 +90,7 @@ app.post('/api/enhance-accessibility', async (req, res) => {
                 ]
             });
 
-            enhancedHTML = message.content[0].text; //HTML enhanced w/ accessibility
+            enhancedHTML = message.content[0].text;
         }
 
         res.status(200).json({ 
@@ -114,7 +114,6 @@ app.post('/api/translate', async (req, res) => {
         const { text, targetLanguage } = req.body;
         console.log(`Received translation request: "${text}" to ${targetLanguage}`);
         
-        // Translate the text
         const [translation] = await translate.translate(text, targetLanguage);
         console.log(`Translation result: "${translation}"`);
         
@@ -154,7 +153,7 @@ app.post('/api/pronunciation', async (req, res) => {
 
 app.post('/api/tts', async (req, res) => {
     const apiKey = process.env.OPENAI_API;
-    const url = 'https://api.openai.com/v1/audio/speech'; // Correct endpoint for TTS
+    const url = 'https://api.openai.com/v1/audio/speech'; 
 
     try {
         const { text } = req.body;
@@ -188,8 +187,6 @@ app.post('/api/tts', async (req, res) => {
 
 
 app.post('/api/create-user', async (req, res) => {
-    // Only if user doesn't already exist
-    // insert default into table
 
     const { emailAddress } = req.body;
     console.log(`Backend received email addr: ${emailAddress}`);
