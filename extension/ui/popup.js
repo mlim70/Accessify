@@ -16,10 +16,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Color blindness options mapping
     const colorBlindButtons = {
         'color-blind-none': 'none',
-        'color-blind-r': 'protanopia',    // Protanopia (red-blind)
-        'color-blind-g': 'deuteranopia',  // Deuteranopia (green-blind)
-        'color-blind-b': 'tritanopia',    // Tritanopia (blue-blind)
-        'color-blind-c': 'complete'       // Full color blindness
+        'color-blind-protanopia': 'protanopia',
+        'color-blind-deuteranopia': 'deuteranopia',
+        'color-blind-tritanopia': 'tritanopia',
+        'color-blind-complete': 'complete'
     };
 
     // Set up event listeners for all colorblind buttons
@@ -213,26 +213,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function handleOptionActivation(optionId) {
         if (optionId.startsWith('color-blind-')) {
-            // Handle color blindness filter activation
-            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-                chrome.tabs.sendMessage(
-                    tabs[0].id,
-                    {
-                        action: 'applyColorBlindFilter',
-                        filterType: optionId.replace('color-blind-', '')
-                    }
-                );
+            const filterType = optionId.replace('color-blind-', '');
+            // Save to storage first
+            chrome.storage.sync.set({ colorBlindFilter: filterType }, () => {
+                console.log('Saved color filter to storage:', filterType);
+                // Then apply the filter
+                chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+                    chrome.tabs.sendMessage(
+                        tabs[0].id,
+                        {
+                            action: 'applyColorBlindFilter',
+                            filterType: filterType
+                        }
+                    );
+                });
             });
         } else if (optionId.startsWith('dyslexia-')) {
-            // Handle dyslexia treatment activation
-            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-                chrome.tabs.sendMessage(
-                    tabs[0].id,
-                    {
-                        action: 'applyDyslexiaTreatment',
-                        dyslexiaType: optionId
-                    }
-                );
+            // Save to storage first
+            chrome.storage.sync.set({ dyslexiaPreference: optionId }, () => {
+                console.log('Saved dyslexia preference to storage:', optionId);
+                // Then apply the treatment
+                chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+                    chrome.tabs.sendMessage(
+                        tabs[0].id,
+                        {
+                            action: 'applyDyslexiaTreatment',
+                            dyslexiaType: optionId
+                        }
+                    );
+                });
             });
         }
     }
@@ -275,19 +284,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (!userEmail) {
                 console.error('Please log in to the web app first');
-                // TODO: Show error message to user
+                alert('Please log in to the web app first');
                 return;
             }
 
+            console.log('Getting preferences from storage...');
             // Get current preferences from storage
             chrome.storage.sync.get(
-                ['colorBlindFilter', 'preferredFont', 'dyslexiaPreference'],
+                ['colorBlindFilter', 'preferredFont', 'dyslexiaPreference', 'language', 'additionalInfo'],
                 function(result) {
+                    console.log('Current storage state:', result);
+                    
                     const preferences = {
                         colorBlindFilter: result.colorBlindFilter || 'none',
                         preferredFont: result.preferredFont || 'default',
-                        dyslexia: result.dyslexiaPreference || 'none'
+                        dyslexia: result.dyslexiaPreference || 'none',
+                        language: result.language || 'en',
+                        additionalInfo: document.querySelector('.conditions-textarea').value || ''
                     };
+
+                    console.log('Sending preferences to backend:', preferences);
 
                     // Send to backend
                     fetch('http://localhost:3001/api/input', {
@@ -300,12 +316,19 @@ document.addEventListener('DOMContentLoaded', function() {
                             preferences
                         })
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         console.log('Preferences saved to backend:', data);
+                        alert('Preferences saved successfully!');
                     })
                     .catch(error => {
                         console.error('Error saving preferences:', error);
+                        alert('Error saving preferences: ' + error.message);
                     });
                 }
             );
@@ -374,68 +397,5 @@ $(document).ready(function() {
           chrome.tabs.reload(tabs[0].id);
         });
       });
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    // chrome.storage.sync.get(['userEmail'], function(result) {
-    //     console.log('Current userEmail in storage:', result.userEmail);
-    //     const loginWarning = document.getElementById('loginWarning');
-    //     if (!result.userEmail) {
-    //         loginWarning.style.display = 'block';
-    //     } else {
-    //         loginWarning.style.display = 'none';
-    //     }
-    // });
-
-    // Save button -> write to preferences (DynamoDB)
-    const saveButton = document.getElementById('savePreferences');
-    if (!saveButton) {
-        return;
-    }
-    
-    saveButton.addEventListener('click', async function() {
-        const userEmail = await new Promise((resolve) => {
-            chrome.storage.sync.get(['userEmail'], (result) => {
-                resolve(result.userEmail);
-            });
-        });
-
-        if (!userEmail) {
-            console.error('Please log in to the web app first');
-            // TODO: Show error message to user
-            return;
-        }
-
-        // Get current preferences from storage
-        chrome.storage.sync.get(
-            ['colorBlindFilter', 'preferredFont', 'dyslexiaPreference'],
-            function(result) {
-                const preferences = {
-                    colorBlindFilter: result.colorBlindFilter || 'none',
-                    preferredFont: result.preferredFont || 'default',
-                    dyslexia: result.dyslexiaPreference || 'none'
-                };
-
-                // Send to backend
-                fetch('http://localhost:3001/api/input', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        userEmail,
-                        preferences
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Preferences saved to backend:', data);
-                })
-                .catch(error => {
-                    console.error('Error saving preferences:', error);
-                });
-            }
-        );
     });
 });
