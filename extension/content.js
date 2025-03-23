@@ -358,6 +358,82 @@ function applyDyslexiaTreatment(dyslexiaType) {
     }
 }
 
+// Create and manage progress bar overlay
+function createProgressOverlay() {
+    const overlay = document.createElement('div');
+    overlay.id = 'translation-progress-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 999999;
+        padding: 8px 0;
+    `;
+
+    const container = document.createElement('div');
+    container.style.cssText = `
+        width: 100%;
+        max-width: 600px;
+        padding: 0 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    `;
+
+    const text = document.createElement('div');
+    text.textContent = 'Translating page...';
+    text.style.cssText = `
+        color: #333;
+        font-size: 14px;
+        white-space: nowrap;
+    `;
+
+    const progressContainer = document.createElement('div');
+    progressContainer.style.cssText = `
+        flex: 1;
+        height: 4px;
+        background: #eee;
+        border-radius: 2px;
+        overflow: hidden;
+    `;
+
+    const progressFill = document.createElement('div');
+    progressFill.id = 'translation-progress-fill';
+    progressFill.style.cssText = `
+        width: 0%;
+        height: 100%;
+        background: #7C3AED;
+        transition: width 0.3s ease;
+    `;
+
+    progressContainer.appendChild(progressFill);
+    container.appendChild(text);
+    container.appendChild(progressContainer);
+    overlay.appendChild(container);
+    document.body.appendChild(overlay);
+    return overlay;
+}
+
+function updateProgress(progress) {
+    const progressFill = document.getElementById('translation-progress-fill');
+    if (progressFill) {
+        progressFill.style.width = `${progress}%`;
+    }
+}
+
+function removeProgressOverlay() {
+    const overlay = document.getElementById('translation-progress-overlay');
+    if (overlay) {
+        overlay.remove();
+    }
+}
+
 async function translatePage(targetLanguage) {
     console.log(`Translating page to ${targetLanguage}`);
     if (additionalStyles) {
@@ -373,17 +449,29 @@ async function translatePage(targetLanguage) {
     }
 
     const elements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span, a, figcaption');
+    const totalElements = elements.length;
+    let translatedCount = 0;
+
+    // Create and show progress overlay
+    const overlay = createProgressOverlay();
 
     for (const element of elements) {
         if (element.textContent.trim()) {
             try {
                 const translatedText = await translateText(element.textContent, targetLanguage);
                 element.textContent = translatedText;
+                translatedCount++;
+                // Update progress
+                const progress = Math.round((translatedCount / totalElements) * 100);
+                updateProgress(progress);
             } catch (error) {
                 console.error(`Error translating element: ${error}`);
             }
         }
     }
+    
+    // Remove progress overlay after a short delay
+    setTimeout(removeProgressOverlay, 500);
     console.log('Page translation completed');
 }
 
