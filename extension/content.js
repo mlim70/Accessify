@@ -25,9 +25,88 @@ let currentAudio = null;
 //     }
 // });
 
+// Create and manage speaker overlay
+function createSpeakerOverlay(text) {
+    const overlay = document.createElement('div');
+    overlay.id = 'speaker-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 999999;
+        padding: 8px 0;
+    `;
+
+    const container = document.createElement('div');
+    container.style.cssText = `
+        width: 100%;
+        max-width: 600px;
+        padding: 0 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    `;
+
+    const icon = document.createElement('div');
+    icon.textContent = 'Reading Text...';
+    icon.style.cssText = `
+        color: #333;
+        font-size: 14px;
+        white-space: nowrap;
+    `;
+
+    const progressContainer = document.createElement('div');
+    progressContainer.style.cssText = `
+        flex: 1;
+        height: 4px;
+        background: #eee;
+        border-radius: 2px;
+        overflow: hidden;
+    `;
+
+    const progressFill = document.createElement('div');
+    progressFill.id = 'speaker-progress-fill';
+    progressFill.style.cssText = `
+        width: 0%;
+        height: 100%;
+        background: #7C3AED;
+        transition: width 0.3s ease;
+    `;
+
+    progressContainer.appendChild(progressFill);
+    container.appendChild(icon);
+    container.appendChild(progressContainer);
+    overlay.appendChild(container);
+    document.body.appendChild(overlay);
+    return overlay;
+}
+
+function updateSpeakerProgress(progress) {
+    const progressFill = document.getElementById('speaker-progress-fill');
+    if (progressFill) {
+        progressFill.style.width = `${progress}%`;
+    }
+}
+
+function removeSpeakerOverlay() {
+    const overlay = document.getElementById('speaker-overlay');
+    if (overlay) {
+        overlay.remove();
+    }
+}
+
 async function readSelectedText(text) {
     console.log("Reading text:", text);
     try {
+        // Create and show speaker overlay
+        const overlay = createSpeakerOverlay(text);
+
         const response = await fetch("http://localhost:3001/api/tts", {
             method: "POST",
             headers: {
@@ -42,7 +121,7 @@ async function readSelectedText(text) {
         console.log("Received response from OpenAI Text-to-Speech API");
         console.log("Response:", response);
         const audioBlob = await response.blob();
-        console.log("reviefed audio blob");
+        console.log("received audio blob");
         console.log("Audio blob:", audioBlob);
         const audioUrl = URL.createObjectURL(audioBlob);
 
@@ -51,17 +130,24 @@ async function readSelectedText(text) {
             currentAudio.src = '';
             currentAudio.pause();
         }
+        
+        // Update progress as audio plays
+        audio.addEventListener('timeupdate', () => {
+            const progress = (audio.currentTime / audio.duration) * 100;
+            updateSpeakerProgress(progress);
+        });
+        
+        // Remove overlay when audio finishes playing
+        audio.addEventListener('ended', removeSpeakerOverlay);
+        
         audio.play();
         currentAudio = audio;
 
-
     } catch (error) {
         console.error('Error with OpenAI Text-to-Speech API:', error);
+        removeSpeakerOverlay();
     }
 }
-
-
-
 
 let lastMouseMoveTime = 0;
 
