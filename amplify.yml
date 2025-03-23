@@ -1,35 +1,36 @@
 version: 1
-frontend:
-  phases:
-    preBuild:
-      commands:
-        - cd site
-        - npm ci
-        - npm install --save-dev @types/chrome
-    build:
-      commands:
-        - npm run build
-  artifacts:
-    baseDirectory: site/.next
-    files:
-      - '**/*'
-  cache:
-    paths:
-      - site/node_modules/**/*
-
-backend:
-  phases:
-    preBuild:
-      commands:
-        - cd backend
-        - npm ci
-    build:
-      commands:
-        - npm start &
-  artifacts:
-    baseDirectory: backend
-    files:
-      - '**/*'
-  cache:
-    paths:
-      - backend/node_modules/**/*  
+applications:
+  - appRoot: site
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - npm ci
+            - npm install --save-dev @types/chrome
+        build:
+          commands:
+            - npm run build
+      artifacts:
+        baseDirectory: .next
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
+  
+  - appRoot: backend
+    backend:
+      phases:
+        preBuild:
+          commands:
+            - npm ci
+        build:
+          commands:
+            - npm start &
+      artifacts:
+        baseDirectory: .
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*  
