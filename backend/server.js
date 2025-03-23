@@ -31,7 +31,11 @@ const translate = new Translate({
 });
 
 // CORS and body parser middleware
-app.use(cors());
+app.use(cors({
+    origin: ['http://localhost:3000', 'chrome-extension://*'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(bodyParser.json({ limit: '50mb' }));
 
 // Routes
