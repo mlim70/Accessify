@@ -223,6 +223,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             restoreOriginalDocument();
         }
         document.body.style.filter = '';
+    } else if (request.action === 'restore-language') {
+        if (originalDocument) {
+        restoreOriginalDocument();}
+        document.body.style.filter = '';
     } else if (request.action === 'sendToClaude') {
         sendToClaude(request.prompt)
             .then(response => sendResponse({ success: true, response }))

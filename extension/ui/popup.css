@@ -451,3 +451,10 @@ button:focus, input:focus {
 .collapsible-header {
     cursor: pointer;
 }
+
+.language-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+

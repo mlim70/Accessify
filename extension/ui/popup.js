@@ -242,6 +242,25 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    const resetLanguageButton = document.querySelector('.reset-language-button');
+    if (!resetLanguageButton) {
+        console.error("Reset language button not found");
+        return;
+    }
+
+    resetLanguageButton.addEventListener('click', function() {
+        console.log('Reset language button clicked');
+        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+            chrome.tabs.sendMessage(
+                tabs[0].id,
+                { action: 'restore-language' },
+                function(response) {
+                    console.log('Reset language response:', response);
+                }
+            );
+        });
+    });
+
     const confirmEmailButton = document.querySelector('.confirm-email-button');
     if (!confirmEmailButton) {
         console.error("Confirm email button not found");
