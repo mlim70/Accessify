@@ -95,17 +95,17 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     console.log('Received message in content script:', request);
     
     // Check authentication before processing any requests
-    if (!isAuthenticated) {
-        chrome.storage.sync.get(['userEmail'], function(result) {
-            if (result.userEmail) {
-                isAuthenticated = true;
-                processRequest(request, sendResponse);
-            } else {
-                sendResponse({ success: false, error: 'User not authenticated' });
-            }
-        });
-        return true;
-    }
+    // if (!isAuthenticated) {
+    //     chrome.storage.sync.get(['userEmail'], function(result) {
+    //         if (result.userEmail) {
+    //             isAuthenticated = true;
+    //             processRequest(request, sendResponse);
+    //         } else {
+    //             sendResponse({ success: false, error: 'User not authenticated' });
+    //         }
+    //     });
+    //     return true;
+    // }
     
     processRequest(request, sendResponse);
     return true;
@@ -142,21 +142,6 @@ function processRequest(request, sendResponse) {
         document.body.style.filter = '';
     }
 }
-
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    console.log('Received message:', request);
-    if (request.action === 'translatePage') {
-        console.log(`Starting translation to ${request.targetLanguage}`);
-        translatePageContent(request.targetLanguage).then(() => {
-            console.log('Translation completed successfully');
-            sendResponse({ success: true });
-        }).catch(error => {
-            console.error('Translation failed:', error);
-            sendResponse({ success: false, error: error.message });
-        });
-        return true; // Keep the message channel open for async response
-    }
-});
 
 // Function to translate text content
 async function translateText(text, targetLanguage) {
@@ -420,16 +405,16 @@ function saveFilterPreference(filterType) {
 }
 
 // Load saved preference when page loads
-chrome.storage.sync.get(['colorBlindFilter'], function(result) {
-    console.log('Loading saved filter preference:', result);
-    if (result.colorBlindFilter) {
-        try {
-            applyColorBlindFilter(result.colorBlindFilter);
-        } catch (error) {
-            console.error('Error applying saved filter:', error);
-        }
-    }
-});
+// chrome.storage.sync.get(['colorBlindFilter'], function(result) {
+//     console.log('Loading saved filter preference:', result);
+//     if (result.colorBlindFilter) {
+//         try {
+//             applyColorBlindFilter(result.colorBlindFilter);
+//         } catch (error) {
+//             console.error('Error applying saved filter:', error);
+//         }
+//     }
+// });
 
 // Add this to verify the script is loaded
 console.log('Content script initialization complete!');
