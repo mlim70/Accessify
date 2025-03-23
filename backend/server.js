@@ -35,11 +35,7 @@ const translate = new Translate({
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // CORS and body parser middleware
-app.use(cors({
-    origin: ['http://localhost:3000', 'chrome-extension://*'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 
 // Routes
