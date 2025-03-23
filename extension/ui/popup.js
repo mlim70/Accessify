@@ -1,3 +1,26 @@
+document.addEventListener('DOMContentLoaded', function() {
+  chrome.storage.local.get(['preferences'], function(result) {
+    if (result.preferences) {
+      loadPreferences(result);
+    }
+  });
+});
+
+window.addEventListener('beforeunload', function() {
+  const stateObject = {
+    // Get values from your UI elements
+    // For example:
+    colorBlindFilter: document.querySelector('#colorBlind').value,
+    dyslexia: document.querySelector('#dyslexia').value,
+    // ... other state values
+  };
+  
+  // Save to chrome.storage
+  chrome.storage.local.set({myState: stateObject}, function() {
+    console.log('State saved');
+  });
+});
+
 // Wait for DOM to be fully loaded
 /**
  * Color-blindness Buttons
@@ -19,10 +42,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Color blindness options mapping
     const colorBlindButtons = {
-    "color-blind-protanopia": "protanopia",
-    "color-blind-deuteranopia": "deuteranopia",
-    "color-blind-tritanopia": "tritanopia",
-    "color-blind-complete": "complete",
+      "color-blind-protanopia": "protanopia",
+      "color-blind-deuteranopia": "deuteranopia",
+      "color-blind-tritanopia": "tritanopia",
+      "color-blind-complete": "complete",
     };
 
     // Set up event listeners for all colorblind buttons
