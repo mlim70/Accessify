@@ -110,42 +110,157 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Translation functionality
-    const targetLanguageSelect = document.getElementById('target-languages');
-    if (targetLanguageSelect) {
-        console.log('Setting up translation listener');
-        targetLanguageSelect.addEventListener('change', function() {
-            const selectedLanguage = this.value;
-            console.log(`Language selected: ${selectedLanguage}`);
+    // Updated language data with correct character encoding
+    const languages = [
+        { code: 'en', name: 'English', native: 'English' },
+        { code: 'es', name: 'Spanish', native: 'Español' },
+        { code: 'zh', name: 'Chinese', native: '中文' },
+        { code: 'ar', name: 'Arabic', native: 'العربية' },
+        { code: 'hi', name: 'Hindi', native: 'हिंदी' },
+        { code: 'te', name: 'Telugu', native: 'తెలుగు' },
+        { code: 'ko', name: 'Korean', native: '한국어' },
+        { code: 'ja', name: 'Japanese', native: '日本語' },
+        { code: 'de', name: 'German', native: 'Deutsch' },
+        { code: 'fr', name: 'French', native: 'Français' },
+        { code: 'ru', name: 'Russian', native: 'Русский' },
+        { code: 'it', name: 'Italian', native: 'Italiano' },
+        { code: 'sv', name: 'Swedish', native: 'Svenska' },
+        { code: 'fi', name: 'Finnish', native: 'Suomi' },
+        { code: 'vi', name: 'Vietnamese', native: 'Tiếng Việt' }
+    ];
+
+    // Make sure the HTML file has proper UTF-8 encoding
+    document.querySelector('head').innerHTML += '<meta charset="UTF-8">';
+
+    const languageList = document.getElementById('language-list');
+    const searchInput = document.getElementById('language-search');
+
+    // Create and append language buttons
+    function createLanguageButtons(filteredLanguages) {
+        languageList.innerHTML = ''; // Clear current list
+        filteredLanguages.forEach(lang => {
+            const button = document.createElement('button');
+            button.className = 'lang-button';
+            button.dataset.langCode = lang.code;
+            button.innerHTML = `${lang.native} <span class="lang-name">(${lang.name})</span>`;
             
-            // Query for the active tab
-            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-                if (!tabs[0]) {
-                    console.error('No active tab found');
-                    return;
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                document.querySelectorAll('.lang-button').forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                button.classList.add('active');
+                // Handle language selection
+                handleLanguageSelection(lang.code);
+            });
+            
+            languageList.appendChild(button);
+        });
+    }
+
+    // Initial population of language list
+    createLanguageButtons(languages);
+
+    // Search functionality
+    searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const filteredLanguages = languages.filter(lang => 
+            lang.name.toLowerCase().includes(searchTerm) || 
+            lang.native.toLowerCase().includes(searchTerm)
+        );
+        createLanguageButtons(filteredLanguages);
+    });
+
+    // Handle language selection
+    function handleLanguageSelection(langCode) {
+        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+            chrome.tabs.sendMessage(
+                tabs[0].id,
+                {
+                    action: 'translatePage',
+                    targetLanguage: langCode
+                },
+                response => {
+                    if (chrome.runtime.lastError) {
+                        console.error('Translation error:', chrome.runtime.lastError);
+                    }
                 }
-                
-                // Send message to content script
+            );
+        });
+    }
+
+    // Handle option buttons (Color Filters and Dyslexia)
+    document.querySelectorAll('.option-group .big-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const parentGroup = this.closest('.option-group');
+            
+            if (this.classList.contains('active')) {
+                // If clicking an active button, deselect it (equivalent to 'none')
+                this.classList.remove('active');
+                // Handle deactivation logic
+                handleOptionDeactivation(this.id);
+            } else {
+                // Remove active class from all buttons in this group
+                parentGroup.querySelectorAll('.big-button').forEach(btn => 
+                    btn.classList.remove('active')
+                );
+                // Add active class to clicked button
+                this.classList.add('active');
+                // Handle activation logic
+                handleOptionActivation(this.id);
+            }
+        });
+    });
+
+    function handleOptionActivation(optionId) {
+        if (optionId.startsWith('color-blind-')) {
+            // Handle color blindness filter activation
+            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
                 chrome.tabs.sendMessage(
                     tabs[0].id,
                     {
-                        action: 'translatePage',
-                        targetLanguage: selectedLanguage
-                    },
-                    function(response) {
-                        if (chrome.runtime.lastError) {
-                            console.error('Translation error:', chrome.runtime.lastError);
-                        } else if (response && response.success) {
-                            console.log('Translation applied successfully');
-                        } else {
-                            console.error('Failed to apply translation:', response?.error);
-                        }
+                        action: 'applyColorBlindFilter',
+                        filterType: optionId.replace('color-blind-', '')
                     }
                 );
             });
-        });
-    } else {
-        console.error('Translation language selector not found');
+        } else if (optionId.startsWith('dyslexia-')) {
+            // Handle dyslexia treatment activation
+            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+                chrome.tabs.sendMessage(
+                    tabs[0].id,
+                    {
+                        action: 'applyDyslexiaTreatment',
+                        dyslexiaType: optionId
+                    }
+                );
+            });
+        }
+    }
+
+    function handleOptionDeactivation(optionId) {
+        if (optionId.startsWith('color-blind-')) {
+            // Handle color blindness filter deactivation
+            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+                chrome.tabs.sendMessage(
+                    tabs[0].id,
+                    {
+                        action: 'applyColorBlindFilter',
+                        filterType: 'none'
+                    }
+                );
+            });
+        } else if (optionId.startsWith('dyslexia-')) {
+            // Handle dyslexia treatment deactivation
+            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+                chrome.tabs.sendMessage(
+                    tabs[0].id,
+                    {
+                        action: 'applyDyslexiaTreatment',
+                        dyslexiaType: 'dyslexia-none'
+                    }
+                );
+            });
+        }
     }
 
     // Save button -> write to preferences (DynamoDB)
