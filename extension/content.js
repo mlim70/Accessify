@@ -219,7 +219,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             additionalStyles = null;
         }
 
-        if (originalHTML) {
+        if (originalDocument) {
             restoreOriginalHTML();
         }
         document.body.style.filter = '';
@@ -363,20 +363,35 @@ const removeImages = (domNode) => {
     }
 }
 
-let originalHTML = null;
+let originalDocument = null;
+let currentLanguageDocument = null;
 let additionalStyles = null;
+let lastAppliedDyslexiaType = null;
 
-const restoreOriginalHTML = () => {
+const restoreOriginalDocument = () => {
     while (document.body.firstChild) {
         document.body.removeChild(document.body.firstChild);
     }
 
-    const children = originalHTML.childNodes;
+    const children = originalDocument.childNodes;
     for (let i = children.length - 1; i >= 0; --i) {
         const child = children[i];
         document.body.appendChild(child);
     }
-    originalHTML = document.body.cloneNode(true);
+    originalDocument = document.body.cloneNode(true);
+}
+
+const restoreCurrentLanguageDocument = () => {
+    while (document.body.firstChild) {
+        document.body.removeChild(document.body.firstChild);
+    }
+
+    const children = currentLanguageDocument.childNodes;
+    for (let i = children.length - 1; i >= 0; --i) {
+        const child = children[i];
+        document.body.appendChild(child);
+    }
+    currentLanguageDocument = document.body.cloneNode(true);
 }
 
 function applyDyslexiaTreatment(dyslexiaType) {
@@ -386,12 +401,15 @@ function applyDyslexiaTreatment(dyslexiaType) {
         additionalStyles = null;
     }
 
-    if (!originalHTML) {
+    if (!originalDocument) {
         // Save the original HTML BEFORE any additional transformations have been applied.
-        originalHTML = document.body.cloneNode(true);
-    } else {
-        restoreOriginalHTML();
+        originalDocument = document.body.cloneNode(true);
     }
+
+    if (!currentLanguageDocument) {
+        currentLanguageDocument = originalDocument.cloneNode(true);
+    }
+    restoreCurrentLanguageDocument();
 
     if (dyslexiaType === 'dyslexia-visual') {
         applyOpenDyslexicFont();
@@ -430,6 +448,52 @@ function applyDyslexiaTreatment(dyslexiaType) {
         // Dark mode to reduce visual fatigue
         removeImages(document.body);
         increaseSpacing(document.body);
+    }
+    lastAppliedDyslexiaType = dyslexiaType;
+}
+
+async function translatePage(targetLanguage) {
+    console.log(`Translating page to ${targetLanguage}`);
+
+    if (!originalDocument) {
+        // Save the original HTML BEFORE any additional transformations have been applied.
+        originalDocument = document.body.cloneNode(true);
+    } else {
+        restoreOriginalDocument();
+    }
+
+    const elements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span, a, figcaption');
+    const totalElements = elements.length;
+    let translatedCount = 0;
+
+    // Create and show progress overlay
+    const overlay = createProgressOverlay();
+
+    for (const element of elements) {
+        if (element.textContent.trim()) {
+            try {
+                const translatedText = await translateText(element.textContent, targetLanguage);
+                element.textContent = translatedText;
+                translatedCount++;
+                // Update progress
+                const progress = Math.round((translatedCount / totalElements) * 100);
+                updateProgress(progress);
+            } catch (error) {
+                console.error(`Error translating element: ${error}`);
+            }
+        }
+    }
+    
+    // Remove progress overlay after a short delay
+    setTimeout(removeProgressOverlay, 500);
+    console.log('Page translation completed');
+
+    // After translation, clone current DOM tree for safekeeping.
+    currentLanguageDocument = document.body.cloneNode(true);
+
+    if (lastAppliedDyslexiaType) {
+        // apply styling back on to the next translation
+        applyDyslexiaTreatment(lastAppliedDyslexiaType);
     }
 }
 
@@ -507,47 +571,6 @@ function removeProgressOverlay() {
     if (overlay) {
         overlay.remove();
     }
-}
-
-async function translatePage(targetLanguage) {
-    console.log(`Translating page to ${targetLanguage}`);
-    if (additionalStyles) {
-        document.head.removeChild(additionalStyles);
-        additionalStyles = null;
-    }
-
-    if (!originalHTML) {
-        // Save the original HTML BEFORE any additional transformations have been applied.
-        originalHTML = document.body.cloneNode(true);
-    } else {
-        restoreOriginalHTML();
-    }
-
-    const elements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span, a, figcaption');
-    const totalElements = elements.length;
-    let translatedCount = 0;
-
-    // Create and show progress overlay
-    const overlay = createProgressOverlay();
-
-    for (const element of elements) {
-        if (element.textContent.trim()) {
-            try {
-                const translatedText = await translateText(element.textContent, targetLanguage);
-                element.textContent = translatedText;
-                translatedCount++;
-                // Update progress
-                const progress = Math.round((translatedCount / totalElements) * 100);
-                updateProgress(progress);
-            } catch (error) {
-                console.error(`Error translating element: ${error}`);
-            }
-        }
-    }
-    
-    // Remove progress overlay after a short delay
-    setTimeout(removeProgressOverlay, 500);
-    console.log('Page translation completed');
 }
 
 // Store the filter preference
