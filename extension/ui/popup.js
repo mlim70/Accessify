@@ -43,27 +43,27 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(`Color filter button clicked: ${buttonId} -> ${filterType}`);
             
             // Save to storage first
-            chrome.storage.sync.set({ colorBlindFilter: filterType }, () => {
-                console.log('Saved color filter to storage:', filterType);
+            // chrome.storage.sync.set({ colorBlindFilter: filterType }, () => {
+            //     console.log('Saved color filter to storage:', filterType);
+            // });
+
+            // Apply the filter
+            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+                if (!tabs[0]) {
+                    console.error('No active tab found');
+                    return;
+                }
                 
-                // Then apply the filter
-                chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-                    if (!tabs[0]) {
-                        console.error('No active tab found');
-                        return;
+                chrome.tabs.sendMessage(
+                    tabs[0].id,
+                    {
+                        action: 'applyColorBlindFilter',
+                        filterType: filterType
+                    },
+                    response => {
+                        console.log('Color filter response:', response);
                     }
-                    
-                    chrome.tabs.sendMessage(
-                        tabs[0].id,
-                        {
-                            action: 'applyColorBlindFilter',
-                            filterType: filterType
-                        },
-                        function(response) {
-                            console.log('Color filter response:', response);
-                        }
-                    );
-                });
+                );
             });
         });
     });
@@ -90,120 +90,122 @@ document.addEventListener('DOMContentLoaded', function() {
             // Save to storage first
             chrome.storage.sync.set({ dyslexiaPreference: dyslexiaType }, () => {
                 console.log('Saved dyslexia preference to storage:', dyslexiaType);
+            });
+
+            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+                if (!tabs[0]) {
+                    console.error('No active tab found');
+                    return;
+                }
                 
-                chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-                    if (!tabs[0]) {
-                        console.error('No active tab found');
-                        return;
+                chrome.tabs.sendMessage(
+                    tabs[0].id,
+                    {
+                        action: 'applyDyslexiaTreatment',
+                        dyslexiaType: dyslexiaType
+                    },
+                    function(response) {
+                        console.log('Dyslexia treatment response:', response);
                     }
-                    
-                    chrome.tabs.sendMessage(
-                        tabs[0].id,
-                        {
-                            action: 'applyDyslexiaTreatment',
-                            dyslexiaType: dyslexiaType
-                        },
-                        function(response) {
-                            console.log('Dyslexia treatment response:', response);
-                        }
-                    );
-                });
+                );
             });
         });
     });
 
     // Save button -> write to preferences (DynamoDB)
     const saveButton = document.querySelector('.save-button');
-    console.log('Save button found:', saveButton ? 'Yes' : 'No');
-    
-    if (saveButton) {
-        saveButton.addEventListener('click', async function() {
-            console.log('=== Starting Save Process ===');
-            
-            // 1. Get user email
-            const userEmail = await new Promise((resolve) => {
-                chrome.storage.sync.get(['userEmail'], (result) => {
-                    console.log('Retrieved user email from storage:', result.userEmail);
-                    resolve(result.userEmail);
-                });
-            });
-
-            if (!userEmail) {
-                console.error('No user email found - user must log in first');
-                alert('Please log in to the web app first');
-                return;
-            }
-
-            // 2. Get current preferences
-            console.log('Getting preferences from storage...');
-            chrome.storage.sync.get(
-                ['colorBlindFilter', 'preferredFont', 'dyslexiaPreference', 'language', 'additionalInfo'],
-                function(result) {
-                    console.log('Current storage state:', result);
-                    
-                    const additionalInfo = document.querySelector('.conditions-textarea')?.value || '';
-                    console.log('Additional info from textarea:', additionalInfo);
-
-                    const preferences = {
-                        colorBlindFilter: result.colorBlindFilter || 'none',
-                        preferredFont: result.preferredFont || 'default',
-                        dyslexia: result.dyslexiaPreference || 'none',
-                        language: result.language || 'en',
-                        additionalInfo: additionalInfo
-                    };
-
-                    console.log('Assembled preferences object:', preferences);
-
-                    // 3. Send to backend
-                    console.log('Sending POST request to backend...');
-                    fetch('http://localhost:3001/api/input', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            userEmail,
-                            preferences
-                        })
-                    })
-                    .then(response => {
-                        console.log('Received response:', response.status, response.statusText);
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Successfully saved to DynamoDB:', data);
-                        alert('Preferences saved successfully!');
-                    })
-                    .catch(error => {
-                        console.error('Error saving to DynamoDB:', error);
-                        alert('Error saving preferences: ' + error.message);
-                    });
-                }
-            );
-        });
+    if (!saveButton) {
+        console.error('Save button not found.');
+        return;
     }
+    
+    saveButton.addEventListener('click', async function() {
+        console.log('=== Starting Save Process ===');
+        
+        // 1. Get user email
+        const userEmail = await new Promise((resolve) => {
+            chrome.storage.sync.get(['userEmail'], (result) => {
+                console.log('Retrieved user email from storage:', result.userEmail);
+                resolve(result.userEmail);
+            });
+        });
+
+        if (!userEmail) {
+            console.error('No user email found - user must log in first');
+            alert('Please log in to the web app first');
+            return;
+        }
+
+        // 2. Get current preferences
+        console.log('Getting preferences from storage...');
+        chrome.storage.sync.get(
+            ['colorBlindFilter', 'preferredFont', 'dyslexiaPreference', 'language', 'additionalInfo'],
+            function(result) {
+                console.log('Current storage state:', result);
+                
+                const additionalInfo = document.querySelector('.conditions-textarea')?.value || '';
+                console.log('Additional info from textarea:', additionalInfo);
+
+                const preferences = {
+                    colorBlindFilter: result.colorBlindFilter || 'none',
+                    preferredFont: result.preferredFont || 'default',
+                    dyslexia: result.dyslexiaPreference || 'none',
+                    language: result.language || 'en',
+                    additionalInfo: additionalInfo
+                };
+
+                console.log('Assembled preferences object:', preferences);
+
+                // 3. Send to backend
+                console.log('Sending POST request to backend...');
+                fetch('http://localhost:3001/api/input', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userEmail,
+                        preferences
+                    })
+                })
+                .then(response => {
+                    console.log('Received response:', response.status, response.statusText);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Successfully saved to DynamoDB:', data);
+                    alert('Preferences saved successfully!');
+                })
+                .catch(error => {
+                    console.error('Error saving to DynamoDB:', error);
+                    alert('Error saving preferences: ' + error.message);
+                });
+            }
+        );
+    });
 
     // Reset button
     const resetButton = document.querySelector('.reset-button');
-    console.log('Reset button found:', resetButton ? 'Yes' : 'No');
-    
-    if (resetButton) {
-        resetButton.addEventListener('click', function() {
-            console.log('Reset button clicked');
-            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-                chrome.tabs.sendMessage(
-                    tabs[0].id,
-                    { action: 'restore-original' },
-                    function(response) {
-                        console.log('Reset response:', response);
-                    }
-                );
-            });
-        });
+    if (!resetButton) {
+        console.error("Reset button not found");
+        return;
     }
+    
+    resetButton.addEventListener('click', function() {
+        console.log('Reset button clicked');
+        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+            chrome.tabs.sendMessage(
+                tabs[0].id,
+                { action: 'restore-original' },
+                function(response) {
+                    console.log('Reset response:', response);
+                }
+            );
+        });
+    });
 });
 
 document.addEventListener('DOMContentLoaded', function() {
