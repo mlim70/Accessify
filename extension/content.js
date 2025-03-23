@@ -155,6 +155,9 @@ document.addEventListener('mousemove', function () {
     lastMouseMoveTime = Date.now();
 });
 
+/**
+ * Screen reader functionality
+ */
 document.addEventListener('mouseup', function () {
     const currentTime = Date.now();
     // Load the stored state of the screen reader toggle
@@ -193,25 +196,6 @@ console.log('Content script initialized for email storage');
 // Modify the message listener to check authentication
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     console.log('Received message in content script:', request);
-
-    // Check authentication before processing any requests
-    // if (!isAuthenticated) {
-    //     chrome.storage.sync.get(['userEmail'], function(result) {
-    //         if (result.userEmail) {
-    //             isAuthenticated = true;
-    //             processRequest(request, sendResponse);
-    //         } else {
-    //             sendResponse({ success: false, error: 'User not authenticated' });
-    //         }
-    //     });
-    //     return true;
-    // }
-
-    processRequest(request, sendResponse);
-    return true;
-});
-
-function processRequest(request, sendResponse) {
     if (request.action === 'applyColorBlindFilter') {
         try {
             console.log('Attempting to apply filter:', request.filterType);
@@ -238,7 +222,6 @@ function processRequest(request, sendResponse) {
         if (originalHTML) {
             restoreOriginalHTML();
         }
-
         document.body.style.filter = '';
     } else if (request.action === 'sendToClaude') {
         sendToClaude(request.prompt)
@@ -246,7 +229,8 @@ function processRequest(request, sendResponse) {
             .catch(error => sendResponse({ success: false, error: error.message }));
         return true;
     }
-}
+    return true;
+});
 
 // Function to translate text content
 async function translateText(text, targetLanguage) {
@@ -579,18 +563,6 @@ function saveFilterPreference(filterType) {
         }
     });
 }
-
-// Load saved preference when page loads
-// chrome.storage.sync.get(['colorBlindFilter'], function(result) {
-//     console.log('Loading saved filter preference:', result);
-//     if (result.colorBlindFilter) {
-//         try {
-//             applyColorBlindFilter(result.colorBlindFilter);
-//         } catch (error) {
-//             console.error('Error applying saved filter:', error);
-//         }
-//     }
-// });
 
 // Add this to verify the script is loaded
 console.log('Content script initialization complete!');

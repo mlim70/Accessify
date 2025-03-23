@@ -1,25 +1,21 @@
 // Wait for DOM to be fully loaded
-document.addEventListener("DOMContentLoaded", function () {
-  console.log("=== Extension Popup Initialized ===");
-
-  // Debug: Check if user is logged in
-  chrome.storage.sync.get(["userEmail"], function (result) {
-    console.log("Current user email in storage:", result.userEmail);
-  });
+/**
+ * Color-blindness Buttons
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('=== Extension Popup Initialized ===');
 
   const screenReaderToggle = document.getElementById("screen-reader-toggle");
 
-  // Load the stored state of the checkbox
-  chrome.storage.sync.get(["screenReaderEnabled"], function (result) {
-    screenReaderToggle.checked = result.screenReaderEnabled || false;
-  });
+    // // Load the stored state of the checkbox
+    // chrome.storage.sync.get(['screenReaderEnabled'], function (result) {
+    //     screenReaderToggle.checked = result.screenReaderEnabled || false;
+    // });
 
-  // Save the state of the checkbox when it changes
-  screenReaderToggle.addEventListener("change", function () {
-    chrome.storage.sync.set({
-      screenReaderEnabled: screenReaderToggle.checked,
+    // Save the state of the checkbox when it changes
+    screenReaderToggle.addEventListener('change', function () {
+        // chrome.storage.sync.set({ screenReaderEnabled: screenReaderToggle.checked });
     });
-  });
 
   // Color blindness options mapping
   const colorBlindButtons = {
@@ -50,34 +46,39 @@ document.addEventListener("DOMContentLoaded", function () {
       //     console.log('Saved color filter to storage:', filterType);
       // });
 
-      // Apply the filter
-      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        if (!tabs[0]) {
-          console.error("No active tab found");
-          return;
-        }
-
-        chrome.tabs.sendMessage(
-          tabs[0].id,
-          {
-            action: "applyColorBlindFilter",
-            filterType: filterType,
-          },
-          (response) => {
-            console.log("Color filter response:", response);
-          }
-        );
-      });
+            // Apply the filter
+            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+                if (!tabs[0]) {
+                    console.error('No active tab found');
+                    return;
+                }
+                
+                chrome.tabs.sendMessage(
+                    tabs[0].id,
+                    {
+                        action: 'applyColorBlindFilter',
+                        filterType: filterType
+                    },
+                    response => {
+                        console.log('Color filter response:', response);
+                    }
+                );
+            });
+        });
     });
-  });
+});
 
-  // Set up event listeners for dyslexia treatment buttons
-  const dyslexiaButtons = [
-    "dyslexia-visual",
-    "dyslexia-surface",
-    "dyslexia-directional",
-    "dyslexia-attentional",
-  ];
+/**
+ * Dyslexia Buttons
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up event listeners for dyslexia treatment buttons
+    const dyslexiaButtons = [
+        'dyslexia-visual',
+        'dyslexia-surface',
+        'dyslexia-directional',
+        'dyslexia-attentional'
+    ];
 
   dyslexiaButtons.forEach((dyslexiaType) => {
     const button = document.getElementById(dyslexiaType);
@@ -90,168 +91,395 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    button.addEventListener("click", function () {
-      console.log(`Dyslexia button clicked: ${dyslexiaType}`);
+        button.addEventListener('click', function() {
+            console.log(`Dyslexia button clicked: ${dyslexiaType}`);
 
-      // Save to storage first
-      chrome.storage.sync.set({ dyslexiaPreference: dyslexiaType }, () => {
-        console.log("Saved dyslexia preference to storage:", dyslexiaType);
-      });
+            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+                if (!tabs[0]) {
+                    console.error('No active tab found');
+                    return;
+                }
+                
+                chrome.tabs.sendMessage(
+                    tabs[0].id,
+                    {
+                        action: 'applyDyslexiaTreatment',
+                        dyslexiaType: dyslexiaType
+                    },
+                    function(response) {
+                        console.log('Dyslexia treatment response:', response);
+                    }
+                );
+            });
+        });
+    });
+});
 
-      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        if (!tabs[0]) {
-          console.error("No active tab found");
-          return;
+/**
+ * Save and reset buttons
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    // Save button -> write to preferences (DynamoDB)
+    const saveButton = document.querySelector('.save-button');
+    if (!saveButton) {
+        console.error('Save button not found.');
+        return;
+    }
+    
+    saveButton.addEventListener('click', () => {
+        const toggleBtn = document.querySelector('.toggle-btn');
+        if (toggleBtn.innerHTML !== '✅') {
+            return;
+        }
+        const emailInputBox = document.getElementById("email-input-box");
+        const emailValue = emailInputBox.value;
+
+        let userPreferences = {}
+        const colorFilterOptionsContainer = 'colorfilter-options';
+        const colorFilterOptions = document.querySelector(`.${colorFilterOptionsContainer}`).getElementsByTagName('button');
+        for (const option of colorFilterOptions) {
+            if (option.classList.contains('active')) {
+                console.log("Active Color Filter Button:");
+                console.log(option.id);
+                console.log();
+
+                userPreferences[colorFilterOptionsContainer] = option.id;
+                break;
+            }
         }
 
-        chrome.tabs.sendMessage(
-          tabs[0].id,
-          {
-            action: "applyDyslexiaTreatment",
-            dyslexiaType: dyslexiaType,
-          },
-          function (response) {
-            console.log("Dyslexia treatment response:", response);
-          }
-        );
-      });
+        const dyslexiaOptionsContainer = 'dyslexia-options';
+        const dyslexiaOptions = document.querySelector(`.${dyslexiaOptionsContainer}`).getElementsByTagName('button');
+        for (const option of dyslexiaOptions) {
+            if (option.classList.contains('active')) {
+                console.log("Active Dyslexia Button:");
+                console.log(option.id);
+                console.log();
+
+                userPreferences[dyslexiaOptionsContainer] = option.id;
+                break;
+            }
+        }
+
+        const languageOptionsContainer = 'language-options';
+        const languageOptions = document.querySelector(`.${languageOptionsContainer}`).getElementsByTagName('button');
+        for (const option of languageOptions) {
+            if (option.classList.contains('active')) {
+                console.log("Active Language Button: ");
+                console.log(option.id);
+                console.log();
+
+                userPreferences[languageOptionsContainer] = option.id;
+                break;
+            }
+        }
+
+        const additionalConstraintsElement = 'conditions-textarea';
+        const additionalConstraints = document.querySelector(`.${additionalConstraintsElement}`).value;
+        userPreferences[additionalConstraintsElement] = additionalConstraints;
+
+        const screenReaderToggle = 'screen-reader-toggle';
+        const screenReader = document.getElementById(screenReaderToggle).checked;
+        userPreferences[screenReaderToggle] = screenReader;
+
+        const imageCaptionToggle = 'image-caption-toggle';
+        const imageCaption = document.getElementById(imageCaptionToggle).checked;
+        userPreferences[imageCaptionToggle] = imageCaption;        
+        
+        userPreferences['emailAddress'] = emailValue;
+        // const { emailAddress, colorFilters, dyslexiaTreatment, language, screenReader, imageCaption, additional } = req.body;
+        fetch("http://localhost:3001/api/save-preferences", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ 
+                userPreferences
+            })
+        });
     });
-  });
 
-  // Save button -> write to preferences (DynamoDB)
-  const saveButton = document.querySelector(".save-button");
-  if (!saveButton) {
-    console.error("Save button not found.");
-    return;
-  }
-
-  saveButton.addEventListener("click", async function () {
-    console.log("=== Starting Save Process ===");
-
-    // 1. Get user email
-    const userEmail = await new Promise((resolve) => {
-      chrome.storage.sync.get(["userEmail"], (result) => {
-        console.log("Retrieved user email from storage:", result.userEmail);
-        resolve(result.userEmail);
-      });
+    // Reset button
+    const resetButton = document.querySelector('.reset-button');
+    if (!resetButton) {
+        console.error("Reset button not found");
+        return;
+    }
+    
+    resetButton.addEventListener('click', function() {
+        console.log('Reset button clicked');
+        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+            chrome.tabs.sendMessage(
+                tabs[0].id,
+                { action: 'restore-original' },
+                function(response) {
+                    console.log('Reset response:', response);
+                }
+            );
+        });
     });
 
-    if (!userEmail) {
-      console.error("No user email found - user must log in first");
-      alert("Please log in to the web app first");
-      return;
+    const confirmEmailButton = document.querySelector('.confirm-email-button');
+    if (!confirmEmailButton) {
+        console.error("Confirm email button not found");
+        return;
     }
 
-    // 2. Get current preferences
-    console.log("Getting preferences from storage...");
-    chrome.storage.sync.get(
-      [
-        "colorBlindFilter",
-        "preferredFont",
-        "dyslexiaPreference",
-        "language",
-        "additionalInfo",
-      ],
-      function (result) {
-        console.log("Current storage state:", result);
-
-        const additionalInfo =
-          document.querySelector(".conditions-textarea")?.value || "";
-        console.log("Additional info from textarea:", additionalInfo);
-
-        const preferences = {
-          colorBlindFilter: result.colorBlindFilter || "none",
-          preferredFont: result.preferredFont || "default",
-          dyslexia: result.dyslexiaPreference || "none",
-          language: result.language || "en",
-          additionalInfo: additionalInfo,
-        };
-
-        console.log("Assembled preferences object:", preferences);
-
-        // 3. Send to backend
-        console.log("Sending POST request to backend...");
-        fetch("http://localhost:3001/api/input", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userEmail,
-            preferences,
-          }),
-        })
-          .then((response) => {
-            console.log(
-              "Received response:",
-              response.status,
-              response.statusText
-            );
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
+    confirmEmailButton.addEventListener('click', function() {
+        const headers = document.querySelectorAll('.collapsible-header');
+        headers.forEach(async function(header) {
+            const emailInputBox = document.getElementById("email-input-box");
+            const emailValue = emailInputBox.value;
+            if (!(emailValue && emailValue.includes('@') && emailValue.includes('.'))) {
+                return;
             }
-            return response.json();
-          })
-          .then((data) => {
-            console.log("Successfully saved to DynamoDB:", data);
+            // Create a new click event
+            const clickEvent = new MouseEvent('click', {
+              view: window,
+              bubbles: true,
+              cancelable: true
+            });
+            
+            result = await preferences(emailValue);
 
-            // 4. Send to Claude for analysis
-            chrome.tabs.query(
-              { active: true, currentWindow: true },
-              function (tabs) {
-                if (!tabs[0]) {
-                  console.error("No active tab found");
-                  return;
-                }
+            if (!result) {
+                return;
+            }
+            // Dispatch the click event on the header
+            header.dispatchEvent(clickEvent);
+            const newHeader = header.cloneNode(true);
+            header.parentNode.replaceChild(newHeader, header);
 
-                chrome.tabs.sendMessage(
-                  tabs[0].id,
-                  {
-                    action: "sendToClaude",
-                    preferences: preferences,
-                  },
-                  function (response) {
-                    if (response.success) {
-                      console.log("Claude analysis:", response.response);
-                      alert(
-                        "Preferences saved and page analyzed successfully!"
-                      );
-                    } else {
-                      console.error("Claude analysis error:", response.error);
-                      alert(
-                        "Preferences saved but analysis failed: " +
-                          response.error
-                      );
-                    }
-                  }
-                );
-              }
-            );
-          });
-      }
-    );
-  });
+            const toggleBtn = document.querySelector('.toggle-btn');
+            toggleBtn.innerHTML = '✅';
+            toggleBtn.style.transform = 'rotate(0deg)';
+            removeRegisterMessage();
+            loadPreferences(result);
+        });
+    });
+});
 
-  // Reset button
-  const resetButton = document.querySelector(".reset-button");
-  if (!resetButton) {
-    console.error("Reset button not found");
-    return;
-  }
+const registerMessageId = "registration-reminder";
+function addRegisterMessage() {
+    // Create warning container
+    removeRegisterMessage();
+    removeLoginMessage();
 
-  resetButton.addEventListener("click", function () {
-    console.log("Reset button clicked");
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      chrome.tabs.sendMessage(
-        tabs[0].id,
-        { action: "restore-original" },
-        function (response) {
-          console.log("Reset response:", response);
+    const warningDiv = document.createElement('div');
+    warningDiv.id = registerMessageId;
+    // warningDiv.style.backgroundColor = '#90EE90';
+    warningDiv.style.backgroundColor = '#fff3cd';
+    warningDiv.style.color = '#856404';
+    warningDiv.style.padding = '12px';
+    warningDiv.style.margin = '10px 0';
+    warningDiv.style.borderRadius = '4px';
+    warningDiv.style.border = '1px solid #ffeeba';
+    warningDiv.style.textAlign = 'center';
+    
+    // Create warning text
+    const warningText = document.createElement('p');
+    warningText.textContent = 'You must ';
+    warningText.style.margin = '0';
+    warningText.style.fontSize = '16px';
+    
+    // Create sign-in link
+    const signInLink = document.createElement('a');
+    signInLink.href = 'http://localhost:3000'; // Change this to your login page URL
+    signInLink.textContent = 'register';
+    signInLink.style.color = '#0056b3';
+    signInLink.style.fontWeight = 'bold';
+    signInLink.style.textDecoration = 'underline';
+    signInLink.target = '_blank';
+    signInLink.rel = 'noopener noreferrer';
+    
+    // Complete the warning message
+    const remainingText = document.createTextNode(' first to access this content.');
+    
+    // Assemble the warning message
+    warningText.appendChild(signInLink);
+    warningText.appendChild(remainingText);
+    warningDiv.appendChild(warningText);
+    
+    // Insert at the beginning of the body
+    const bodyElement = document.body;
+    bodyElement.insertBefore(warningDiv, document.getElementById("first-section"));
+}
+
+function removeRegisterMessage() {
+    const existingWarningMessage = document.getElementById(registerMessageId);
+    if (existingWarningMessage) {
+        existingWarningMessage.remove();
+    }
+}
+
+const loginMessageId = "registration-reminder";
+function addLoginMessage() {
+    removeRegisterMessage();
+    removeLoginMessage();
+
+    const warningDiv = document.createElement('div');
+    warningDiv.id = registerMessageId;
+    // warningDiv.style.backgroundColor = '#90EE90';
+    warningDiv.style.backgroundColor = '#fff3cd';
+    warningDiv.style.color = '#856404';
+    warningDiv.style.padding = '12px';
+    warningDiv.style.margin = '10px 0';
+    warningDiv.style.borderRadius = '4px';
+    warningDiv.style.border = '1px solid #ffeeba';
+    warningDiv.style.textAlign = 'center';
+    
+    // Create warning text
+    const warningText = document.createElement('p');
+    warningText.textContent = 'You must sign in to save preferences.';
+    warningText.style.margin = '0';
+    warningText.style.fontSize = '16px';
+    
+    warningDiv.appendChild(warningText);
+    
+    // Insert at the beginning of the body
+    const bodyElement = document.body;
+    bodyElement.insertBefore(warningDiv, document.getElementById("first-section"));
+}
+
+function removeLoginMessage() {
+    const existingWarningMessage = document.getElementById(loginMessageId);
+    if (existingWarningMessage) {
+        existingWarningMessage.remove();
+    }
+}
+
+async function preferences(email) {
+    const response = await fetch("http://localhost:3001/api/check-email", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ emailAddress: email })
+    });
+
+    if (response.status === 200) {
+        const data = await response.json();
+        return data.preferences;
+    } else if (response.status === 404) {
+        // does not exist
+        // prompt user to create account
+        addRegisterMessage();
+        return null;
+    } else {
+        throw new Error(`Unexpected status ${data.status}`);
+    }
+}
+
+function loadPreferences(results) {
+    // Set color blindness filter
+    const colorFilterOptions = document.querySelector('.option-group').getElementsByTagName('button');
+    for (const option of colorFilterOptions) {
+        if (option.id === `color-blind-${results.preferences.colorBlindFilter}`) {
+            option.classList.add('active');
+        } else {
+            option.classList.remove('active');
         }
-      );
+    }
+
+    // Set dyslexia options
+    const dyslexiaOptions = document.querySelectorAll('.option-group button[id^="dyslexia-"]');
+    dyslexiaOptions.forEach(option => {
+        if (option.id === results.preferences.dyslexia) {
+            option.classList.add('active');
+        } else {
+            option.classList.remove('active');
+        }
+    });
+
+    // Set language
+    const languageOptions = document.querySelectorAll('.lang-button');
+    languageOptions.forEach(option => {
+        if (option.dataset.langCode === results.preferences.language) {
+            option.classList.add('active');
+        } else {
+            option.classList.remove('active');
+        }
+    });
+
+    // Set screen reader toggle
+    const screenReaderToggle = document.getElementById('screen-reader-toggle');
+    if (screenReaderToggle) {
+        screenReaderToggle.checked = results.preferences.screenReader || false;
+    }
+
+    // Set image caption toggle
+    const imageCaptionToggle = document.getElementById('image-caption-toggle');
+    if (imageCaptionToggle) {
+        imageCaptionToggle.checked = results.preferences.imageCaption || false;
+    }
+
+    // Set additional conditions
+    const additionalConditions = document.querySelector('.conditions-textarea');
+    if (additionalConditions) {
+        additionalConditions.value = results.preferences.additionalInfo || '';
+    }
+
+    // Apply the preferences to the current page
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        if (!tabs[0]) return;
+
+        // Apply color blind filter
+        if (results.preferences.colorBlindFilter !== 'none') {
+            chrome.tabs.sendMessage(
+                tabs[0].id,
+                {
+                    action: 'applyColorBlindFilter',
+                    filterType: results.preferences.colorBlindFilter
+                }
+            );
+        }
+
+        // Apply dyslexia treatment
+        if (results.preferences.dyslexia !== 'none') {
+            chrome.tabs.sendMessage(
+                tabs[0].id,
+                {
+                    action: 'applyDyslexiaTreatment',
+                    dyslexiaType: results.preferences.dyslexia
+                }
+            );
+        }
+
+        // Apply language translation
+        if (results.preferences.language !== 'en') {
+            chrome.tabs.sendMessage(
+                tabs[0].id,
+                {
+                    action: 'translatePage',
+                    targetLanguage: results.preferences.language
+                }
+            );
+        }
+    });
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const headers = document.querySelectorAll('.collapsible-header');
+    
+    headers.forEach(header => {
+      header.addEventListener('click', function() {
+        // Get the next sibling element which is the collapsible content
+        const content = this.nextElementSibling;
+        
+        // Toggle the collapsed class
+        content.classList.toggle('collapsed');
+        
+        // Change the arrow direction
+        const toggleBtn = this.querySelector('.toggle-btn');
+        if (content.classList.contains('collapsed')) {
+          toggleBtn.style.transform = 'rotate(-90deg)';
+        } else {
+          toggleBtn.style.transform = 'rotate(0deg)';
+        }
+      });
     });
   });
-});
 
 document.addEventListener("DOMContentLoaded", function () {
   // Updated language data with correct character encoding
@@ -396,45 +624,5 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       });
     }
-  }
-});
-// Initialize font selector when jQuery is ready
-window.addEventListener("load", function () {
-  if (typeof jQuery !== "undefined") {
-    console.log("Initializing font selector...");
-    const fonts = [
-      { name: "OpenDyslexic", comment: " (Dyslexic-friendly)" },
-      { name: "Dyslexie", comment: " (Dyslexic-friendly)" },
-      { name: "Arial", comment: "" },
-      { name: "Times New Roman", comment: "" },
-      // Add more fonts as needed
-    ];
-
-    const fontSelect = document.createElement("select");
-    fontSelect.id = "fontSelect";
-    fonts.forEach((font) => {
-      const option = new Option(font.name + font.comment, font.name);
-      fontSelect.appendChild(option);
-    });
-
-    // Add to DOM
-    const fontSection = document.createElement("div");
-    fontSection.className = "section";
-    fontSection.innerHTML = "<h2>Font Selection</h2>";
-    fontSection.appendChild(fontSelect);
-
-    // Insert before the bottom buttons
-    const buttonContainer = document.querySelector(".button-container");
-    buttonContainer.parentNode.insertBefore(fontSection, buttonContainer);
-
-    // Handle font changes
-    fontSelect.addEventListener("change", function () {
-      const selectedFont = this.value;
-      chrome.storage.sync.set({ preferredFont: selectedFont }, () => {
-        console.log("Font saved:", selectedFont);
-      });
-    });
-  } else {
-    console.error("jQuery not loaded");
   }
 });
