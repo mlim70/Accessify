@@ -114,6 +114,7 @@ npm run build
 npm start
 
 # Navigate to the backend directory
+cd ..
 cd backend
 
 # Install dependencies
