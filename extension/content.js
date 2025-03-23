@@ -16,7 +16,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         try {
             console.log('Attempting to apply filter:', request.filterType);
             applyColorBlindFilter(request.filterType);
-            saveFilterPreference(request.filterType);
+            // saveFilterPreference(request.filterType);
             console.log('Successfully applied filter: ', request.filterType);
             sendResponse({ success: true });
         } catch (error) {
@@ -38,6 +38,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         if (originalHTML) {
             restoreOriginalHTML();
         }
+        
+        document.body.style.filter = '';
     }
     return true; // Keep the message channel open for async response
 });
