@@ -6,6 +6,15 @@ const { Translate } = require('@google-cloud/translate').v2;
 const UserInputService = require('./UserInput');
 const Anthropic = require('@anthropic-ai/sdk');
 const { generateAccessibilityPrompt } = require('./services/claude-prompt');
+const fs = require('fs');
+const path = require('path');
+
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+    const credentialsPath = path.join(__dirname, 'service-account-key.json');
+    const credentialsJson = Buffer.from(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON, 'base64').toString();
+    fs.writeFileSync(credentialsPath, credentialsJson);
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath;
+}
 
 const app = express();
 const PORT = process.env.PORT || 3001;
