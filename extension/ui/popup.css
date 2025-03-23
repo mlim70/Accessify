@@ -349,6 +349,12 @@ h2 {
     transform: translateY(-1px);
 }
 
+.save-email-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+}
+
 /* Focus states for buttons */
 .save-button:focus,
 .reset-button:focus {

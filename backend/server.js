@@ -169,8 +169,48 @@ app.post('/api/tts', async (req, res) => {
           });
           res.send(buffer);
     } catch (error) {
-        console.error('Erorr generating pronunciation guide: ', error);
-        res.status(500).json({ error: 'Erorr generating pronunciation guide: ', details: error.message });
+        console.error('Error generating pronunciation guide: ', error);
+        res.status(500).json({ error: 'Error generating pronunciation guide: ', details: error.message });
+    }
+});
+
+app.post('/api/check-email', async (req, res) => {
+    try {
+        const { emailAddress } = req.body;
+        console.log(`Received email: ${emailAddress}`);
+        const item = await UserInputService.queryByEmail(emailAddress);
+        if (item.length) {
+            // item exists
+            console.log("Retrieved item: ");
+            console.log(item);
+            return res.status(200).json({preferences: item[0]});
+        } else {
+            console.log("Item doesn't exist");
+            return res.status(404).json({ error: `Record with email address ${emailAddress} does not exist`});
+        }
+    } catch (error) {
+        console.error('Error confirming email address: ', error);
+        res.status(500).json({ error: 'Error checking email address: ', details: error.message });
+    }
+});
+
+app.post('/api/save-preferences', async (req, res) => {
+    try {
+        console.log("Received: ");
+        console.log(req.body);
+        console.log();
+        const preferences = {
+            'colorBlindFilter': req.body['colorfilter-options'],
+            'dyslexia': req.body['dyslexia-options'],
+            'language': req.body['language-options'],
+            'screenReader': req.body['screen-reader-toggle'],
+            'imageCaption': req.body['image-caption-toggle'],
+            'additionalInfo': req.body['conditions-textarea']
+        }
+        UserInputService.create(preferences, req.body.emailAddress);
+    } catch (error) {
+        console.error('Error confirming email address: ', error);
+        res.status(500).json({ error: 'Error checking email address: ', details: error.message });
     }
 });
 

@@ -16,16 +16,19 @@
 
         <div class="container" id="first-section">
             <div class="section">
-                <h2 class="collapsible-header"> Load/Save Preferences <span class="toggle-btn">▼</span></h2>
+                <h2 class="collapsible-header"> Sign In <span class="toggle-btn">▼</span></h2>
                 <div class="email-input collapsible">
-                    <input type="text" class="search-box" placeholder="example@gatech.edu">
+                    <input type="text" class="search-box" id="email-input-box" placeholder="example@gatech.edu">
+                    <div class="save-email-button">
+                        <button class="confirm-email-button"> Sign-In </button>
+                    </div>
                 </div>
             </div>
 
             <!-- Color Filters Section -->
             <div class="section">
                 <h2>Color Filters</h2>
-                <div class="option-group">
+                <div class="option-group colorfilter-options">
                     <button class="big-button" id="color-blind-protanopia">Protanopia</button>
                     <button class="big-button" id="color-blind-deuteranopia">Deuteranopia</button>
                     <button class="big-button" id="color-blind-tritanopia">Tritanopia</button>
@@ -36,7 +39,7 @@
             <!-- Dyslexia Section -->
             <div class="section">
                 <h2>Dyslexia</h2>
-                <div class="option-group">
+                <div class="option-group dyslexia-options">
                     <button class="big-button" id="dyslexia-visual">Visual</button>
                     <button class="big-button" id="dyslexia-surface">Surface</button>
                     <button class="big-button" id="dyslexia-directional">Directional</button>
@@ -47,7 +50,7 @@
             <!-- Language Section -->
             <div class="section">
                 <h2>Language</h2>
-                <input type="text" id="language-search" class="search-box" placeholder="Type to search language...">
+                <input type="text" id="language-search" class="search-box language-options" placeholder="Type to search language...">
                 <div class="language-list" id="language-list">
                     <!-- Languages will be populated by JavaScript -->
                 </div>

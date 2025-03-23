@@ -5,21 +5,16 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('=== Extension Popup Initialized ===');
 
-    // Debug: Check if user is logged in
-    chrome.storage.sync.get(['userEmail'], function(result) {
-        console.log('Current user email in storage:', result.userEmail);
-    });
-
     const screenReaderToggle = document.getElementById('screen-reader-toggle');
 
-    // Load the stored state of the checkbox
-    chrome.storage.sync.get(['screenReaderEnabled'], function (result) {
-        screenReaderToggle.checked = result.screenReaderEnabled || false;
-    });
+    // // Load the stored state of the checkbox
+    // chrome.storage.sync.get(['screenReaderEnabled'], function (result) {
+    //     screenReaderToggle.checked = result.screenReaderEnabled || false;
+    // });
 
     // Save the state of the checkbox when it changes
     screenReaderToggle.addEventListener('change', function () {
-        chrome.storage.sync.set({ screenReaderEnabled: screenReaderToggle.checked });
+        // chrome.storage.sync.set({ screenReaderEnabled: screenReaderToggle.checked });
     });
 
     // Color blindness options mapping
@@ -92,11 +87,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         button.addEventListener('click', function() {
             console.log(`Dyslexia button clicked: ${dyslexiaType}`);
-            
-            // Save to storage first
-            chrome.storage.sync.set({ dyslexiaPreference: dyslexiaType }, () => {
-                console.log('Saved dyslexia preference to storage:', dyslexiaType);
-            });
 
             chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
                 if (!tabs[0]) {
@@ -130,72 +120,77 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
-    saveButton.addEventListener('click', async function() {
-        console.log('=== Starting Save Process ===');
-        
-        // 1. Get user email
-        const userEmail = await new Promise((resolve) => {
-            chrome.storage.sync.get(['userEmail'], (result) => {
-                console.log('Retrieved user email from storage:', result.userEmail);
-                resolve(result.userEmail);
-            });
-        });
-
-        if (!userEmail) {
-            console.error('No user email found - user must log in first');
-            alert('Please log in to the web app first');
+    saveButton.addEventListener('click', () => {
+        const toggleBtn = document.querySelector('.toggle-btn');
+        if (toggleBtn.innerHTML !== '✅') {
             return;
         }
+        const emailInputBox = document.getElementById("email-input-box");
+        const emailValue = emailInputBox.value;
 
-        // 2. Get current preferences
-        console.log('Getting preferences from storage...');
-        chrome.storage.sync.get(
-            ['colorBlindFilter', 'preferredFont', 'dyslexiaPreference', 'language', 'additionalInfo'],
-            function(result) {
-                console.log('Current storage state:', result);
-                
-                const additionalInfo = document.querySelector('.conditions-textarea')?.value || '';
-                console.log('Additional info from textarea:', additionalInfo);
+        let userPreferences = {}
+        const colorFilterOptionsContainer = 'colorfilter-options';
+        const colorFilterOptions = document.querySelector(`.${colorFilterOptionsContainer}`).getElementsByTagName('button');
+        for (const option of colorFilterOptions) {
+            if (option.classList.contains('active')) {
+                console.log("Active Color Filter Button:");
+                console.log(option.id);
+                console.log();
 
-                const preferences = {
-                    colorBlindFilter: result.colorBlindFilter || 'none',
-                    preferredFont: result.preferredFont || 'default',
-                    dyslexia: result.dyslexiaPreference || 'none',
-                    language: result.language || 'en',
-                    additionalInfo: additionalInfo
-                };
-
-                console.log('Assembled preferences object:', preferences);
-
-                // 3. Send to backend
-                console.log('Sending POST request to backend...');
-                fetch('http://localhost:3001/api/input', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        userEmail,
-                        preferences
-                    })
-                })
-                .then(response => {
-                    console.log('Received response:', response.status, response.statusText);
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Successfully saved to DynamoDB:', data);
-                    alert('Preferences saved successfully!');
-                })
-                .catch(error => {
-                    console.error('Error saving to DynamoDB:', error);
-                    alert('Error saving preferences: ' + error.message);
-                });
+                userPreferences[colorFilterOptionsContainer] = option.id;
+                break;
             }
-        );
+        }
+
+        const dyslexiaOptionsContainer = 'dyslexia-options';
+        const dyslexiaOptions = document.querySelector(`.${dyslexiaOptionsContainer}`).getElementsByTagName('button');
+        for (const option of dyslexiaOptions) {
+            if (option.classList.contains('active')) {
+                console.log("Active Dyslexia Button:");
+                console.log(option.id);
+                console.log();
+
+                userPreferences[dyslexiaOptionsContainer] = option.id;
+                break;
+            }
+        }
+
+        const languageOptionsContainer = 'language-options';
+        const languageOptions = document.querySelector(`.${languageOptionsContainer}`).getElementsByTagName('button');
+        for (const option of languageOptions) {
+            if (option.classList.contains('active')) {
+                console.log("Active Language Button: ");
+                console.log(option.id);
+                console.log();
+
+                userPreferences[languageOptionsContainer] = option.id;
+                break;
+            }
+        }
+
+        const additionalConstraintsElement = 'conditions-textarea';
+        const additionalConstraints = document.querySelector(`.${additionalConstraintsElement}`).value;
+        userPreferences[additionalConstraintsElement] = additionalConstraints;
+
+        const screenReaderToggle = 'screen-reader-toggle';
+        const screenReader = document.getElementById(screenReaderToggle).checked;
+        userPreferences[screenReaderToggle] = screenReader;
+
+        const imageCaptionToggle = 'image-caption-toggle';
+        const imageCaption = document.getElementById(imageCaptionToggle).checked;
+        userPreferences[imageCaptionToggle] = imageCaption;        
+        
+        userPreferences['emailAddress'] = emailValue;
+        // const { emailAddress, colorFilters, dyslexiaTreatment, language, screenReader, imageCaption, additional } = req.body;
+        fetch("http://localhost:3001/api/save-preferences", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ 
+                userPreferences
+            })
+        });
     });
 
     // Reset button
@@ -217,55 +212,161 @@ document.addEventListener('DOMContentLoaded', function() {
             );
         });
     });
+
+    const confirmEmailButton = document.querySelector('.confirm-email-button');
+    if (!confirmEmailButton) {
+        console.error("Confirm email button not found");
+        return;
+    }
+
+    confirmEmailButton.addEventListener('click', function() {
+        const headers = document.querySelectorAll('.collapsible-header');
+        headers.forEach(async function(header) {
+            const emailInputBox = document.getElementById("email-input-box");
+            const emailValue = emailInputBox.value;
+            if (!(emailValue && emailValue.includes('@') && emailValue.includes('.'))) {
+                return;
+            }
+            // Create a new click event
+            const clickEvent = new MouseEvent('click', {
+              view: window,
+              bubbles: true,
+              cancelable: true
+            });
+            
+            result = await preferences(emailValue);
+
+            if (!result) {
+                return;
+            }
+            // Dispatch the click event on the header
+            header.dispatchEvent(clickEvent);
+            const newHeader = header.cloneNode(true);
+            header.parentNode.replaceChild(newHeader, header);
+
+            const toggleBtn = document.querySelector('.toggle-btn');
+            toggleBtn.innerHTML = '✅';
+            toggleBtn.style.transform = 'rotate(0deg)';
+            removeRegisterMessage();
+            loadPreferences(result);
+        });
+    });
 });
 
-/**
- * Adds a link to our website
- */
-document.addEventListener('DOMContentLoaded', function() {
-    const warningDivId = "website-info";
-    function addWebsiteWelcome() {
-        // Create warning container
-        const warningDiv = document.createElement('div');
-        warningDiv.id = warningDivId;
-        warningDiv.style.backgroundColor = '#90EE90';
-        warningDiv.style.color = '#856404';
-        warningDiv.style.padding = '12px';
-        warningDiv.style.margin = '10px 0';
-        warningDiv.style.borderRadius = '4px';
-        warningDiv.style.border = '1px solid #ffeeba';
-        warningDiv.style.textAlign = 'center';
-        
-        // Create warning text
-        const warningText = document.createElement('p');
-        warningText.textContent = 'Visit our ';
-        warningText.style.margin = '0';
-        warningText.style.fontSize = '16px';
-        
-        // Create sign-in link
-        const signInLink = document.createElement('a');
-        signInLink.href = 'http://localhost:3000'; // Change this to your login page URL
-        signInLink.textContent = 'website';
-        signInLink.style.color = '#0056b3';
-        signInLink.style.fontWeight = 'bold';
-        signInLink.style.textDecoration = 'underline';
-        signInLink.target = '_blank';
-        signInLink.rel = 'noopener noreferrer';
-        
-        // Complete the warning message
-        const remainingText = document.createTextNode(' to learn more!');
-        
-        // Assemble the warning message
-        warningText.appendChild(signInLink);
-        warningText.appendChild(remainingText);
-        warningDiv.appendChild(warningText);
-        
-        // Insert at the beginning of the body
-        const bodyElement = document.body;
-        bodyElement.insertBefore(warningDiv, document.getElementById("first-section"));
+const registerMessageId = "registration-reminder";
+function addRegisterMessage() {
+    // Create warning container
+    removeRegisterMessage();
+    removeLoginMessage();
+
+    const warningDiv = document.createElement('div');
+    warningDiv.id = registerMessageId;
+    // warningDiv.style.backgroundColor = '#90EE90';
+    warningDiv.style.backgroundColor = '#fff3cd';
+    warningDiv.style.color = '#856404';
+    warningDiv.style.padding = '12px';
+    warningDiv.style.margin = '10px 0';
+    warningDiv.style.borderRadius = '4px';
+    warningDiv.style.border = '1px solid #ffeeba';
+    warningDiv.style.textAlign = 'center';
+    
+    // Create warning text
+    const warningText = document.createElement('p');
+    warningText.textContent = 'You must ';
+    warningText.style.margin = '0';
+    warningText.style.fontSize = '16px';
+    
+    // Create sign-in link
+    const signInLink = document.createElement('a');
+    signInLink.href = 'http://localhost:3000'; // Change this to your login page URL
+    signInLink.textContent = 'register';
+    signInLink.style.color = '#0056b3';
+    signInLink.style.fontWeight = 'bold';
+    signInLink.style.textDecoration = 'underline';
+    signInLink.target = '_blank';
+    signInLink.rel = 'noopener noreferrer';
+    
+    // Complete the warning message
+    const remainingText = document.createTextNode(' first to access this content.');
+    
+    // Assemble the warning message
+    warningText.appendChild(signInLink);
+    warningText.appendChild(remainingText);
+    warningDiv.appendChild(warningText);
+    
+    // Insert at the beginning of the body
+    const bodyElement = document.body;
+    bodyElement.insertBefore(warningDiv, document.getElementById("first-section"));
+}
+
+function removeRegisterMessage() {
+    const existingWarningMessage = document.getElementById(registerMessageId);
+    if (existingWarningMessage) {
+        existingWarningMessage.remove();
     }
-    addWebsiteWelcome();
-});
+}
+
+const loginMessageId = "registration-reminder";
+function addLoginMessage() {
+    removeRegisterMessage();
+    removeLoginMessage();
+
+    const warningDiv = document.createElement('div');
+    warningDiv.id = registerMessageId;
+    // warningDiv.style.backgroundColor = '#90EE90';
+    warningDiv.style.backgroundColor = '#fff3cd';
+    warningDiv.style.color = '#856404';
+    warningDiv.style.padding = '12px';
+    warningDiv.style.margin = '10px 0';
+    warningDiv.style.borderRadius = '4px';
+    warningDiv.style.border = '1px solid #ffeeba';
+    warningDiv.style.textAlign = 'center';
+    
+    // Create warning text
+    const warningText = document.createElement('p');
+    warningText.textContent = 'You must sign in to save preferences.';
+    warningText.style.margin = '0';
+    warningText.style.fontSize = '16px';
+    
+    warningDiv.appendChild(warningText);
+    
+    // Insert at the beginning of the body
+    const bodyElement = document.body;
+    bodyElement.insertBefore(warningDiv, document.getElementById("first-section"));
+}
+
+function removeLoginMessage() {
+    const existingWarningMessage = document.getElementById(loginMessageId);
+    if (existingWarningMessage) {
+        existingWarningMessage.remove();
+    }
+}
+
+async function preferences(email) {
+    const response = await fetch("http://localhost:3001/api/check-email", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ emailAddress: email })
+    });
+
+    if (response.status === 200) {
+        const data = await response.json();
+        return data.preferences;
+    } else if (response.status === 404) {
+        // does not exist
+        // prompt user to create account
+        addRegisterMessage();
+        return null;
+    } else {
+        throw new Error(`Unexpected status ${data.status}`);
+    }
+}
+
+function loadPreferences(results) {
+    
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     const headers = document.querySelectorAll('.collapsible-header');
