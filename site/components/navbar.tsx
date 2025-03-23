@@ -67,7 +67,7 @@ const Navbar: React.FC<NavbarProps> = () => {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/100">
       <div className="container relative flex h-16 items-center">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center space-x-2">
@@ -112,7 +112,7 @@ const Navbar: React.FC<NavbarProps> = () => {
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-16 z-50 bg-white">
+        <div className="md:hidden fixed inset-0 top-16 z-50 ">
           <div className="container py-6 flex flex-col gap-6 bg-white">
             <nav className="flex flex-col gap-6">
               {navLinks.map((link) => (
