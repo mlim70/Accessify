@@ -1,3 +1,81 @@
+// Add this at the very top of content.js, before any other code
+console.log('Setting up email storage listener');
+
+let isAuthenticated = false;
+
+let currentAudio = null;
+
+window.addEventListener('message', function(event) {
+    console.log('Received window message:', event.data);
+    
+    // Only accept messages from our webpage
+    if (event.origin !== 'http://localhost:3000') {
+        console.log('Ignored message from:', event.origin);
+        return;
+    }
+    
+    if (event.data.type === 'STORE_USER_EMAIL' && event.data.email) {
+        console.log('Attempting to store email:', event.data.email);
+        isAuthenticated = true;
+        chrome.storage.sync.set({ userEmail: event.data.email }, function() {
+            console.log('Successfully stored email in Chrome storage:', event.data.email);
+            // Notify the webpage that storage was successful
+            window.postMessage({ type: 'EMAIL_STORED_SUCCESS' }, 'http://localhost:3000');
+        });
+    }
+});
+
+async function readSelectedText(text) {
+    console.log("Reading text:", text);
+    try {
+        const response = await fetch("http://localhost:3001/api/tts", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"},
+        body: JSON.stringify({ text })
+        });
+        console.log("Sent request to OpenAI Text-to-Speech API");
+        if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        console.log("Received response from OpenAI Text-to-Speech API");
+        console.log("Response:", response);
+        const audioBlob = await response.blob();
+        console.log("reviefed audio blob");
+        console.log("Audio blob:", audioBlob);
+        const audioUrl = URL.createObjectURL(audioBlob);
+        
+        const audio = new Audio(audioUrl);
+        if (currentAudio) {
+            currentAudio.src = '';
+            currentAudio.pause();
+        }
+        audio.play();
+        currentAudio = audio;
+
+
+    } catch (error) {
+        console.error('Error with OpenAI Text-to-Speech API:', error);
+    }
+}
+
+let lastMouseMoveTime = 0;
+
+document.addEventListener('mousemove', function() {
+    lastMouseMoveTime = Date.now();
+});
+
+document.addEventListener('mouseup', function() {
+    const currentTime = Date.now();
+    if (currentTime - lastMouseMoveTime <= 1000) { // 50 milliseconds = 0.05 seconds
+        const selectedText = window.getSelection().toString().trim();
+        if (selectedText) {
+            console.log('Text selected: ' + selectedText);
+            readSelectedText(selectedText);
+        }
+    }
+});
+
 // Color blindness filter styles
 const colorBlindFilters = {
     'none': 'none',
@@ -9,9 +87,31 @@ const colorBlindFilters = {
 
 console.log('Content script loaded with colorblind filters:', Object.keys(colorBlindFilters));
 
-// Listen for messages from popup
+// Add near the top of your content.js, before other listeners
+console.log('Content script initialized for email storage');
+
+// Modify the message listener to check authentication
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     console.log('Received message in content script:', request);
+    
+    // Check authentication before processing any requests
+    if (!isAuthenticated) {
+        chrome.storage.sync.get(['userEmail'], function(result) {
+            if (result.userEmail) {
+                isAuthenticated = true;
+                processRequest(request, sendResponse);
+            } else {
+                sendResponse({ success: false, error: 'User not authenticated' });
+            }
+        });
+        return true;
+    }
+    
+    processRequest(request, sendResponse);
+    return true;
+});
+
+function processRequest(request, sendResponse) {
     if (request.action === 'applyColorBlindFilter') {
         try {
             console.log('Attempting to apply filter:', request.filterType);
@@ -41,8 +141,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         
         document.body.style.filter = '';
     }
-    return true; // Keep the message channel open for async response
-});
+}
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     console.log('Received message:', request);

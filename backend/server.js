@@ -25,13 +25,18 @@ app.use(bodyParser.json({ limit: '50mb' }));
 // Routes
 app.post('/api/input', async (req, res) => {
     try {
-        const { input } = req.body;
-        const newUserInput = await UserInputService.create(input);
-        res.status(201).json({ message: 'Input saved successfully', data: newUserInput });
+        const { userEmail, preferences } = req.body; // Email & Preferences
+        if (!userEmail || !preferences) {
+            return res.status(400).json({ message: 'Both userEmail and preferences are required' });
+        }
+
+        const newUserPreference = await UserInputService.create(preferences, userEmail);
+        res.status(201).json({ message: 'Preferences saved successfully', data: newUserPreference });
     } catch (error) {
-        res.status(500).json({ message: 'Error saving input', error: error.message });
+        res.status(500).json({ message: 'Error saving preferences', error: error.message });
     }
 });
+
 
 app.post('/api/enhance-accessibility', async (req, res) => {
     try {
@@ -61,16 +66,6 @@ app.post('/api/enhance-accessibility', async (req, res) => {
             const model = genAI.getGenerativeModel({ model: "gemini-pro" });
             const result = await model.generateContent(prompt);
             enhancedHTML = result.response.text();
-
-            await UserInputService.create({
-                original: html,
-                enhanced: enhancedHTML,
-                url: url,
-                title: title,
-                preferences: preferences,
-                lastUpdated: new Date().toISOString(),
-                isRegenerated: forceRegenerate
-            });
         }
 
         res.status(200).json({ 
@@ -136,6 +131,43 @@ app.post('/api/pronunciation', async (req, res) => {
         }
         console.log(`Made ${challengingWords.length} revisions`)
         return res.status(200).json({ revisedText: text });
+    } catch (error) {
+        console.error('Erorr generating pronunciation guide: ', error);
+        res.status(500).json({ error: 'Erorr generating pronunciation guide: ', details: error.message });
+    }
+});
+
+app.post('/api/tts', async (req, res) => {
+    const apiKey = process.env.OPENAI_API;
+    const url = 'https://api.openai.com/v1/audio/speech'; // Correct endpoint for TTS
+    console.log(apiKey);
+
+    console.log('Received TTS request');
+    console.log('Request body:', req.body);
+    try {
+        const { text } = req.body;
+        const requestBody = {
+            model: "gpt-4o-mini-tts", // Replace with the correct model name
+            input: text,
+            voice: "alloy",
+            response_format: "mp3"
+          };
+      
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+          });
+
+          const buffer = Buffer.from(await response.arrayBuffer());
+          res.set({
+            'Content-Type': 'audio/mp3',
+            'Content-Length': buffer.length
+          });
+          res.send(buffer);
     } catch (error) {
         console.error('Erorr generating pronunciation guide: ', error);
         res.status(500).json({ error: 'Erorr generating pronunciation guide: ', details: error.message });

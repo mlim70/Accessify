@@ -375,4 +375,67 @@ $(document).ready(function() {
         });
       });
     });
-  });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    chrome.storage.sync.get(['userEmail'], function(result) {
+        console.log('Current userEmail in storage:', result.userEmail);
+        const loginWarning = document.getElementById('loginWarning');
+        if (!result.userEmail) {
+            loginWarning.style.display = 'block';
+        } else {
+            loginWarning.style.display = 'none';
+        }
+    });
+
+    // Save button -> write to preferences (DynamoDB)
+    const saveButton = document.getElementById('savePreferences');
+    if (!saveButton) {
+        return;
+    }
+    
+    saveButton.addEventListener('click', async function() {
+        const userEmail = await new Promise((resolve) => {
+            chrome.storage.sync.get(['userEmail'], (result) => {
+                resolve(result.userEmail);
+            });
+        });
+
+        if (!userEmail) {
+            console.error('Please log in to the web app first');
+            // TODO: Show error message to user
+            return;
+        }
+
+        // Get current preferences from storage
+        chrome.storage.sync.get(
+            ['colorBlindFilter', 'preferredFont', 'dyslexiaPreference'],
+            function(result) {
+                const preferences = {
+                    colorBlindFilter: result.colorBlindFilter || 'none',
+                    preferredFont: result.preferredFont || 'default',
+                    dyslexia: result.dyslexiaPreference || 'none'
+                };
+
+                // Send to backend
+                fetch('http://localhost:3001/api/input', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userEmail,
+                        preferences
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Preferences saved to backend:', data);
+                })
+                .catch(error => {
+                    console.error('Error saving preferences:', error);
+                });
+            }
+        );
+    });
+});
