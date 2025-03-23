@@ -1,29 +1,29 @@
 // Add this at the very top of content.js, before any other code
 console.log('Setting up email storage listener');
 
-// let isAuthenticated = false;
+let isAuthenticated = false;
 
 let currentAudio = null;
 
-// window.addEventListener('message', function(event) {
-//     console.log('Received window message:', event.data);
+window.addEventListener('message', function(event) {
+    console.log('Received window message:', event.data);
 
-//     // Only accept messages from our webpage
-//     if (event.origin !== 'http://localhost:3000') {
-//         console.log('Ignored message from:', event.origin);
-//         return;
-//     }
+    // Only accept messages from our webpage
+    if (event.origin !== 'http://localhost:3000') {
+        console.log('Ignored message from:', event.origin);
+        return;
+    }
 
-//     if (event.data.type === 'STORE_USER_EMAIL' && event.data.email) {
-//         console.log('Attempting to store email:', event.data.email);
-//         isAuthenticated = true;
-//         chrome.storage.sync.set({ userEmail: event.data.email }, function() {
-//             console.log('Successfully stored email in Chrome storage:', event.data.email);
-//             // Notify the webpage that storage was successful
-//             window.postMessage({ type: 'EMAIL_STORED_SUCCESS' }, 'http://localhost:3000');
-//         });
-//     }
-// });
+    if (event.data.type === 'STORE_USER_EMAIL' && event.data.email) {
+        console.log('Attempting to store email:', event.data.email);
+        isAuthenticated = true;
+        chrome.storage.sync.set({ userEmail: event.data.email }, function() {
+            console.log('Successfully stored email in Chrome storage:', event.data.email);
+            // Notify the webpage that storage was successful
+            window.postMessage({ type: 'EMAIL_STORED_SUCCESS' }, 'http://localhost:3000');
+        });
+    }
+});
 
 async function readSelectedText(text) {
     console.log("Reading text:", text);
@@ -109,17 +109,17 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     console.log('Received message in content script:', request);
 
     // Check authentication before processing any requests
-    // if (!isAuthenticated) {
-    //     chrome.storage.sync.get(['userEmail'], function(result) {
-    //         if (result.userEmail) {
-    //             isAuthenticated = true;
-    //             processRequest(request, sendResponse);
-    //         } else {
-    //             sendResponse({ success: false, error: 'User not authenticated' });
-    //         }
-    //     });
-    //     return true;
-    // }
+    if (!isAuthenticated) {
+        chrome.storage.sync.get(['userEmail'], function(result) {
+            if (result.userEmail) {
+                isAuthenticated = true;
+                processRequest(request, sendResponse);
+            } else {
+                sendResponse({ success: false, error: 'User not authenticated' });
+            }
+        });
+        return true;
+    }
 
     processRequest(request, sendResponse);
     return true;

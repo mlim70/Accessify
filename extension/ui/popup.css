@@ -421,3 +421,27 @@ button:focus, input:focus {
     margin-top: 16px;
     padding: 0 2px;
 }
+
+/* Style for the toggle button */
+.toggle-btn {
+    cursor: pointer;
+    float: right;
+    transition: transform 0.3s;
+}
+
+/* Style for the collapsible content */
+.collapsible {
+    max-height: 100px; /* Adjust based on your content */
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+/* Style for collapsed state */
+.collapsed {
+    max-height: 0;
+}
+
+/* Add some pointer cursor to the header */
+.collapsible-header {
+    cursor: pointer;
+}

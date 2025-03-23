@@ -1,4 +1,7 @@
 // Wait for DOM to be fully loaded
+/**
+ * Color-blindness Buttons
+ */
 document.addEventListener('DOMContentLoaded', function() {
     console.log('=== Extension Popup Initialized ===');
 
@@ -18,8 +21,6 @@ document.addEventListener('DOMContentLoaded', function() {
     screenReaderToggle.addEventListener('change', function () {
         chrome.storage.sync.set({ screenReaderEnabled: screenReaderToggle.checked });
     });
-
-
 
     // Color blindness options mapping
     const colorBlindButtons = {
@@ -67,7 +68,12 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+});
 
+/**
+ * Dyslexia Buttons
+ */
+document.addEventListener('DOMContentLoaded', function() {
     // Set up event listeners for dyslexia treatment buttons
     const dyslexiaButtons = [
         'dyslexia-visual',
@@ -111,7 +117,12 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+});
 
+/**
+ * Save and reset buttons
+ */
+document.addEventListener('DOMContentLoaded', function() {
     // Save button -> write to preferences (DynamoDB)
     const saveButton = document.querySelector('.save-button');
     if (!saveButton) {
@@ -207,6 +218,76 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+/**
+ * Adds a link to our website
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    const warningDivId = "website-info";
+    function addWebsiteWelcome() {
+        // Create warning container
+        const warningDiv = document.createElement('div');
+        warningDiv.id = warningDivId;
+        warningDiv.style.backgroundColor = '#90EE90';
+        warningDiv.style.color = '#856404';
+        warningDiv.style.padding = '12px';
+        warningDiv.style.margin = '10px 0';
+        warningDiv.style.borderRadius = '4px';
+        warningDiv.style.border = '1px solid #ffeeba';
+        warningDiv.style.textAlign = 'center';
+        
+        // Create warning text
+        const warningText = document.createElement('p');
+        warningText.textContent = 'Visit our ';
+        warningText.style.margin = '0';
+        warningText.style.fontSize = '16px';
+        
+        // Create sign-in link
+        const signInLink = document.createElement('a');
+        signInLink.href = 'http://localhost:3000'; // Change this to your login page URL
+        signInLink.textContent = 'website';
+        signInLink.style.color = '#0056b3';
+        signInLink.style.fontWeight = 'bold';
+        signInLink.style.textDecoration = 'underline';
+        signInLink.target = '_blank';
+        signInLink.rel = 'noopener noreferrer';
+        
+        // Complete the warning message
+        const remainingText = document.createTextNode(' to learn more!');
+        
+        // Assemble the warning message
+        warningText.appendChild(signInLink);
+        warningText.appendChild(remainingText);
+        warningDiv.appendChild(warningText);
+        
+        // Insert at the beginning of the body
+        const bodyElement = document.body;
+        bodyElement.insertBefore(warningDiv, document.getElementById("first-section"));
+    }
+    addWebsiteWelcome();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const headers = document.querySelectorAll('.collapsible-header');
+    
+    headers.forEach(header => {
+      header.addEventListener('click', function() {
+        // Get the next sibling element which is the collapsible content
+        const content = this.nextElementSibling;
+        
+        // Toggle the collapsed class
+        content.classList.toggle('collapsed');
+        
+        // Change the arrow direction
+        const toggleBtn = this.querySelector('.toggle-btn');
+        if (content.classList.contains('collapsed')) {
+          toggleBtn.style.transform = 'rotate(-90deg)';
+        } else {
+          toggleBtn.style.transform = 'rotate(0deg)';
+        }
+      });
+    });
+  });
 
 document.addEventListener('DOMContentLoaded', function() {
     // Updated language data with correct character encoding
@@ -360,45 +441,5 @@ document.addEventListener('DOMContentLoaded', function() {
                 );
             });
         }
-    }
-});
-// Initialize font selector when jQuery is ready
-window.addEventListener('load', function() {
-    if (typeof jQuery !== 'undefined') {
-        console.log('Initializing font selector...');
-        const fonts = [
-            { name: 'OpenDyslexic', comment: ' (Dyslexic-friendly)' },
-            { name: 'Dyslexie', comment: ' (Dyslexic-friendly)' },
-            { name: 'Arial', comment: '' },
-            { name: 'Times New Roman', comment: '' }
-            // Add more fonts as needed
-        ];
-
-        const fontSelect = document.createElement('select');
-        fontSelect.id = 'fontSelect';
-        fonts.forEach(font => {
-            const option = new Option(font.name + font.comment, font.name);
-            fontSelect.appendChild(option);
-        });
-
-        // Add to DOM
-        const fontSection = document.createElement('div');
-        fontSection.className = 'section';
-        fontSection.innerHTML = '<h2>Font Selection</h2>';
-        fontSection.appendChild(fontSelect);
-        
-        // Insert before the bottom buttons
-        const buttonContainer = document.querySelector('.button-container');
-        buttonContainer.parentNode.insertBefore(fontSection, buttonContainer);
-
-        // Handle font changes
-        fontSelect.addEventListener('change', function() {
-            const selectedFont = this.value;
-            chrome.storage.sync.set({ preferredFont: selectedFont }, () => {
-                console.log('Font saved:', selectedFont);
-            });
-        });
-    } else {
-        console.error('jQuery not loaded');
     }
 });
