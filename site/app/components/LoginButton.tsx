@@ -1,12 +1,30 @@
-'use client';
+"use client";
 
-import { signIn, signOut, useSession } from 'next-auth/react'
-import { Button } from '@/components/ui/button'
+import { signIn, signOut, useSession } from "next-auth/react";
+import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function LoginButton() {
-  
-  const { data: session } = useSession()
+  const { data: session } = useSession();
 
+  useEffect(() => {
+    if (session?.user?.email) {
+      console.log("User email: ", session.user.email);
+      fetch("http://localhost:3001/api/create-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ emailAddress: session.user.email }),
+      }).then(res => res.json())
+        .then(data => {
+          console.log("Backend response:", data);
+        }).catch(err => {
+          console.error("Error updating user in database:", err);
+        });
+    }
+  }, [session]);
+  
   if (session) {
     return (
       <Button
@@ -16,15 +34,15 @@ export default function LoginButton() {
       >
         Sign Out
       </Button>
-    )
+    );
   }
 
   return (
     <Button
-      onClick={() => signIn('google')}
+      onClick={() => {signIn("google", { redirect: false })}}
       className="bg-primary hover:bg-primary/90"
     >
       Sign in with Google
     </Button>
-  )
-} 
+  );
+}
