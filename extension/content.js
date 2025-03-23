@@ -220,7 +220,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         }
 
         if (originalDocument) {
-            restoreOriginalHTML();
+            restoreOriginalDocument();
         }
         document.body.style.filter = '';
     } else if (request.action === 'sendToClaude') {
@@ -526,7 +526,7 @@ function createProgressOverlay() {
     `;
 
     const text = document.createElement('div');
-    text.textContent = 'Translating page...';
+    text.textContent = 'Applying Transformation...';
     text.style.cssText = `
         color: #333;
         font-size: 14px;
