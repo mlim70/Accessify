@@ -371,8 +371,93 @@ async function preferences(email) {
 }
 
 function loadPreferences(results) {
-    
+    // Set color blindness filter
+    const colorFilterOptions = document.querySelector('.option-group').getElementsByTagName('button');
+    for (const option of colorFilterOptions) {
+        if (option.id === `color-blind-${results.preferences.colorBlindFilter}`) {
+            option.classList.add('active');
+        } else {
+            option.classList.remove('active');
+        }
+    }
+
+    // Set dyslexia options
+    const dyslexiaOptions = document.querySelectorAll('.option-group button[id^="dyslexia-"]');
+    dyslexiaOptions.forEach(option => {
+        if (option.id === results.preferences.dyslexia) {
+            option.classList.add('active');
+        } else {
+            option.classList.remove('active');
+        }
+    });
+
+    // Set language
+    const languageOptions = document.querySelectorAll('.lang-button');
+    languageOptions.forEach(option => {
+        if (option.dataset.langCode === results.preferences.language) {
+            option.classList.add('active');
+        } else {
+            option.classList.remove('active');
+        }
+    });
+
+    // Set screen reader toggle
+    const screenReaderToggle = document.getElementById('screen-reader-toggle');
+    if (screenReaderToggle) {
+        screenReaderToggle.checked = results.preferences.screenReader || false;
+    }
+
+    // Set image caption toggle
+    const imageCaptionToggle = document.getElementById('image-caption-toggle');
+    if (imageCaptionToggle) {
+        imageCaptionToggle.checked = results.preferences.imageCaption || false;
+    }
+
+    // Set additional conditions
+    const additionalConditions = document.querySelector('.conditions-textarea');
+    if (additionalConditions) {
+        additionalConditions.value = results.preferences.additionalInfo || '';
+    }
+
+    // Apply the preferences to the current page
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        if (!tabs[0]) return;
+
+        // Apply color blind filter
+        if (results.preferences.colorBlindFilter !== 'none') {
+            chrome.tabs.sendMessage(
+                tabs[0].id,
+                {
+                    action: 'applyColorBlindFilter',
+                    filterType: results.preferences.colorBlindFilter
+                }
+            );
+        }
+
+        // Apply dyslexia treatment
+        if (results.preferences.dyslexia !== 'none') {
+            chrome.tabs.sendMessage(
+                tabs[0].id,
+                {
+                    action: 'applyDyslexiaTreatment',
+                    dyslexiaType: results.preferences.dyslexia
+                }
+            );
+        }
+
+        // Apply language translation
+        if (results.preferences.language !== 'en') {
+            chrome.tabs.sendMessage(
+                tabs[0].id,
+                {
+                    action: 'translatePage',
+                    targetLanguage: results.preferences.language
+                }
+            );
+        }
+    });
 }
+
 
 document.addEventListener('DOMContentLoaded', function() {
     const headers = document.querySelectorAll('.collapsible-header');
