@@ -1,27 +1,150 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EmoryHax
 
-## Getting Started
+## Overview
 
-First, run the development server:
+EmoryHax is a project designed to enhance web accessibility for people with vision impairment. The project leverages various technologies to provide features like text-to-speech, translation, dyslexia-friendly fonts, and color blindness support.
 
-```bash
-npm run dev
+## Tech Stack
+
+### Frontend
+
+The frontend application (website) is built using the following technologies:
+
+- **Next.js**: A React framework that enables server-side rendering and static site generation.
+- **React**: A JavaScript library for building user interfaces.
+- **Tailwind CSS**: A utility-first CSS framework for styling the application.
+- **NextAuth.js**: An authentication solution for Next.js applications.
+- **TypeScript**: A strongly typed programming language that builds on JavaScript.
+
+### Backend
+
+The backend server (that works with the chrome extension) is built using the following technologies:
+
+- **Node.js**: A JavaScript runtime built on Chrome's V8 JavaScript engine.
+- **Express**: A minimal and flexible Node.js web application framework.
+- **AWS SDK**: Used to interact with AWS services like DynamoDB.
+- **Google Cloud Translation**: Provides language translation capabilities.
+- **Google Generative AI**: Provides advanced AI capabilities such as text generation and pronunciation hints.
+- **Anthropic SDK**: Used to integrate with Anthropic's Claude model for generating accessibility enhancements.
+- **OpenAI API**: Used for text-to-speech capabilities.
+
+### Chrome Extension
+
+The Chrome extension is built using the following technologies:
+
+- **JavaScript**: The primary programming language for the extension.
+- **HTML**: Used for the extension's popup interface.
+- **CSS**: Used for styling the extension's popup interface.
+- **Chrome Extensions API**: Provides the necessary APIs to build Chrome extensions.
+
+## Project Structure
+
+
+```emoryhax/
+├── extension/
+│   ├── content.js          # Main content script for the Chrome extension
+│   ├── background.js       # Background script for handling extension events
+│   ├── popup.html          # HTML for the extension's popup interface
+│   ├── popup.js            # JavaScript for the extension's popup interface
+│   ├── manifest.json       # Manifest file for the Chrome extension
+│   ├── styles/
+│   │   ├── popup.css       # CSS for the extension's popup interface
+│   │   ├── content.css     # CSS for the content script
+│   ├── fonts/
+│   │   ├── OpenDyslexic-Regular.otf  # Font file for OpenDyslexic Regular
+│   │   ├── OpenDyslexic-Bold.otf     # Font file for OpenDyslexic Bold
+│   ├── images/
+│   │   ├── icon.png        # Icon for the extension
+│   │   ├── logo.png        # Logo for the extension
+├── backend/
+│   ├── server.js           # Main server file for the backend
+│   ├── routes/
+│   │   ├── tts.js          # Route for text-to-speech API
+│   │   ├── translate.js    # Route for translation API
+│   │   ├── pronunciation.js # Route for pronunciation hints API
+│   ├── controllers/
+│   │   ├── ttsController.js # Controller for text-to-speech logic
+│   │   ├── translateController.js # Controller for translation logic
+│   │   ├── pronunciationController.js # Controller for pronunciation hints logic
+│   ├── models/
+│   │   ├── user.js         # User model for database interactions
+│   ├── config/
+│   │   ├── db.js           # Database configuration
+│   ├── utils/
+│   │   ├── helpers.js      # Helper functions
+├── site/
+│   ├── app/
+│   │   ├── page.tsx        # Main page component for the site
+│   │   ├── components/
+│   │   │   ├── Navbar.tsx  # Navbar component
+│   │   │   ├── HeroSection.tsx # Hero section component
+│   │   │   ├── SavePreferences.tsx # Save preferences component
+│   │   ├── styles/
+│   │   │   ├── global.css  # Global CSS for the site
+├── README.md               # Documentation for the project
+├── LICENSE                 # License file for the project
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-**FULL DEPLOYMENT COMING SOON: https://accessify-extension.com/**
 
-## Learn More
+## Environment Variables
 
-To learn more about Next.js, take a look at the following resources:
+The following environment variables are used in the project:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `PORT`: The port on which the server will run.
+- `GOOGLE_CLOUD_PROJECT_ID`: The Google Cloud project ID.
+- `GOOGLE_APPLICATION_CREDENTIALS`: The path to the Google Cloud service account key file.
+- `GOOGLE_APPLICATION_CREDENTIALS_JSON`: The base64-encoded JSON key for Google Cloud service account.
+- `GEMINI_API_KEY`: The API key for Google Generative AI.
+- `ANTHROPIC_API_KEY`: The API key for Anthropic.
+- `OPENAI_API`: The API key for OpenAI.
+- `NEXTAUTH_URL`: The URL of the Next.js application.
+- `NEXTAUTH_SECRET`: The secret used to encrypt session tokens.
+- `GOOGLE_CLIENT_ID`: The client ID for Google OAuth.
+- `GOOGLE_CLIENT_SECRET`: The client secret for Google OAuth.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Running the Application
 
-## Deploy on Vercel
+To run the application, use the following commands:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Frontend & Backend
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+# Navigate to the site directory
+cd site
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+
+# Build the application for production
+npm run build
+
+# Start the production server
+npm start
+
+# Navigate to the backend directory
+cd backend
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+
+# Start the production server
+npm start
+```
+
+### Chrome Extension
+
+Open Chrome and navigate to 
+```
+chrome://extensions/
+```
+Enable "Developer mode" using the toggle in the top right corner.
+
+Click "Load unpacked" and select the extension directory.
+
+#### Enjoy!
