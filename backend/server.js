@@ -187,6 +187,21 @@ app.post('/api/tts', async (req, res) => {
     }
 });
 
+app.post('/api/create-user', async (req, res) => {
+    // Only if user doesn't already exist
+    // insert default into table
+
+    const { emailAddress } = req.body;
+    console.log(`Backend received email addr: ${emailAddress}`);
+    const item = await UserInputService.queryByEmail(emailAddress);
+    if (item.length !== 0) {
+        console.log("User already exists.");
+        return res.status(200).json({message: "User already exists."});
+    }
+    UserInputService.create({}, emailAddress);
+    return res.status(200).json({message: `Initialized new default user for ${emailAddress}`})
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
