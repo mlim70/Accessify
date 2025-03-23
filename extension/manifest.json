@@ -14,20 +14,26 @@
     "tabs",
     "tts"
   ],
+  "host_permissions": [
+    "http://localhost:3001/*",
+    "https://main.d3gujotgix03b1.amplifyapp.com/*"
+  ],
   "content_scripts": [
     {
       "matches": [
         "<all_urls>",
-        "http://localhost:3000/*"
+        "http://localhost:3000/*",
+        "https://accessify-extension.com/*"
       ],
       "js": [
+        "config.js",
         "content.js"
       ],
       "run_at": "document_start"
     }
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; media-src 'self' blob:;"
+    "extension_pages": "script-src 'self'; object-src 'self'; media-src 'self' blob: http://localhost:3001 https://main.d3gujotgix03b1.amplifyapp.com; connect-src 'self' http://localhost:3001 https://main.d3gujotgix03b1.amplifyapp.com;"
   },
   "action": {
     "default_popup": "ui/popup.html",
@@ -35,7 +41,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["fonts/OpenDyslexic-Regular.otf", "fonts/OpenDyslexic-Bold.otf", "generative-ai.umd.js"],
+      "resources": ["fonts/OpenDyslexic-Regular.otf", "fonts/OpenDyslexic-Bold.otf", "generative-ai.umd.js", "config.js"],
       "matches": ["<all_urls>"],
       "js": ["content.js", "features/font-changer.js", "utils/translator.js"]
     }

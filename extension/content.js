@@ -1,3 +1,5 @@
+const config = require('./config');
+
 // Add this at the very top of content.js, before any other code
 console.log('Setting up email storage listener');
 
@@ -9,7 +11,7 @@ let currentAudio = null;
 //     console.log('Received window message:', event.data);
 
 //     // Only accept messages from our webpage
-//     if (event.origin !== 'http://localhost:3000') {
+//     if (event.origin !== config.FRONTEND_URL) {
 //         console.log('Ignored message from:', event.origin);
 //         return;
 //     }
@@ -20,7 +22,7 @@ let currentAudio = null;
 //         chrome.storage.sync.set({ userEmail: event.data.email }, function() {
 //             console.log('Successfully stored email in Chrome storage:', event.data.email);
 //             // Notify the webpage that storage was successful
-//             window.postMessage({ type: 'EMAIL_STORED_SUCCESS' }, 'http://localhost:3000');
+//             window.postMessage({ type: 'EMAIL_STORED_SUCCESS' }, config.FRONTEND_URL);
 //         });
 //     }
 // });
@@ -107,7 +109,7 @@ async function readSelectedText(text) {
         // Create and show speaker overlay
         const overlay = createSpeakerOverlay(text);
 
-        const response = await fetch("http://localhost:3001/api/tts", {
+        const response = await fetch(`${config.API_BASE_URL}/api/tts`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -252,7 +254,7 @@ function processRequest(request, sendResponse) {
 async function translateText(text, targetLanguage) {
     try {
         console.log(`Attempting to translate: "${text}" to ${targetLanguage}`);
-        const response = await fetch('http://localhost:3001/api/translate', {
+        const response = await fetch(`${config.API_BASE_URL}/api/translate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -279,7 +281,7 @@ async function translateText(text, targetLanguage) {
 async function generatePronunciationHints(text) {
     try {
         console.log(`Attempting to generate hints for: "${text}"`);
-        const response = await fetch('http://localhost:3001/api/pronunciation', {
+        const response = await fetch(`${config.API_BASE_URL}/api/pronunciation`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -602,7 +604,7 @@ async function sendToClaude(prompt) {
         const html = document.documentElement.outerHTML;
         
         // Send to backend
-        const response = await fetch('http://localhost:3001/api/claude-query', {
+        const response = await fetch(`${config.API_BASE_URL}/api/claude-query`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

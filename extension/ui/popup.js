@@ -1,3 +1,5 @@
+const config = require('../config');
+
 // Wait for DOM to be fully loaded
 document.addEventListener("DOMContentLoaded", function () {
   console.log("=== Extension Popup Initialized ===");
@@ -171,7 +173,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // 3. Send to backend
         console.log("Sending POST request to backend...");
-        fetch("http://localhost:3001/api/input", {
+        fetch(`${config.API_BASE_URL}/api/input`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
