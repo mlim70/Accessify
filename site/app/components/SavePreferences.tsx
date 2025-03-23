@@ -8,12 +8,15 @@ export default function SavePreferences() {
   const [preferences, setPreferences] = useState({
     colorBlindFilter: 'none',
     preferredFont: 'default',
-    dyslexia: 'none'
+    dyslexia: 'none',
+    language: 'en',
+    additionalInfo: '',
+    fontChoice: 'Arial'
   });
   const [status, setStatus] = useState<string>('');
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
+    e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setPreferences((prev) => ({
@@ -98,6 +101,60 @@ export default function SavePreferences() {
             <option value="directional">Directional</option>
             <option value="attentional">Attentional</option>
           </select>
+        </div>
+
+        <div>
+          <label htmlFor="language">Preferred Language:</label>
+          <select
+            id="language"
+            name="language"
+            value={preferences.language}
+            onChange={handleChange}
+          >
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="it">Italian</option>
+            <option value="pt">Portuguese</option>
+            <option value="ru">Russian</option>
+            <option value="zh">Chinese</option>
+            <option value="ja">Japanese</option>
+            <option value="ko">Korean</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="fontChoice">Font Choice:</label>
+          <select
+            id="fontChoice"
+            name="fontChoice"
+            value={preferences.fontChoice}
+            onChange={handleChange}
+          >
+            <option value="Arial">Arial</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Helvetica">Helvetica</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Tahoma">Tahoma</option>
+            <option value="Trebuchet MS">Trebuchet MS</option>
+            <option value="Impact">Impact</option>
+            <option value="Comic Sans MS">Comic Sans MS</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="additionalInfo">Additional Information:</label>
+          <textarea
+            id="additionalInfo"
+            name="additionalInfo"
+            value={preferences.additionalInfo}
+            onChange={handleChange}
+            placeholder="Enter any additional information about your accessibility needs..."
+            rows={4}
+          />
         </div>
 
         <button type="submit">Save Preferences</button>
