@@ -1,4 +1,4 @@
-# EmoryHax
+# Accessify
 
 ## Overview
 
@@ -44,43 +44,32 @@ The Chrome extension is built using the following technologies:
 ├── extension/
 │   ├── content.js          # Main content script for the Chrome extension
 │   ├── background.js       # Background script for handling extension events
-│   ├── popup.html          # HTML for the extension's popup interface
-│   ├── popup.js            # JavaScript for the extension's popup interface
-│   ├── manifest.json       # Manifest file for the Chrome extension
-│   ├── styles/
+│   ├── ui/
+│   │   ├── popup.html          # HTML for the extension's popup interface
+│   │   ├── popup.js            # JavaScript for the extension's popup interface
 │   │   ├── popup.css       # CSS for the extension's popup interface
-│   │   ├── content.css     # CSS for the content script
+│   ├── manifest.json       # Manifest file for the Chrome extension
 │   ├── fonts/
 │   │   ├── OpenDyslexic-Regular.otf  # Font file for OpenDyslexic Regular
 │   │   ├── OpenDyslexic-Bold.otf     # Font file for OpenDyslexic Bold
-│   ├── images/
-│   │   ├── icon.png        # Icon for the extension
-│   │   ├── logo.png        # Logo for the extension
+│   ├── icon.png        # Icon for the extension
 ├── backend/
 │   ├── server.js           # Main server file for the backend
-│   ├── routes/
-│   │   ├── tts.js          # Route for text-to-speech API
-│   │   ├── translate.js    # Route for translation API
-│   │   ├── pronunciation.js # Route for pronunciation hints API
-│   ├── controllers/
-│   │   ├── ttsController.js # Controller for text-to-speech logic
-│   │   ├── translateController.js # Controller for translation logic
-│   │   ├── pronunciationController.js # Controller for pronunciation hints logic
-│   ├── models/
-│   │   ├── user.js         # User model for database interactions
-│   ├── config/
-│   │   ├── db.js           # Database configuration
-│   ├── utils/
-│   │   ├── helpers.js      # Helper functions
+│   ├── services/
+│   │   ├── claude-endpoint.ts
+│   │   ├── claude-prompt.js 
+│   ├── dynamoClient.js
+│   ├── UserInput.js
+│   ├── .env
+│   ├── service-account-key.json
 ├── site/
 │   ├── app/
 │   │   ├── page.tsx        # Main page component for the site
 │   │   ├── components/
 │   │   │   ├── Navbar.tsx  # Navbar component
 │   │   │   ├── HeroSection.tsx # Hero section component
-│   │   │   ├── SavePreferences.tsx # Save preferences component
-│   │   ├── styles/
-│   │   │   ├── global.css  # Global CSS for the site
+│   │   │   ├── feature-card.tsx
+│   │   │   ├── footer.tsx
 ├── README.md               # Documentation for the project
 ├── LICENSE                 # License file for the project
 ```
@@ -115,13 +104,13 @@ cd site
 # Install dependencies
 npm install
 
-# Start the development server
+# Start the development server locally
 npm run dev
 
-# Build the application for production
+# Build the application for production (not locally)
 npm run build
 
-# Start the production server
+# Start the production server (not locally)
 npm start
 
 # Navigate to the backend directory
@@ -130,10 +119,13 @@ cd backend
 # Install dependencies
 npm install
 
-# Start the development server
+# Start the development server locally
 npm run dev
 
-# Start the production server
+# Build the application for production (not locally)
+npm run build
+
+# Start the production server (not locally)
 npm start
 ```
 
