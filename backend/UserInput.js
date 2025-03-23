@@ -12,9 +12,10 @@ class UserInputService {
             userEmail: userEmail, // Needed for the GSI "EmailIndex"
             preferences: {
                 colorBlindFilter: preferences.colorBlindFilter || 'none',
-                preferredFont: preferences.preferredFont || 'default',
                 dyslexia: preferences.dyslexia || 'none',
                 language: preferences.language || 'en',
+                screenReader: preferences.screenReader || 'off',
+                imageCaption: preferences.imageCaption || 'off',
                 additionalInfo: preferences.additionalInfo || ''
             },
             createdAt: timestamp,

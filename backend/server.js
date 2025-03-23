@@ -145,7 +145,6 @@ app.post('/api/pronunciation', async (req, res) => {
             const pronunciation = result.response.text().replace('\n', '');
             text = text.replace(word, `${word} (${pronunciation})`)
         }
-        console.log(`Made ${challengingWords.length} revisions`)
         return res.status(200).json({ revisedText: text });
     } catch (error) {
         console.error('Error generating pronunciation guide:', error);
@@ -155,7 +154,7 @@ app.post('/api/pronunciation', async (req, res) => {
 
 app.post('/api/tts', async (req, res) => {
     const apiKey = process.env.OPENAI_API;
-    const url = 'https://api.openai.com/v1/audio/speech';
+    const url = 'https://api.openai.com/v1/audio/speech'; // Correct endpoint for TTS
 
     try {
         const { text } = req.body;
@@ -187,6 +186,7 @@ app.post('/api/tts', async (req, res) => {
     }
 });
 
+
 app.post('/api/create-user', async (req, res) => {
     // Only if user doesn't already exist
     // insert default into table
@@ -200,6 +200,42 @@ app.post('/api/create-user', async (req, res) => {
     }
     UserInputService.create({}, emailAddress);
     return res.status(200).json({message: `Initialized new default user for ${emailAddress}`})
+});
+
+app.post('/api/check-email', async (req, res) => {
+    try {
+        const { emailAddress } = req.body;
+        console.log(`Received email: ${emailAddress}`);
+        const item = await UserInputService.queryByEmail(emailAddress);
+        if (item.length) {
+            // item exists
+            return res.status(200).json({preferences: item[0]});
+        } else {
+            return res.status(404).json({ error: `Record with email address ${emailAddress} does not exist`});
+        }
+    } catch (error) {
+        console.error('Error confirming email address: ', error);
+        res.status(500).json({ error: 'Error checking email address: ', details: error.message });
+    }
+});
+
+app.post('/api/save-preferences', async (req, res) => {
+    try {
+        const preferences = {
+            'colorBlindFilter': req.body.userPreferences['colorfilter-options'],
+            'dyslexia': req.body.userPreferences['dyslexia-options'],
+            'language': req.body.userPreferences['language-options'],
+            'screenReader': req.body.userPreferences['screen-reader-toggle'],
+            'imageCaption': req.body.userPreferences['image-caption-toggle'],
+            'additionalInfo': req.body.userPreferences['conditions-textarea']
+        }
+        UserInputService.create(preferences, req.body.userPreferences.emailAddress);
+        res.status(200);
+    } catch (error) {
+        console.error('Error confirming email address: ', error);
+        res.status(500).json({ error: 'Error checking email address: ', details: error.message });
+    }
+
 });
 
 app.listen(PORT, () => {
