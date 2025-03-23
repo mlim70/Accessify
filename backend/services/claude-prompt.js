@@ -5,28 +5,28 @@
  * @returns {string} The formatted prompt
  */
 async function generateAccessibilityPrompt(preferences, html) {
-    let prompt = `You are an accessibility expert. Your task is to enhance the 
+  let prompt = `You are an accessibility expert. Your task is to enhance the 
     provided HTML to make it more accessible for users with specific disabilities.
 
     TARGET DISABILITIES:`;
-    
-    // Color blindness specifications
-    if (preferences.colorBlindness !== 'none') {
-        prompt += `\n1. Color Blindness Type: ${preferences.colorBlindness}
+
+  // Color blindness specifications
+  if (preferences.colorBlindness !== "none") {
+    prompt += `\n1. Color Blindness Type: ${preferences.colorBlindness}
         - For Red-Green (Deuteranopia/Protanopia): Avoid red/green contrasts, use blues and yellows
         - For Blue-Yellow (Tritanopia): Avoid blue/yellow contrasts, use reds and greens
         - For Complete (Monochromacy): Use high contrast patterns and shapes instead of color distinctions`;
-    }
-    
-    // Dyslexia specifications
-    if (preferences.dyslexia !== 'none') {
-        prompt += `\n2. Dyslexia Type: ${preferences.dyslexia}
+  }
+
+  // Dyslexia specifications
+  if (preferences.dyslexia !== "none") {
+    prompt += `\n2. Dyslexia Type: ${preferences.dyslexia}
         - For Phonological: Ensure clear font choices (OpenDyslexic or similar)
         - For Surface Dyslexia: Increase letter and line spacing
         - General: Use left-aligned text, avoid justified text`;
-    }
+  }
 
-    prompt += `\n\nREQUIRED MODIFICATIONS:
+  prompt += `\n\nREQUIRED MODIFICATIONS:
     1. Color and Contrast:
     - Ensure WCAG 2.1 AA standard contrast ratios (minimum 4.5:1 for normal text)
     - Add visual indicators beyond color for important elements
@@ -76,9 +76,9 @@ async function generateAccessibilityPrompt(preferences, html) {
     The HTML to modify follows below:
     ${html}`;
 
-    return prompt;
+  return prompt;
 }
 
 module.exports = {
-    generateAccessibilityPrompt
-}; 
+  generateAccessibilityPrompt,
+};

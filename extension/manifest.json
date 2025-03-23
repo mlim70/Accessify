@@ -6,22 +6,11 @@
   "icons": {
     "48": "icon.png"
   },
-  "permissions": [
-    "activeTab",
-    "storage",
-    "scripting",
-    "tabs",
-    "tts"
-  ],
+  "permissions": ["activeTab", "storage", "scripting", "tabs", "tts"],
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>",
-        "http://localhost:3000/*"
-      ],
-      "js": [
-        "content.js"
-      ],
+      "matches": ["<all_urls>", "http://localhost:3000/*"],
+      "js": ["content.js"],
       "run_at": "document_start"
     }
   ],
@@ -34,7 +23,11 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["fonts/OpenDyslexic-Regular.otf", "fonts/OpenDyslexic-Bold.otf", "generative-ai.umd.js"],
+      "resources": [
+        "fonts/OpenDyslexic-Regular.otf",
+        "fonts/OpenDyslexic-Bold.otf",
+        "generative-ai.umd.js"
+      ],
       "matches": ["<all_urls>"],
       "js": ["content.js", "features/font-changer.js", "utils/translator.js"]
     }

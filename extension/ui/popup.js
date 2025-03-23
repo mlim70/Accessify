@@ -210,7 +210,6 @@ document.addEventListener('DOMContentLoaded', function() {
         userPreferences[imageCaptionToggle] = imageCaption;        
         
         userPreferences['emailAddress'] = emailValue;
-        // const { emailAddress, colorFilters, dyslexiaTreatment, language, screenReader, imageCaption, additional } = req.body;
         fetch("http://localhost:3001/api/save-preferences", {
             method: "POST",
             headers: {
@@ -222,7 +221,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Reset button
     const resetButton = document.querySelector('.reset-button');
     if (!resetButton) {
         console.error("Reset button not found");
@@ -275,7 +273,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!(emailValue && emailValue.includes('@') && emailValue.includes('.'))) {
                 return;
             }
-            // Create a new click event
             const clickEvent = new MouseEvent('click', {
               view: window,
               bubbles: true,
@@ -287,7 +284,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!result) {
                 return;
             }
-            // Dispatch the click event on the header
             header.dispatchEvent(clickEvent);
             const newHeader = header.cloneNode(true);
             header.parentNode.replaceChild(newHeader, header);
@@ -303,13 +299,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 const registerMessageId = "registration-reminder";
 function addRegisterMessage() {
-    // Create warning container
     removeRegisterMessage();
     removeLoginMessage();
 
     const warningDiv = document.createElement('div');
     warningDiv.id = registerMessageId;
-    // warningDiv.style.backgroundColor = '#90EE90';
     warningDiv.style.backgroundColor = '#fff3cd';
     warningDiv.style.color = '#856404';
     warningDiv.style.padding = '12px';
@@ -318,15 +312,13 @@ function addRegisterMessage() {
     warningDiv.style.border = '1px solid #ffeeba';
     warningDiv.style.textAlign = 'center';
     
-    // Create warning text
     const warningText = document.createElement('p');
     warningText.textContent = 'You must ';
     warningText.style.margin = '0';
     warningText.style.fontSize = '16px';
     
-    // Create sign-in link
     const signInLink = document.createElement('a');
-    signInLink.href = 'http://localhost:3000'; // Change this to your login page URL
+    signInLink.href = 'http://localhost:3000';
     signInLink.textContent = 'register';
     signInLink.style.color = '#0056b3';
     signInLink.style.fontWeight = 'bold';
@@ -334,15 +326,12 @@ function addRegisterMessage() {
     signInLink.target = '_blank';
     signInLink.rel = 'noopener noreferrer';
     
-    // Complete the warning message
     const remainingText = document.createTextNode(' first to access this content.');
     
-    // Assemble the warning message
     warningText.appendChild(signInLink);
     warningText.appendChild(remainingText);
     warningDiv.appendChild(warningText);
     
-    // Insert at the beginning of the body
     const bodyElement = document.body;
     bodyElement.insertBefore(warningDiv, document.getElementById("first-section"));
 }
@@ -361,7 +350,6 @@ function addLoginMessage() {
 
     const warningDiv = document.createElement('div');
     warningDiv.id = registerMessageId;
-    // warningDiv.style.backgroundColor = '#90EE90';
     warningDiv.style.backgroundColor = '#fff3cd';
     warningDiv.style.color = '#856404';
     warningDiv.style.padding = '12px';
@@ -370,7 +358,6 @@ function addLoginMessage() {
     warningDiv.style.border = '1px solid #ffeeba';
     warningDiv.style.textAlign = 'center';
     
-    // Create warning text
     const warningText = document.createElement('p');
     warningText.textContent = 'You must sign in to save preferences.';
     warningText.style.margin = '0';
@@ -378,7 +365,6 @@ function addLoginMessage() {
     
     warningDiv.appendChild(warningText);
     
-    // Insert at the beginning of the body
     const bodyElement = document.body;
     bodyElement.insertBefore(warningDiv, document.getElementById("first-section"));
 }
@@ -403,8 +389,6 @@ async function preferences(email) {
         const data = await response.json();
         return data.preferences;
     } else if (response.status === 404) {
-        // does not exist
-        // prompt user to create account
         addRegisterMessage();
         return null;
     } else {
@@ -413,7 +397,6 @@ async function preferences(email) {
 }
 
 function loadPreferences(results) {
-    // Set color blindness filter
     const colorFilterOptions = document.querySelector('.option-group').getElementsByTagName('button');
     for (const option of colorFilterOptions) {
         if (option.id === `color-blind-${results.preferences.colorBlindFilter}`) {
@@ -423,7 +406,6 @@ function loadPreferences(results) {
         }
     }
 
-    // Set dyslexia options
     const dyslexiaOptions = document.querySelectorAll('.option-group button[id^="dyslexia-"]');
     dyslexiaOptions.forEach(option => {
         if (option.id === results.preferences.dyslexia) {
@@ -433,7 +415,6 @@ function loadPreferences(results) {
         }
     });
 
-    // Set language
     const languageOptions = document.querySelectorAll('.lang-button');
     languageOptions.forEach(option => {
         if (option.dataset.langCode === results.preferences.language) {
@@ -443,25 +424,21 @@ function loadPreferences(results) {
         }
     });
 
-    // Set screen reader toggle
     const screenReaderToggle = document.getElementById('screen-reader-toggle');
     if (screenReaderToggle) {
         screenReaderToggle.checked = results.preferences.screenReader || false;
     }
 
-    // Set image caption toggle
     const imageCaptionToggle = document.getElementById('image-caption-toggle');
     if (imageCaptionToggle) {
         imageCaptionToggle.checked = results.preferences.imageCaption || false;
     }
 
-    // Set additional conditions
     const additionalConditions = document.querySelector('.conditions-textarea');
     if (additionalConditions) {
         additionalConditions.value = results.preferences.additionalInfo || '';
     }
 
-    // Apply the preferences to the current page
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
         if (!tabs[0]) return;
 
@@ -476,7 +453,6 @@ function loadPreferences(results) {
             );
         }
 
-        // Apply dyslexia treatment
         if (results.preferences.dyslexia !== 'none') {
             chrome.tabs.sendMessage(
                 tabs[0].id,
@@ -487,7 +463,6 @@ function loadPreferences(results) {
             );
         }
 
-        // Apply language translation
         if (results.preferences.language !== 'en') {
             chrome.tabs.sendMessage(
                 tabs[0].id,
@@ -506,13 +481,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     headers.forEach(header => {
       header.addEventListener('click', function() {
-        // Get the next sibling element which is the collapsible content
         const content = this.nextElementSibling;
         
-        // Toggle the collapsed class
         content.classList.toggle('collapsed');
         
-        // Change the arrow direction
         const toggleBtn = this.querySelector('.toggle-btn');
         if (content.classList.contains('collapsed')) {
           toggleBtn.style.transform = 'rotate(-90deg)';
@@ -524,7 +496,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Updated language data with correct character encoding
   const languages = [
     { code: "en", name: "English", native: "English" },
     { code: "es", name: "Spanish", native: "Español" },
@@ -543,15 +514,13 @@ document.addEventListener("DOMContentLoaded", function () {
     { code: "vi", name: "Vietnamese", native: "Tiếng Việt" },
   ];
 
-  // Make sure the HTML file has proper UTF-8 encoding
   document.querySelector("head").innerHTML += '<meta charset="UTF-8">';
 
   const languageList = document.getElementById("language-list");
   const searchInput = document.getElementById("language-search");
 
-  // Create and append language buttons
   function createLanguageButtons(filteredLanguages) {
-    languageList.innerHTML = ""; // Clear current list
+    languageList.innerHTML = ""; 
     filteredLanguages.forEach((lang) => {
       const button = document.createElement("button");
       button.className = "lang-button";
@@ -559,13 +528,10 @@ document.addEventListener("DOMContentLoaded", function () {
       button.innerHTML = `${lang.native} <span class="lang-name">(${lang.name})</span>`;
 
       button.addEventListener("click", () => {
-        // Remove active class from all buttons
         document
           .querySelectorAll(".lang-button")
           .forEach((btn) => btn.classList.remove("active"));
-        // Add active class to clicked button
         button.classList.add("active");
-        // Handle language selection
         handleLanguageSelection(lang.code);
       });
 
@@ -573,10 +539,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Initial population of language list
   createLanguageButtons(languages);
 
-  // Search functionality
   searchInput.addEventListener("input", (e) => {
     const searchTerm = e.target.value.toLowerCase();
     const filteredLanguages = languages.filter(
@@ -587,7 +551,6 @@ document.addEventListener("DOMContentLoaded", function () {
     createLanguageButtons(filteredLanguages);
   });
 
-  // Handle language selection
   function handleLanguageSelection(langCode) {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       chrome.tabs.sendMessage(
@@ -605,24 +568,18 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Handle option buttons (Color Filters and Dyslexia)
   document.querySelectorAll(".option-group .big-button").forEach((button) => {
     button.addEventListener("click", function () {
       const parentGroup = this.closest(".option-group");
 
       if (this.classList.contains("active")) {
-        // If clicking an active button, deselect it (equivalent to 'none')
         this.classList.remove("active");
-        // Handle deactivation logic
         handleOptionDeactivation(this.id);
       } else {
-        // Remove active class from all buttons in this group
         parentGroup
           .querySelectorAll(".big-button")
           .forEach((btn) => btn.classList.remove("active"));
-        // Add active class to clicked button
         this.classList.add("active");
-        // Handle activation logic
         handleOptionActivation(this.id);
       }
     });
@@ -630,7 +587,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function handleOptionActivation(optionId) {
     if (optionId.startsWith("color-blind-")) {
-      // Handle color blindness filter activation
       chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {
           action: "applyColorBlindFilter",
@@ -638,7 +594,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       });
     } else if (optionId.startsWith("dyslexia-")) {
-      // Handle dyslexia treatment activation
       chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {
           action: "applyDyslexiaTreatment",
@@ -650,7 +605,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function handleOptionDeactivation(optionId) {
     if (optionId.startsWith("color-blind-")) {
-      // Handle color blindness filter deactivation
       chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {
           action: "applyColorBlindFilter",
@@ -658,7 +612,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       });
     } else if (optionId.startsWith("dyslexia-")) {
-      // Handle dyslexia treatment deactivation
       chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {
           action: "applyDyslexiaTreatment",
