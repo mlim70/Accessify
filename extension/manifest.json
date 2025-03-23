@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "All in one accessibility",
+  "name": "Accessify",
   "version": "1.0",
-  "description": "Changes the font of web pages to your preferred Google Web Font",
+  "description": "Making the web accessible for people with disabilities.",
   "icons": {
     "48": "icon.png"
   },
