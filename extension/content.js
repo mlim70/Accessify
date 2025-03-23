@@ -3,6 +3,8 @@ console.log('Setting up email storage listener');
 
 let isAuthenticated = false;
 
+let currentAudio = null;
+
 window.addEventListener('message', function(event) {
     console.log('Received window message:', event.data);
     
@@ -22,6 +24,49 @@ window.addEventListener('message', function(event) {
         });
     }
 });
+
+async function readSelectedText(text) {
+    console.log("Reading text:", text);
+    try {
+        const response = await fetch("http://localhost:3001/api/tts", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"},
+        body: JSON.stringify({ text })
+        });
+        console.log("Sent request to OpenAI Text-to-Speech API");
+        if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        console.log("Received response from OpenAI Text-to-Speech API");
+        console.log("Response:", response);
+        const audioBlob = await response.blob();
+        console.log("reviefed audio blob");
+        console.log("Audio blob:", audioBlob);
+        const audioUrl = URL.createObjectURL(audioBlob);
+        
+        const audio = new Audio(audioUrl);
+        if (currentAudio) {
+            currentAudio.src = '';
+            currentAudio.pause();
+        }
+        audio.play();
+        currentAudio = audio;
+
+
+    } catch (error) {
+        console.error('Error with OpenAI Text-to-Speech API:', error);
+    }
+}
+
+document.addEventListener('mouseup', function() {
+    const selectedText = window.getSelection().toString().trim();
+  
+    if (selectedText) {
+      console.log('Text selected: ' + selectedText);
+      readSelectedText(selectedText);
+    }
+  });
 
 // Color blindness filter styles
 const colorBlindFilters = {

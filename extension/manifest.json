@@ -29,9 +29,6 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; media-src 'self' blob:;"
   },
-  "background": {
-    "service_worker": "background.js"
-  },
   "action": {
     "default_popup": "ui/popup.html",
     "default_icon": "icon.png"
