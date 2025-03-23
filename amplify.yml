@@ -26,11 +26,13 @@ applications:
             - npm ci
         build:
           commands:
-            - npm start &
+            - npm install --production
       artifacts:
         baseDirectory: .
         files:
           - '**/*'
+        excludes:
+          - node_modules/nodemon/**/*
       cache:
         paths:
           - node_modules/**/*  
