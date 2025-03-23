@@ -5,12 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   ChevronRight,
   Chrome,
-  Eye,
-  FileText,
   Headphones,
-  Image,
   Languages,
-  Maximize,
   Palette,
   Type,
 } from "lucide-react"
@@ -42,40 +38,10 @@ export default function Home() {
       tabValue: "translate"
     },
     {
-      title: "Magnification Tool",
-      description: "Enlarges portions of the screen for users with visual impairments.",
-      icon: <Maximize className="h-8 w-8 text-primary" />,
-      tabValue: "magnify"
-    },
-    {
-      title: "LLM Input Modification",
-      description: "Uses AI to modify website code in real-time for better accessibility.",
-      icon: <FileText className="h-8 w-8 text-primary" />,
-      tabValue: "llm"
-    },
-    {
       title: "Text to Speech",
       description: "Reads website content aloud for users with visual impairments or reading difficulties.",
       icon: <Headphones className="h-8 w-8 text-primary" />,
       tabValue: "tts"
-    },
-    {
-      title: "Image Captioning",
-      description: "Automatically generates and reads descriptions for images on websites.",
-      icon: <Image className="h-8 w-8 text-primary" />,
-      tabValue: "caption"
-    },
-    {
-      title: "OCR & Summarization",
-      description: "Extracts and summarizes text from images for easier comprehension.",
-      icon: <Eye className="h-8 w-8 text-primary" />,
-      tabValue: "ocr"
-    },
-    {
-      title: "Resource Suggestions",
-      description: "Recommends other helpful extensions and resources based on specific disabilities.",
-      icon: <Chrome className="h-8 w-8 text-primary" />,
-      tabValue: "overview"
     },
   ]
 
@@ -89,16 +55,12 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-center mb-12">Powerful Accessibility Features</h2>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-3 md:grid-cols-9 mb-8">
+            <TabsList className="grid grid-cols-3 md:grid-cols-5 mb-8">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="dyslexic">Dyslexic Font</TabsTrigger>
               <TabsTrigger value="colorblind">Color Blindness</TabsTrigger>
               <TabsTrigger value="translate">Translator</TabsTrigger>
-              <TabsTrigger value="magnify">Magnification</TabsTrigger>
-              <TabsTrigger value="llm">LLM Input</TabsTrigger>
               <TabsTrigger value="tts">Text to Speech</TabsTrigger>
-              <TabsTrigger value="caption">Image Captioning</TabsTrigger>
-              <TabsTrigger value="ocr">OCR</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-4">
@@ -170,9 +132,88 @@ export default function Home() {
                   <h4 className="font-semibold mb-2">How to use:</h4>
                   <ol className="list-decimal ml-5 space-y-2">
                     <li>Click the Accessify icon in your Chrome toolbar</li>
-                    <li>Select &quot;Color Blindness&quot; from the menu</li>
-                    <li>Choose your specific type of color blindness</li>
-                    <li>Adjust the intensity of the filter as needed</li>
+                    <li>Go to &quot;Color Filters&quot; from the menu</li>
+                    <li>Choose your specific type of color blindness (Protanopia, Deuteranopia, or Tritanopia)</li>
+                  </ol>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="translate" className="space-y-4">
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <div className="flex items-center mb-4">
+                  <Languages className="h-8 w-8 text-primary mr-3" />
+                  <h3 className="text-2xl font-bold">Translation Support</h3>
+                </div>
+                <p className="mb-4">
+                  Our translation feature instantly translates web content into your preferred language, making the web
+                  more accessible to users worldwide. It supports over 100 languages and preserves the original layout
+                  while providing accurate translations.
+                </p>
+                <div className="flex flex-col md:flex-row gap-6 mt-8">
+                  <div className="flex-1 p-4 border rounded-lg">
+                    <h4 className="font-semibold mb-2">Original Content</h4>
+                    <p>
+                      The original webpage content in its native language. Users who don&apos;t speak this language may
+                      find it difficult to understand.
+                    </p>
+                  </div>
+                  <div className="flex-1 p-4 border rounded-lg bg-primary/5">
+                    <h4 className="font-semibold mb-2">Translated Content</h4>
+                    <p>
+                      The same content translated into your preferred language, maintaining the original formatting
+                      and layout while making it accessible to you.
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-6">
+                  <h4 className="font-semibold mb-2">How to use:</h4>
+                  <ol className="list-decimal ml-5 space-y-2">
+                    <li>Click the Accessify icon in your Chrome toolbar</li>
+                    <li>Scroll down to  &quot;Language&quot; from the menu</li>
+                    <li>Choose or search foryour preferred language</li>
+                    <li>The page will automatically translate while maintaining its layout with a progress bar on top of the page to see how much is left</li>
+                  </ol>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="tts" className="space-y-4">
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <div className="flex items-center mb-4">
+                  <Headphones className="h-8 w-8 text-primary mr-3" />
+                  <h3 className="text-2xl font-bold">Text to Speech</h3>
+                </div>
+                <p className="mb-4">
+                  Our text-to-speech feature reads webpage content aloud, making it easier for users with visual
+                  impairments or reading difficulties to access web content, supporting multiple voices and languages.
+                </p>
+                <div className="flex flex-col md:flex-row gap-6 mt-8">
+                  <div className="flex-1 p-4 border rounded-lg">
+                    <h4 className="font-semibold mb-2">Features</h4>
+                    <ul className="list-disc ml-5 space-y-2">
+                      <li>Natural-sounding voices in multiple languages</li>
+                      <li>Smooth progress bar to see how much is left</li>
+                      <li>Highlight text as it&apos;s being read</li>
+                    </ul>
+                  </div>
+                  <div className="flex-1 p-4 border rounded-lg bg-primary/5">
+                    <h4 className="font-semibold mb-2">Use Cases</h4>
+                    <ul className="list-disc ml-5 space-y-2">
+                      <li>Visual impairments</li>
+                      <li>Reading difficulties</li>
+                      <li>Multitasking while browsing</li>
+                      <li>Learning new languages</li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="mt-6">
+                  <h4 className="font-semibold mb-2">How to use:</h4>
+                  <ol className="list-decimal ml-5 space-y-2">
+                    <li>Click the Accessify icon in your Chrome toolbar</li>
+                    <li>Scroll down to &quot;Tools&quot; from the menu</li>
+                    <li>Enable &quot;Screen Reader&quot;</li>
+                    <li>Highlight any text to have it read aloud</li>
                   </ol>
                 </div>
               </div>
