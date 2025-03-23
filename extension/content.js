@@ -9,9 +9,31 @@ const colorBlindFilters = {
 
 console.log('Content script loaded with colorblind filters:', Object.keys(colorBlindFilters));
 
-// Listen for messages from popup
+// Add near the top of your content.js, before other listeners
+console.log('Content script initialized for email storage');
+
+// Modify the message listener to check authentication
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     console.log('Received message in content script:', request);
+    
+    // Check authentication before processing any requests
+    if (!isAuthenticated) {
+        chrome.storage.sync.get(['userEmail'], function(result) {
+            if (result.userEmail) {
+                isAuthenticated = true;
+                processRequest(request, sendResponse);
+            } else {
+                sendResponse({ success: false, error: 'User not authenticated' });
+            }
+        });
+        return true;
+    }
+    
+    processRequest(request, sendResponse);
+    return true;
+});
+
+function processRequest(request, sendResponse) {
     if (request.action === 'applyColorBlindFilter') {
         try {
             console.log('Attempting to apply filter:', request.filterType);
@@ -32,8 +54,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     } else if (request.action === 'restore-original') {
         restoreOriginalHTML();
     }
-    return true; // Keep the message channel open for async response
-});
+}
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     console.log('Received message:', request);
