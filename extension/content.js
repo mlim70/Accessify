@@ -59,14 +59,22 @@ async function readSelectedText(text) {
     }
 }
 
+let lastMouseMoveTime = 0;
+
+document.addEventListener('mousemove', function() {
+    lastMouseMoveTime = Date.now();
+});
+
 document.addEventListener('mouseup', function() {
-    const selectedText = window.getSelection().toString().trim();
-  
-    if (selectedText) {
-      console.log('Text selected: ' + selectedText);
-      readSelectedText(selectedText);
+    const currentTime = Date.now();
+    if (currentTime - lastMouseMoveTime <= 1000) { // 50 milliseconds = 0.05 seconds
+        const selectedText = window.getSelection().toString().trim();
+        if (selectedText) {
+            console.log('Text selected: ' + selectedText);
+            readSelectedText(selectedText);
+        }
     }
-  });
+});
 
 // Color blindness filter styles
 const colorBlindFilters = {
