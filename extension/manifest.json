@@ -39,12 +39,16 @@
   "default_icon": "icon.png"
 },
 "web_accessible_resources": [
-      {
-        "resources": ["fonts/OpenDyslexic-Regular.otf", "fonts/OpenDyslexic-Bold.otf"],
-        "matches": ["<all_urls>"]
-      }
-    ]
-
-
-  
-}
+=======
+    "manifest_version": 3,
+    "name": "All in one accessibility",
+    "version": "1.0",
+    "description": "Changes the font of web pages to your preferred Google Web Font",
+    "icons": {
+      "48": "icon.png"
+    },
+    "action": {
+      "default_popup": "ui/popup.html",
+      "default_icon": "icon.png"
+    },
+    "content_scripts": [
