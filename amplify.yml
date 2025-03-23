@@ -16,4 +16,17 @@ applications:
           - '**/*'
       cache:
         paths:
+          - node_modules/**/*
+  - appRoot: backend
+    backend:
+      phases:
+        preBuild:
+          commands:
+            - npm ci
+      artifacts:
+        baseDirectory: .
+        files:
+          - '**/*'
+      cache:
+        paths:
           - node_modules/**/*  
