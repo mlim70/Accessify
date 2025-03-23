@@ -13,6 +13,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('Popup DOM loaded, setting up event listeners for colorblind buttons');
 
+    const screenReaderToggle = document.getElementById('screen-reader-toggle');
+
+    // Load the stored state of the checkbox
+    chrome.storage.sync.get(['screenReaderEnabled'], function (result) {
+        screenReaderToggle.checked = result.screenReaderEnabled || false;
+    });
+
+    // Save the state of the checkbox when it changes
+    screenReaderToggle.addEventListener('change', function () {
+        chrome.storage.sync.set({ screenReaderEnabled: screenReaderToggle.checked });
+    });
+
+
+
     // Color blindness options mapping
     const colorBlindButtons = {
         'color-blind-none': 'none',
