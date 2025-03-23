@@ -5,36 +5,36 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('=== Extension Popup Initialized ===');
 
-  const screenReaderToggle = document.getElementById("screen-reader-toggle");
+    const screenReaderToggle = document.getElementById("screen-reader-toggle");
 
     // // Load the stored state of the checkbox
-    // chrome.storage.sync.get(['screenReaderEnabled'], function (result) {
-    //     screenReaderToggle.checked = result.screenReaderEnabled || false;
-    // });
+    chrome.storage.sync.get(['screenReaderEnabled'], function (result) {
+        screenReaderToggle.checked = result.screenReaderEnabled || false;
+    });
 
     // Save the state of the checkbox when it changes
     screenReaderToggle.addEventListener('change', function () {
-        // chrome.storage.sync.set({ screenReaderEnabled: screenReaderToggle.checked });
+        chrome.storage.sync.set({ screenReaderEnabled: screenReaderToggle.checked });
     });
 
-  // Color blindness options mapping
-  const colorBlindButtons = {
+    // Color blindness options mapping
+    const colorBlindButtons = {
     "color-blind-protanopia": "protanopia",
     "color-blind-deuteranopia": "deuteranopia",
     "color-blind-tritanopia": "tritanopia",
     "color-blind-complete": "complete",
-  };
+    };
 
-  // Set up event listeners for all colorblind buttons
-  Object.keys(colorBlindButtons).forEach((buttonId) => {
-    const button = document.getElementById(buttonId);
-    console.log(
-      `Looking for button: ${buttonId}`,
-      button ? "Found" : "Not found"
-    );
+    // Set up event listeners for all colorblind buttons
+    Object.keys(colorBlindButtons).forEach((buttonId) => {
+        const button = document.getElementById(buttonId);
+        console.log(
+            `Looking for button: ${buttonId}`,
+            button ? "Found" : "Not found");
+            
     if (!button) {
-      console.warn(`Button not found: ${buttonId}`);
-      return;
+        console.warn(`Button not found: ${buttonId}`);
+        return;
     }
 
     button.addEventListener("click", function () {
