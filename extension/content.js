@@ -154,6 +154,11 @@ function processRequest(request, sendResponse) {
         }
 
         document.body.style.filter = '';
+    } else if (request.action === 'sendToClaude') {
+        sendToClaude(request.prompt)
+            .then(response => sendResponse({ success: true, response }))
+            .catch(error => sendResponse({ success: false, error: error.message }));
+        return true;
     }
 }
 
@@ -415,3 +420,34 @@ function saveFilterPreference(filterType) {
 
 // Add this to verify the script is loaded
 console.log('Content script initialization complete!');
+
+// Function to get HTML content and send to Claude
+async function sendToClaude(prompt) {
+    try {
+        // Get the HTML content
+        const html = document.documentElement.outerHTML;
+        
+        // Send to backend
+        const response = await fetch('http://localhost:3001/api/claude-query', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                html,
+                prompt
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Claude response:', data);
+        return data.response;
+    } catch (error) {
+        console.error('Error sending to Claude:', error);
+        throw error;
+    }
+}

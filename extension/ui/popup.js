@@ -136,36 +136,72 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // 2. Get current preferences
-        console.log('Getting preferences from storage...');
-        chrome.storage.sync.get(
-            ['colorBlindFilter', 'preferredFont', 'dyslexiaPreference', 'language', 'additionalInfo'],
-            function(result) {
-                console.log('Current storage state:', result);
-                
-                const additionalInfo = document.querySelector('.conditions-textarea')?.value || '';
-                console.log('Additional info from textarea:', additionalInfo);
+            // 2. Get current preferences
+            console.log('Getting preferences from storage...');
+            chrome.storage.sync.get(
+                ['colorBlindFilter', 'preferredFont', 'dyslexiaPreference', 'language', 'additionalInfo'],
+                function(result) {
+                    console.log('Current storage state:', result);
+                    
+                    const additionalInfo = document.querySelector('.conditions-textarea')?.value || '';
+                    console.log('Additional info from textarea:', additionalInfo);
 
-                const preferences = {
-                    colorBlindFilter: result.colorBlindFilter || 'none',
-                    preferredFont: result.preferredFont || 'default',
-                    dyslexia: result.dyslexiaPreference || 'none',
-                    language: result.language || 'en',
-                    additionalInfo: additionalInfo
-                };
+                    const preferences = {
+                        colorBlindFilter: result.colorBlindFilter || 'none',
+                        preferredFont: result.preferredFont || 'default',
+                        dyslexia: result.dyslexiaPreference || 'none',
+                        language: result.language || 'en',
+                        additionalInfo: additionalInfo
+                    };
 
-                console.log('Assembled preferences object:', preferences);
+                    console.log('Assembled preferences object:', preferences);
 
-                // 3. Send to backend
-                console.log('Sending POST request to backend...');
-                fetch('http://localhost:3001/api/input', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        userEmail,
-                        preferences
+                    // 3. Send to backend
+                    console.log('Sending POST request to backend...');
+                    fetch('http://localhost:3001/api/input', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            userEmail,
+                            preferences
+                        })
+                    })
+                    .then(response => {
+                        console.log('Received response:', response.status, response.statusText);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Successfully saved to DynamoDB:', data);
+                        
+                        // 4. Send to Claude for analysis
+                        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+                            if (!tabs[0]) {
+                                console.error('No active tab found');
+                                return;
+                            }
+
+                            chrome.tabs.sendMessage(
+                                tabs[0].id,
+                                {
+                                    action: 'sendToClaude',
+                                    preferences: preferences
+                                },
+                                function(response) {
+                                    if (response.success) {
+                                        console.log('Claude analysis:', response.response);
+                                        alert('Preferences saved and page analyzed successfully!');
+                                    } else {
+                                        console.error('Claude analysis error:', response.error);
+                                        alert('Preferences saved but analysis failed: ' + response.error);
+                                    }
+                                }
+                            );
+                        });
                     })
                 })
                 .then(response => {
