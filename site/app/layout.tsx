@@ -5,13 +5,19 @@ import Providers from "./providers";
 export const metadata: Metadata = {
   title: "Accessify - Web Accessibility Made Easy",
   description: "EmoryHacks2025 Hackathon Project",
+  icons: {
+    icon: [
+      { rel: 'icon', url: '/icon.png' },
+      { rel: 'apple-touch-icon', url: '/icon.png' },
+    ],
+  },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body>

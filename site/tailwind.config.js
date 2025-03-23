@@ -1,7 +1,5 @@
-import animate from "tailwindcss-animate"
-
 /** @type {import('tailwindcss').Config} */
-export default {
+const config = {
   darkMode: ["class"],
   content: [
     './pages/**/*.{ts,tsx}',
@@ -26,12 +24,12 @@ export default {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			primary: {
-  				DEFAULT: 'hsl(var(--primary))',
-  				foreground: 'hsl(var(--primary-foreground))'
+  				DEFAULT: '#FF9900',
+  				foreground: '#000000'
   			},
   			secondary: {
-  				DEFAULT: 'hsl(var(--secondary))',
-  				foreground: 'hsl(var(--secondary-foreground))'
+  				DEFAULT: '#232F3E',
+  				foreground: '#ffffff'
   			},
   			destructive: {
   				DEFAULT: 'hsl(var(--destructive))',
@@ -42,8 +40,8 @@ export default {
   				foreground: 'hsl(var(--muted-foreground))'
   			},
   			accent: {
-  				DEFAULT: 'hsl(var(--accent))',
-  				foreground: 'hsl(var(--accent-foreground))'
+  				DEFAULT: '#FF9900',
+  				foreground: '#000000'
   			},
   			popover: {
   				DEFAULT: 'hsl(var(--popover))',
@@ -90,6 +88,8 @@ export default {
   		}
   	}
   },
-  plugins: [animate],
+  plugins: ["tailwindcss-animate"],
 }
+
+export default config
 

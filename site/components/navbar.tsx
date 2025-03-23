@@ -4,18 +4,18 @@ import React from 'react'
 import { Session } from 'next-auth'
 import Link from 'next/link'
 import LoginButton from '@/app/components/LoginButton'
-import { Button } from "@/components/ui/button"
-import { Chrome, Menu, X } from "lucide-react"
-import { usePathname } from "next/navigation"
+import { Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useSession } from 'next-auth/react'
 
 interface NavbarProps {
   session?: Session | null
 }
 
-const Navbar: React.FC<NavbarProps> = ({ session }) => {
+const Navbar: React.FC<NavbarProps> = () => {
+  const { data: session } = useSession()
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
-  const pathname = usePathname()
+  const [activeSection, setActiveSection] = React.useState("")
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
@@ -25,12 +25,42 @@ const Navbar: React.FC<NavbarProps> = ({ session }) => {
     { href: "/", label: "Home" },
     { href: "/#features", label: "Features" },
     { href: "/#how-it-works", label: "How It Works" },
-    { href: "/docs", label: "Documentation" },
   ]
 
+  React.useEffect(() => {
+    const handleScroll = () => {
+      const sections = {
+        features: document.getElementById('features'),
+        howItWorks: document.getElementById('how-it-works'),
+      }
+
+      const scrollPosition = window.scrollY + 100 // Offset for better trigger point
+
+      if (scrollPosition < (sections.features?.offsetTop || 0)) {
+        setActiveSection("")
+      } else if (scrollPosition < (sections.howItWorks?.offsetTop || 0)) {
+        setActiveSection("features")
+      } else {
+        setActiveSection("how-it-works")
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    handleScroll() // Initial check
+
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const isLinkActive = (href: string) => {
+    if (href === "/") return activeSection === ""
+    if (href === "/#features") return activeSection === "features"
+    if (href === "/#how-it-works") return activeSection === "how-it-works"
+    return false
+  }
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
+    <header className="sticky top-0 z-50 w-full border-b bg-secondary/95 backdrop-blur supports-[backdrop-filter]:bg-secondary/60">
+      <div className="container relative flex h-16 items-center">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center space-x-2">
             <img src="/accessify-logo.png" alt="Accessify" className="h-8" />
@@ -38,25 +68,27 @@ const Navbar: React.FC<NavbarProps> = ({ session }) => {
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-6">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "text-sm font-medium transition-colors hover:text-primary",
-                pathname === link.href ? "text-primary" : "text-muted-foreground",
-              )}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        <div className="absolute left-1/2 -translate-x-1/2">
+          <nav className="hidden md:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "text-base font-semibold transition-colors hover:text-[#FF9900] hover:scale-105 transform",
+                  isLinkActive(link.href) ? "text-[#FF9900]" : "text-white",
+                )}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
 
-        <div className="hidden md:flex items-center gap-4">
+        <div className="ml-auto flex items-center gap-4">
           {session ? (
             <div className="flex items-center space-x-4">
-              <span className="text-gray-700">{session.user?.name}</span>
+              <span className="text-white text-base font-medium">{session.user?.email}</span>
               <LoginButton />
             </div>
           ) : (
@@ -65,21 +97,24 @@ const Navbar: React.FC<NavbarProps> = ({ session }) => {
         </div>
 
         {/* Mobile Menu Button */}
-        <button className="md:hidden" onClick={toggleMenu} aria-label={isMenuOpen ? "Close menu" : "Open menu"}>
+        <button className="md:hidden ml-auto text-white" onClick={toggleMenu} aria-label={isMenuOpen ? "Close menu" : "Open menu"}>
           {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-16 z-50 bg-background">
+        <div className="md:hidden fixed inset-0 top-16 z-50 bg-secondary">
           <div className="container py-6 flex flex-col gap-6">
-            <nav className="flex flex-col gap-4">
+            <nav className="flex flex-col gap-6">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-lg font-medium py-2"
+                  className={cn(
+                    "text-xl font-semibold transition-colors hover:text-[#FF9900] hover:translate-x-2 transform",
+                    isLinkActive(link.href) ? "text-[#FF9900]" : "text-white",
+                  )}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.label}
@@ -90,7 +125,7 @@ const Navbar: React.FC<NavbarProps> = ({ session }) => {
             <div className="flex flex-col gap-4 mt-4">
               {session ? (
                 <div className="flex items-center space-x-4">
-                  <span className="text-gray-700">{session.user?.name}</span>
+                  <span className="text-white text-lg font-medium">{session.user?.email}</span>
                   <LoginButton />
                 </div>
               ) : (

@@ -1,7 +1,6 @@
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from './authOptions'
-import { Session } from 'next-auth'
-import { Button } from "@/components/ui/button"
+"use client"
+
+import React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   ChevronRight,
@@ -19,69 +18,77 @@ import FeatureCard from "@/components/feature-card"
 import HeroSection from "@/components/hero-section"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
-import LoginButton from './components/LoginButton'
 
-export default async function Home() {
-  const session: Session | null = await getServerSession(authOptions)
+export default function Home() {
+  const [activeTab, setActiveTab] = React.useState("overview")
 
   const features = [
     {
       title: "Dyslexic Font",
       description: "Makes text easier to read for people with dyslexia by using specialized fonts.",
       icon: <Type className="h-8 w-8 text-primary" />,
+      tabValue: "dyslexic"
     },
     {
       title: "Color Blindness",
       description: "Adjusts colors on websites to be more visible for people with different types of color blindness.",
       icon: <Palette className="h-8 w-8 text-primary" />,
+      tabValue: "colorblind"
     },
     {
       title: "Translation",
       description: "Translates web content into the user's preferred language.",
       icon: <Languages className="h-8 w-8 text-primary" />,
+      tabValue: "translate"
     },
     {
       title: "Magnification Tool",
       description: "Enlarges portions of the screen for users with visual impairments.",
       icon: <Maximize className="h-8 w-8 text-primary" />,
+      tabValue: "magnify"
     },
     {
       title: "LLM Input Modification",
       description: "Uses AI to modify website code in real-time for better accessibility.",
       icon: <FileText className="h-8 w-8 text-primary" />,
+      tabValue: "llm"
     },
     {
       title: "Text to Speech",
       description: "Reads website content aloud for users with visual impairments or reading difficulties.",
       icon: <Headphones className="h-8 w-8 text-primary" />,
+      tabValue: "tts"
     },
     {
       title: "Image Captioning",
       description: "Automatically generates and reads descriptions for images on websites.",
       icon: <Image className="h-8 w-8 text-primary" />,
+      tabValue: "caption"
     },
     {
       title: "OCR & Summarization",
       description: "Extracts and summarizes text from images for easier comprehension.",
       icon: <Eye className="h-8 w-8 text-primary" />,
+      tabValue: "ocr"
     },
     {
       title: "Resource Suggestions",
       description: "Recommends other helpful extensions and resources based on specific disabilities.",
       icon: <Chrome className="h-8 w-8 text-primary" />,
+      tabValue: "overview"
     },
   ]
 
   return (
     <main className="min-h-screen">
-      <Navbar session={session} />
-      <HeroSection session={session} />
+      <Navbar />
+      <HeroSection />
 
       <section id="features" className="py-20 bg-slate-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Powerful Accessibility Features</h2>
 
-          <Tabs defaultValue="overview" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid grid-cols-3 md:grid-cols-9 mb-8">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="dyslexic">Dyslexic Font</TabsTrigger>
@@ -92,18 +99,22 @@ export default async function Home() {
               <TabsTrigger value="tts">Text to Speech</TabsTrigger>
               <TabsTrigger value="caption">Image Captioning</TabsTrigger>
               <TabsTrigger value="ocr">OCR</TabsTrigger>
-              
             </TabsList>
 
             <TabsContent value="overview" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
                 {features.map((feature, index) => (
-                  <FeatureCard
+                  <div 
                     key={index}
-                    title={feature.title}
-                    description={feature.description}
-                    icon={feature.icon}
-                  />
+                    onClick={() => setActiveTab(feature.tabValue)}
+                    className="cursor-pointer h-full"
+                  >
+                    <FeatureCard
+                      title={feature.title}
+                      description={feature.description}
+                      icon={feature.icon}
+                    />
+                  </div>
                 ))}
               </div>
             </TabsContent>
@@ -221,17 +232,6 @@ export default async function Home() {
                   </p>
                 </div>
               </div>
-            </div>
-
-            <div className="mt-12 text-center">
-              {!session ? (
-                <LoginButton />
-              ) : (
-                <Button size="lg" className="bg-primary hover:bg-primary/90">
-                  <Chrome className="mr-2 h-5 w-5" />
-                  Add to Chrome
-                </Button>
-              )}
             </div>
           </div>
         </div>
