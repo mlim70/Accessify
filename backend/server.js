@@ -138,8 +138,36 @@ app.post('/api/pronunciation', async (req, res) => {
 });
 
 app.post('/api/tts', async (req, res) => {
+    const apiKey = process.env.OPENAI_API;
+    const url = 'https://api.openai.com/v1/audio/speech'; // Correct endpoint for TTS
+    console.log(apiKey);
+
+    console.log('Received TTS request');
+    console.log('Request body:', req.body);
     try {
         const { text } = req.body;
+        const requestBody = {
+            model: "gpt-4o-mini-tts", // Replace with the correct model name
+            input: text,
+            voice: "alloy",
+            response_format: "mp3"
+          };
+      
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+          });
+
+          const buffer = Buffer.from(await response.arrayBuffer());
+          res.set({
+            'Content-Type': 'audio/mp3',
+            'Content-Length': buffer.length
+          });
+          res.send(buffer);
     } catch (error) {
         console.error('Erorr generating pronunciation guide: ', error);
         res.status(500).json({ error: 'Erorr generating pronunciation guide: ', details: error.message });

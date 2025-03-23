@@ -1,13 +1,11 @@
-import config from '../config.js';
-
 // Add authentication check function
-async function checkAuthentication() {
-    return new Promise((resolve) => {
-        chrome.storage.sync.get(['userEmail'], function(result) {
-            resolve(!!result.userEmail);
-        });
-    });
-}
+// async function checkAuthentication() {
+//     return new Promise((resolve) => {
+//         chrome.storage.sync.get(['userEmail'], function(result) {
+//             resolve(!!result.userEmail);
+//         });
+//     });
+// }
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
@@ -19,13 +17,15 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  console.log("HIII");
+  console.log(info.menuItemId);
   if (info.menuItemId === "readText") {
     // Check authentication before proceeding
-    const isAuthenticated = await checkAuthentication();
-    if (!isAuthenticated) {
-      console.log("User not authenticated");
-      return;
-    }
+    // const isAuthenticated = await checkAuthentication();
+    // if (!isAuthenticated) {
+    //   console.log("User not authenticated");
+    //   return;
+    // }
 
     console.log("Read context menu item clicked");
     console.log("Selected text:", info.selectionText);
@@ -50,35 +50,28 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
 async function readSelectedText(text) {
   console.log("Reading text:", text);
-  
-  const apiKey = config.OPENAI_API_KEY;
-  const url = 'https://api.openai.com/v1/audio/speech'; // Correct endpoint for TTS
-  
-  const requestBody = {
-    model: "gpt-4o-mini-tts", // Replace with the correct model name
-    input: text,
-    voice: "alloy"
-  };
-  
   try {
-    const response = await fetch(url, {
-      method: 'POST',
+    const response = await fetch("http://localhost:3001/api/tts", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify(requestBody)
+        "Content-Type": "application/json"},
+      body: JSON.stringify({ text })
     });
-
+    console.log("Sent request to OpenAI Text-to-Speech API");
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-
+    console.log("Received response from OpenAI Text-to-Speech API");
+    console.log("Response:", response);
     const audioBlob = await response.blob();
+    console.log("reviefed audio blob");
+    console.log("Audio blob:", audioBlob);
     const audioUrl = URL.createObjectURL(audioBlob);
     
     const audio = new Audio(audioUrl);
     audio.play();
+
+
   } catch (error) {
     console.error('Error with OpenAI Text-to-Speech API:', error);
   }
