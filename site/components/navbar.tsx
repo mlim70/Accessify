@@ -58,8 +58,16 @@ const Navbar: React.FC<NavbarProps> = () => {
     return false
   }
 
+  const formatEmail = (email: string) => {
+    const [localPart, domain] = email.split('@')
+    if (localPart.length <= 4) {
+      return email
+    }
+    return `${localPart.slice(0, 2)}...${localPart.slice(-2)}@${domain}`
+  }
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-secondary/95 backdrop-blur supports-[backdrop-filter]:bg-secondary/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/100">
       <div className="container relative flex h-16 items-center">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center space-x-2">
@@ -76,7 +84,7 @@ const Navbar: React.FC<NavbarProps> = () => {
                 href={link.href}
                 className={cn(
                   "text-base font-semibold transition-colors hover:text-[#FF9900] hover:scale-105 transform",
-                  isLinkActive(link.href) ? "text-[#FF9900]" : "text-white",
+                  isLinkActive(link.href) ? "text-[#FF9900]" : "text-black",
                 )}
               >
                 {link.label}
@@ -87,8 +95,8 @@ const Navbar: React.FC<NavbarProps> = () => {
 
         <div className="ml-auto flex items-center gap-4">
           {session ? (
-            <div className="flex items-center space-x-4">
-              <span className="text-white text-base font-medium">{session.user?.email}</span>
+            <div className="hidden md:flex items-center space-x-4">
+              <span className="text-black text-base font-medium">{formatEmail(session.user?.email || '')}</span>
               <LoginButton />
             </div>
           ) : (
@@ -97,15 +105,15 @@ const Navbar: React.FC<NavbarProps> = () => {
         </div>
 
         {/* Mobile Menu Button */}
-        <button className="md:hidden ml-auto text-white" onClick={toggleMenu} aria-label={isMenuOpen ? "Close menu" : "Open menu"}>
+        <button className="md:hidden ml-auto text-black" onClick={toggleMenu} aria-label={isMenuOpen ? "Close menu" : "Open menu"}>
           {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-16 z-50 bg-secondary">
-          <div className="container py-6 flex flex-col gap-6">
+        <div className="md:hidden fixed inset-0 top-16 z-50 ">
+          <div className="container py-6 flex flex-col gap-6 bg-white">
             <nav className="flex flex-col gap-6">
               {navLinks.map((link) => (
                 <Link
@@ -113,7 +121,7 @@ const Navbar: React.FC<NavbarProps> = () => {
                   href={link.href}
                   className={cn(
                     "text-xl font-semibold transition-colors hover:text-[#FF9900] hover:translate-x-2 transform",
-                    isLinkActive(link.href) ? "text-[#FF9900]" : "text-white",
+                    isLinkActive(link.href) ? "text-[#FF9900]" : "text-black",
                   )}
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -123,14 +131,10 @@ const Navbar: React.FC<NavbarProps> = () => {
             </nav>
 
             <div className="flex flex-col gap-4 mt-4">
-              {session ? (
-                <div className="flex items-center space-x-4">
-                  <span className="text-white text-lg font-medium">{session.user?.email}</span>
-                  <LoginButton />
-                </div>
-              ) : (
-                <LoginButton />
+              {session && (
+                <span className="text-black text-base font-medium">Logged in as: {formatEmail(session.user?.email || '')}</span>
               )}
+              <LoginButton />
             </div>
           </div>
         </div>
