@@ -30,7 +30,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         translatePage(request.targetLanguage);
         sendResponse({ success: true });
     } else if (request.action === 'restore-original') {
-        restoreOriginalHTML();
+        if (additionalStyles) {
+            document.head.removeChild(additionalStyles);
+            additionalStyles = null;
+        }
+
+        if (originalHTML) {
+            restoreOriginalHTML();
+        }
     }
     return true; // Keep the message channel open for async response
 });
