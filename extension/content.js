@@ -185,25 +185,6 @@ async function translateText(text, targetLanguage) {
     }
 }
 
-// Function to translate all text content in the page
-async function translatePageContent(targetLanguage) {
-    console.log(`Starting page translation to ${targetLanguage}`);
-    const elements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span, a');
-    console.log(`Found ${elements.length} elements to translate`);
-
-    for (const element of elements) {
-        if (element.textContent.trim()) {
-            try {
-                const translatedText = await translateText(element.textContent, targetLanguage);
-                element.textContent = translatedText;
-            } catch (error) {
-                console.error(`Error translating element: ${error}`);
-            }
-        }
-    }
-    console.log('Page translation completed');
-}
-
 async function generatePronunciationHints(text) {
     try {
         console.log(`Attempting to generate hints for: "${text}"`);
@@ -390,6 +371,8 @@ async function translatePage(targetLanguage) {
     } else {
         restoreOriginalHTML();
     }
+
+    const elements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span, a, figcaption');
 
     for (const element of elements) {
         if (element.textContent.trim()) {
