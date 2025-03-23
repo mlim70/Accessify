@@ -1,15 +1,15 @@
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
     // Add this debug code at the top
-    chrome.storage.sync.get(['userEmail'], function(result) {
-        console.log('Current userEmail in storage:', result.userEmail);
-        const loginWarning = document.getElementById('loginWarning');
-        if (!result.userEmail) {
-            loginWarning.style.display = 'block';
-        } else {
-            loginWarning.style.display = 'none';
-        }
-    });
+    // chrome.storage.sync.get(['userEmail'], function(result) {
+    //     console.log('Current userEmail in storage:', result.userEmail);
+    //     const loginWarning = document.getElementById('loginWarning');
+    //     if (!result.userEmail) {
+    //         loginWarning.style.display = 'block';
+    //     } else {
+    //         loginWarning.style.display = 'none';
+    //     }
+    // });
 
     console.log('Popup DOM loaded, setting up event listeners for colorblind buttons');
 
@@ -378,15 +378,15 @@ $(document).ready(function() {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-    chrome.storage.sync.get(['userEmail'], function(result) {
-        console.log('Current userEmail in storage:', result.userEmail);
-        const loginWarning = document.getElementById('loginWarning');
-        if (!result.userEmail) {
-            loginWarning.style.display = 'block';
-        } else {
-            loginWarning.style.display = 'none';
-        }
-    });
+    // chrome.storage.sync.get(['userEmail'], function(result) {
+    //     console.log('Current userEmail in storage:', result.userEmail);
+    //     const loginWarning = document.getElementById('loginWarning');
+    //     if (!result.userEmail) {
+    //         loginWarning.style.display = 'block';
+    //     } else {
+    //         loginWarning.style.display = 'none';
+    //     }
+    // });
 
     // Save button -> write to preferences (DynamoDB)
     const saveButton = document.getElementById('savePreferences');
