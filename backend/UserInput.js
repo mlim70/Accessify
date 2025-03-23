@@ -10,9 +10,15 @@ class UserInputService {
         const newPreferenceRecord = {
             EmoryHacks: userEmail, // Primary key for the table
             userEmail: userEmail, // Needed for the GSI "EmailIndex"
-            preferences, // The preferences data
-            createdAt: timestamp, // Helps with sorting in the GSI
-            updatedAt: timestamp // Last update time
+            preferences: {
+                colorBlindFilter: preferences.colorBlindFilter || 'none',
+                preferredFont: preferences.preferredFont || 'default',
+                dyslexia: preferences.dyslexia || 'none',
+                language: preferences.language || 'en',
+                additionalInfo: preferences.additionalInfo || ''
+            },
+            createdAt: timestamp,
+            updatedAt: timestamp
         };
 
         const params = {
