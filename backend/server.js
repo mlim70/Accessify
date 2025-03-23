@@ -2,15 +2,18 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { Translate } = require('@google-cloud/translate').v2;
 const UserInputService = require('./UserInput');
+const Anthropic = require('@anthropic-ai/sdk');
+const { generateAccessibilityPrompt } = require('./services/claude-prompt');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Initialize Gemini AI
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// Initialize Anthropic Claude
+const anthropic = new Anthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY,
+});
 
 // Initialize Google Cloud Translation
 const translate = new Translate({
@@ -62,10 +65,19 @@ app.post('/api/enhance-accessibility', async (req, res) => {
         if (!enhancedHTML || forceRegenerate) {
             console.log(forceRegenerate ? 'Regenerating enhancement...' : 'Generating new enhancement...');
             
-            const prompt = await generatePrompt(preferences, html);
-            const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-            const result = await model.generateContent(prompt);
-            enhancedHTML = result.response.text();
+            const prompt = await generateAccessibilityPrompt(preferences, html); //Get prompt using claude-prompt.js
+            const message = await anthropic.messages.create({ //Send prompt to claude
+                model: "claude-3-7-sonnet-latest",
+                max_tokens: 4096,
+                messages: [
+                    {
+                        role: "user",
+                        content: prompt
+                    }
+                ]
+            });
+
+            enhancedHTML = message.content[0].text; //HTML enhanced w/ accessibility
         }
 
         res.status(200).json({ 
@@ -75,21 +87,12 @@ app.post('/api/enhance-accessibility', async (req, res) => {
                     isFromCache ? 'Using cached enhancement' : 'New enhancement generated'
         });
     } catch (error) {
-        console.error('Error processing with Gemini AI:', error);
+        console.error('Error processing with Claude:', error);
         res.status(500).json({ 
             message: 'Error enhancing accessibility', 
             error: error.message,
-            details: 'Failed to process HTML with Gemini AI or database operation'
+            details: 'Failed to enhance HTML with Claude'
         });
-    }
-});
-
-app.get('/api/inputs', async (req, res) => {
-    try {
-        const inputs = await UserInputService.find();
-        res.status(200).json(inputs);
-    } catch (error) {
-        res.status(500).json({ message: 'Error fetching inputs', error: error.message });
     }
 });
 
@@ -132,45 +135,42 @@ app.post('/api/pronunciation', async (req, res) => {
         console.log(`Made ${challengingWords.length} revisions`)
         return res.status(200).json({ revisedText: text });
     } catch (error) {
-        console.error('Erorr generating pronunciation guide: ', error);
-        res.status(500).json({ error: 'Erorr generating pronunciation guide: ', details: error.message });
+        console.error('Error generating pronunciation guide:', error);
+        res.status(500).json({ error: 'Error generating pronunciation guide:', details: error.message });
     }
 });
 
 app.post('/api/tts', async (req, res) => {
     const apiKey = process.env.OPENAI_API;
-    const url = 'https://api.openai.com/v1/audio/speech'; // Correct endpoint for TTS
-    console.log(apiKey);
+    const url = 'https://api.openai.com/v1/audio/speech';
 
-    console.log('Received TTS request');
-    console.log('Request body:', req.body);
     try {
         const { text } = req.body;
         const requestBody = {
-            model: "gpt-4o-mini-tts", // Replace with the correct model name
+            model: "gpt-4o-mini-tts",
             input: text,
             voice: "alloy",
             response_format: "mp3"
-          };
+        };
       
         const response = await fetch(url, {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${apiKey}`,
-              'Content-Type': 'application/json'
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(requestBody)
-          });
+        });
 
-          const buffer = Buffer.from(await response.arrayBuffer());
-          res.set({
+        const buffer = Buffer.from(await response.arrayBuffer());
+        res.set({
             'Content-Type': 'audio/mp3',
             'Content-Length': buffer.length
-          });
-          res.send(buffer);
+        });
+        res.send(buffer);
     } catch (error) {
-        console.error('Erorr generating pronunciation guide: ', error);
-        res.status(500).json({ error: 'Erorr generating pronunciation guide: ', details: error.message });
+        console.error('Error generating speech:', error);
+        res.status(500).json({ error: 'Error generating speech:', details: error.message });
     }
 });
 

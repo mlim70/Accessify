@@ -175,7 +175,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     })
                     .then(data => {
                         console.log('Successfully saved to DynamoDB:', data);
-                        alert('Preferences saved successfully!');
+                        
+                        // 4. Send to Claude for analysis
+                        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+                            if (!tabs[0]) {
+                                console.error('No active tab found');
+                                return;
+                            }
+
+                            chrome.tabs.sendMessage(
+                                tabs[0].id,
+                                {
+                                    action: 'sendToClaude',
+                                    preferences: preferences
+                                },
+                                function(response) {
+                                    if (response.success) {
+                                        console.log('Claude analysis:', response.response);
+                                        alert('Preferences saved and page analyzed successfully!');
+                                    } else {
+                                        console.error('Claude analysis error:', response.error);
+                                        alert('Preferences saved but analysis failed: ' + response.error);
+                                    }
+                                }
+                            );
+                        });
                     })
                     .catch(error => {
                         console.error('Error saving to DynamoDB:', error);
