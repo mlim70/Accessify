@@ -8,6 +8,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 const { generateAccessibilityPrompt } = require('./services/claude-prompt');
 const fs = require('fs');
 const path = require('path');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
     const credentialsPath = path.join(__dirname, 'service-account-key.json');
@@ -29,6 +30,9 @@ const translate = new Translate({
     projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
     keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS
 });
+
+// Initialize Google AI
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // CORS and body parser middleware
 app.use(cors());
