@@ -111,7 +111,7 @@ Accessify/
 └── README.md            // Project documentation and setup instructions
 ```
 
-## APIs and AI Services
+## APIs and AI | Modules & Functions
 
 ### Translation Service
 
@@ -240,6 +240,7 @@ cd backend
 # Install dependencies
 npm install
 
+# *(In a new terminal):
 # Start the development server locally
 npm run dev
 
