@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     resetButton.addEventListener('click', function() {
-        console.log('Reset button clicked');
+        resetAll(); //De-select buttons
         chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
             chrome.tabs.sendMessage(
                 tabs[0].id,
@@ -618,4 +618,33 @@ async function ensureContentScriptLoaded(tabId) {
             throw injectionError;
         }
     }
+}
+
+function resetAll() {
+    // reset buttons
+    const colorBlindButtons = document.querySelectorAll('.colorfilter-options button');
+    colorBlindButtons.forEach(button => {
+        button.classList.remove('active');
+    });
+    const dyslexiaButtons = document.querySelectorAll('.dyslexia-options button');
+    dyslexiaButtons.forEach(button => {
+        button.classList.remove('active');
+    });
+    const languageButtons = document.querySelectorAll('.lang-button');
+    languageButtons.forEach(button => {
+        button.classList.remove('active');
+    });
+    const screenReaderToggle = document.getElementById('screen-reader-toggle');
+    if (screenReaderToggle) {
+        screenReaderToggle.checked = false;
+    }
+
+    const imageCaptionToggle = document.getElementById('image-caption-toggle');
+    if (imageCaptionToggle) {
+        imageCaptionToggle.checked = false;
+    }
+    // Clear current preferences
+    chrome.storage.local.remove('accessifyPreferences', function() {
+        console.log('All preferences reset');
+    });
 }
