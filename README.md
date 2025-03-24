@@ -6,36 +6,54 @@ EmoryHax is a project designed to enhance web accessibility for people with visi
 
 ## Tech Stack
 
-### Frontend
+---
 
-The frontend application (website) is built using the following technologies:
+### Frontend ![Next.js Badge](https://img.shields.io/badge/Next.js-000000?style=flat&logo=next.js&logoColor=white)
+> **Next.js** — React framework for server-rendered and static web applications  
+> **React** — Library for building user interfaces  
+> **TypeScript** — Typed superset of JavaScript for better development experience  
+> **Tailwind CSS** — Utility-first CSS framework for modern UI development  
+> **NextAuth.js** — Authentication solution for Next.js applications  
+> **Radix UI** — Unstyled, accessible component primitives  
+> **Lucide React** — Clean and consistent icon set
 
-- **Next.js**: A React framework that enables server-side rendering and static site generation.
-- **React**: A JavaScript library for building user interfaces.
-- **Tailwind CSS**: A utility-first CSS framework for styling the application.
-- **NextAuth.js**: An authentication solution for Next.js applications.
-- **TypeScript**: A strongly typed programming language that builds on JavaScript.
+---
 
-### Backend
+### Backend ![Node.js Badge](https://img.shields.io/badge/Node.js-339933?style=flat&logo=node.js&logoColor=white)
+> **Express** — Fast, unopinionated web framework for Node.js  
+> **AWS SDK** — AWS service integration for DynamoDB  
+> **Google Cloud Translation** — Multi-language translation capabilities  
+> **Google Generative AI** — Advanced AI for text generation and analysis  
+> **Anthropic Claude** — AI model for accessibility enhancements based on user-inputted custom prompts  
 
-The backend server (that works with the chrome extension) is built using the following technologies:
+---
 
-- **Node.js**: A JavaScript runtime built on Chrome's V8 JavaScript engine.
-- **Express**: A minimal and flexible Node.js web application framework.
-- **AWS SDK**: Used to interact with AWS services like DynamoDB.
-- **Google Cloud Translation**: Provides language translation capabilities.
-- **Google Generative AI**: Provides advanced AI capabilities such as text generation and pronunciation hints.
-- **Anthropic SDK**: Used to integrate with Anthropic's Claude model for generating accessibility enhancements.
-- **OpenAI API**: Used for text-to-speech capabilities.
+### Chrome Extension ![Chrome Badge](https://img.shields.io/badge/Chrome-4285F4?style=flat&logo=google-chrome&logoColor=white)
+> **Chrome Extensions API** — Browser extension development framework  
+> **JavaScript** — Core programming language for extension logic  
+> **HTML/CSS** — Extension popup interface and styling  
+> **Chrome Storage** — Quick-access local data persistence for user preferences 
+> **Chrome Scripting API** — Dynamic content script injection
 
-### Chrome Extension
+---
 
-The Chrome extension is built using the following technologies:
+### Authentication & Security
+> **NextAuth.js** — Secure authentication with multiple providers  
+> **Google OAuth2.0** — Secure third-party authentication  
 
-- **JavaScript**: The primary programming language for the extension.
-- **HTML**: Used for the extension's popup interface.
-- **CSS**: Used for styling the extension's popup interface.
-- **Chrome Extensions API**: Provides the necessary APIs to build Chrome extensions.
+---
+
+### Deployment & Infrastructure
+> **AWS Amplify** — Full-stack deployment and hosting  
+> **DynamoDB** — Serverless NoSQL database - ideal for high-traffic and future scaling
+
+---
+
+### Development Tools
+> **ESLint** — Code quality and style enforcement  
+> **PostCSS** — CSS processing and optimization  
+> **Tailwind CSS** — Utility-first styling system  
+> **Nodemon** — Development server with auto-reload
 
 ## Project Structure
 
