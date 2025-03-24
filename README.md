@@ -39,41 +39,53 @@ The Chrome extension is built using the following technologies:
 
 ## Project Structure
 
-
-```emoryhax/
-├── extension/
-│   ├── content.js          # Main content script for the Chrome extension
-│   ├── background.js       # Background script for handling extension events
-│   ├── ui/
-│   │   ├── popup.html          # HTML for the extension's popup interface
-│   │   ├── popup.js            # JavaScript for the extension's popup interface
-│   │   ├── popup.css       # CSS for the extension's popup interface
-│   ├── manifest.json       # Manifest file for the Chrome extension
-│   ├── fonts/
-│   │   ├── OpenDyslexic-Regular.otf  # Font file for OpenDyslexic Regular
-│   │   ├── OpenDyslexic-Bold.otf     # Font file for OpenDyslexic Bold
-│   ├── icon.png        # Icon for the extension
-├── backend/
-│   ├── server.js           # Main server file for the backend
-│   ├── services/
-│   │   ├── claude-endpoint.ts
-│   │   ├── claude-prompt.js 
-│   ├── dynamoClient.js
-│   ├── UserInput.js
-│   ├── .env
-│   ├── service-account-key.json
-├── site/
-│   ├── app/
-│   │   ├── page.tsx        # Main page component for the site
-│   │   ├── components/
-│   │   │   ├── Navbar.tsx  # Navbar component
-│   │   │   ├── HeroSection.tsx # Hero section component
-│   │   │   ├── feature-card.tsx
-│   │   │   ├── footer.tsx
-├── README.md               # Documentation for the project
-├── LICENSE                 # License file for the project
 ```
-
+Accessify/
+├── backend/
+│   ├── src/
+│   │   ├── server.js         // Express server with API endpoints
+│   │   └── config/           // Configuration files
+│   ├── .env                  // Backend environment variables
+│   └── package.json          // Backend dependencies
+│
+├── site/                     // Next.js frontend
+│   ├── app/
+│   │   ├── auth/            // Authentication pages
+│   │   │   ├── login/
+│   │   │   └── signup/
+│   │   └── page.js          // Main landing page
+│   ├── components/
+│   │   ├── features/
+│   │   │   └── auth/
+│   │   │       └── LoginButton.tsx
+│   │   ├── layout/
+│   │   │   └── HeroSection.tsx
+│   │   └── ui/              // Reusable UI components
+│   │       ├── Button.tsx
+│   │       ├── Card.tsx
+│   │       ├── Checkbox.tsx
+│   │       ├── Input.tsx
+│   │       ├── Label.tsx
+│   │       └── Tabs.tsx
+│   ├── lib/                 // Utility functions
+│   ├── public/              // Static assets
+│   └── package.json         // Frontend dependencies
+│
+├── extension/               // Chrome extension
+│   ├── popup/
+│   │   ├── popup.html      // Extension popup UI
+│   │   ├── popup.css       // Popup styles
+│   │   └── popup.js        // Popup functionality
+│   ├── content.js          // Content script for webpage modifications
+│   ├── manifest.json       // Extension configuration
+│   └── assets/            // Extension assets
+│
+├── .env.local              // Root environment variables
+├── package.json           // Root dependencies
+├── .gitignore            // Git ignore rules
+├── amplify.yml           // AWS Amplify configuration
+└── README.md            // Project documentation
+```
 
 ## Environment Variables
 
