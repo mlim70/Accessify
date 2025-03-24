@@ -8,8 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 window.addEventListener('beforeunload', function() {
   const stateObject = {
-    // Get values from your UI elements
-    // For example:
     colorBlindFilter: document.querySelector('#colorBlind').value,
     dyslexia: document.querySelector('#dyslexia').value,
     // ... other state values
@@ -21,10 +19,7 @@ window.addEventListener('beforeunload', function() {
   });
 });
 
-// Wait for DOM to be fully loaded
-/**
- * Color-blindness Buttons
- */
+// Make sure DOM is loaded first
 document.addEventListener('DOMContentLoaded', function() {
     console.log('=== Extension Popup Initialized ===');
 
@@ -35,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Set up screen reader toggle
+    // Screen reader toggle
     const screenReaderToggle = document.getElementById("screen-reader-toggle");
     if (screenReaderToggle) {
         chrome.storage.sync.get(['screenReaderEnabled'], function (result) {
@@ -47,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Set up color blind buttons
+    // Buttons
     const colorBlindButtons = {
         "color-blind-protanopia": "protanopia",
         "color-blind-deuteranopia": "deuteranopia",
@@ -66,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const filterType = colorBlindButtons[buttonId];
             console.log(`Color filter button clicked: ${buttonId} -> ${filterType}`);
 
-            // Toggle active state
+            // Toggle 'selected' (active)
             const isActive = button.classList.contains('active');
             document.querySelectorAll('.colorfilter-options button').forEach(btn => btn.classList.remove('active'));
             if (!isActive) {
@@ -98,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Set up dyslexia buttons
+    // Buttons
     const dyslexiaButtons = [
         'dyslexia-visual',
         'dyslexia-surface',
@@ -116,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', async function() {
             console.log(`Dyslexia button clicked: ${dyslexiaType}`);
 
-            // Toggle active state
+            // Toggle 'selected' (active)
             const isActive = button.classList.contains('active');
             document.querySelectorAll('.dyslexia-options button').forEach(btn => btn.classList.remove('active'));
             if (!isActive) {
@@ -148,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Set up language buttons
+    // Language buttons
     const languages = [
         { code: "en", name: "English", native: "English" },
         { code: "es", name: "Spanish", native: "Español" },
@@ -202,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Set up collapsible sections
+    // Collapsibles
     const headers = document.querySelectorAll('.collapsible-header');
     headers.forEach(header => {
         header.addEventListener('click', function() {
@@ -219,11 +214,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-/**
- * Save and reset buttons
- */
+//Save/reset buttons
 document.addEventListener('DOMContentLoaded', function() {
-    // Save button -> write to preferences (DynamoDB)
+    // Save to DYNAMO
     const saveButton = document.querySelector('.save-button');
     if (!saveButton) {
         console.error('Save button not found.');
@@ -477,7 +470,6 @@ async function preferences(email) {
     }
 }
 
-// Consolidate language selection code
 function handleLanguageSelection(langCode) {
     chrome.tabs.query({ active: true, currentWindow: true }, async function(tabs) {
         if (!tabs[0]) {
@@ -507,14 +499,13 @@ function handleLanguageSelection(langCode) {
     });
 }
 
-// Consolidate preferences loading
+// Load preferences
 async function loadPreferences(results) {
     if (!results || !results.preferences) {
         console.warn('No preferences to load');
         return;
     }
 
-    // Load color filter preferences
     const colorFilterOptions = document.querySelector('.option-group').getElementsByTagName('button');
     for (const option of colorFilterOptions) {
         if (option.id === `color-blind-${results.preferences.colorBlindFilter}`) {
@@ -524,7 +515,6 @@ async function loadPreferences(results) {
         }
     }
 
-    // Load dyslexia preferences
     const dyslexiaOptions = document.querySelectorAll('.option-group button[id^="dyslexia-"]');
     dyslexiaOptions.forEach(option => {
         if (option.id === results.preferences.dyslexia) {
@@ -534,7 +524,6 @@ async function loadPreferences(results) {
         }
     });
 
-    // Load language preferences
     const languageOptions = document.querySelectorAll('.lang-button');
     languageOptions.forEach(option => {
         if (option.dataset.langCode === results.preferences.language) {
@@ -544,7 +533,6 @@ async function loadPreferences(results) {
         }
     });
 
-    // Load toggle states
     const screenReaderToggle = document.getElementById('screen-reader-toggle');
     if (screenReaderToggle) {
         screenReaderToggle.checked = results.preferences.screenReader || false;
@@ -555,17 +543,15 @@ async function loadPreferences(results) {
         imageCaptionToggle.checked = results.preferences.imageCaption || false;
     }
 
-    // Load additional conditions
     const additionalConditions = document.querySelector('.conditions-textarea');
     if (additionalConditions) {
         additionalConditions.value = results.preferences.additionalInfo || '';
     }
 
-    // Apply active preferences to the current tab
+    //Apply the modifications
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
         if (!tabs[0]) return;
 
-        // Apply color blind filter
         if (results.preferences.colorBlindFilter && results.preferences.colorBlindFilter !== 'none') {
             chrome.tabs.sendMessage(
                 tabs[0].id,
@@ -576,7 +562,6 @@ async function loadPreferences(results) {
             );
         }
 
-        // Apply dyslexia treatment
         if (results.preferences.dyslexia && results.preferences.dyslexia !== 'none') {
             chrome.tabs.sendMessage(
                 tabs[0].id,
@@ -587,7 +572,6 @@ async function loadPreferences(results) {
             );
         }
 
-        // Apply language translation
         if (results.preferences.language && results.preferences.language !== 'en') {
             chrome.tabs.sendMessage(
                 tabs[0].id,
@@ -600,10 +584,8 @@ async function loadPreferences(results) {
     });
 }
 
-// Add this at the top of the file, after the initial DOMContentLoaded event listener
 async function ensureContentScriptLoaded(tabId) {
     try {
-        // Try to ping the content script
         const response = await new Promise((resolve, reject) => {
             chrome.tabs.sendMessage(tabId, { action: 'ping' }, response => {
                 if (chrome.runtime.lastError) {
@@ -621,7 +603,6 @@ async function ensureContentScriptLoaded(tabId) {
     } catch (error) {
         console.log('Content script not loaded, injecting...');
         try {
-            // Inject the content script
             await chrome.scripting.executeScript({
                 target: { tabId: tabId },
                 files: ['content.js']
