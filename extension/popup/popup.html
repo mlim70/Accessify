@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Accessibility Extension</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="header-container">
+      <h1>Accessify!</h1>
+      <a
+        href="http://localhost:3000"
+        target="_blank"
+        class="gear-icon"
+        title="Settings"
+      >
+        <img src="../assets/images/gear.png" alt="Settings" />
+      </a>
+    </div>
+
+    <div class="container" id="first-section">
+      <div class="section">
+        <h2 class="collapsible-header">
+          Sign In <span class="toggle-btn">▼</span>
+        </h2>
+        <div class="email-input collapsible">
+          <input
+            type="text"
+            class="search-box"
+            id="email-input-box"
+            placeholder="example@gatech.edu"
+          />
+          <div class="save-email-button">
+            <button class="confirm-email-button">Sign-In</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Color Filters</h2>
+        <div class="option-group colorfilter-options">
+          <button class="big-button" id="color-blind-protanopia">
+            Protanopia
+          </button>
+          <button class="big-button" id="color-blind-deuteranopia">
+            Deuteranopia
+          </button>
+          <button class="big-button" id="color-blind-tritanopia">
+            Tritanopia
+          </button>
+          <button class="big-button" id="color-blind-complete">
+            Grayscale
+          </button>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Dyslexia</h2>
+        <div class="option-group dyslexia-options">
+          <button class="big-button" id="dyslexia-visual">Visual</button>
+          <button class="big-button" id="dyslexia-surface">Surface</button>
+          <button class="big-button" id="dyslexia-directional">
+            Directional
+          </button>
+          <button class="big-button" id="dyslexia-attentional">
+            Attentional/ADHD
+          </button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="language-header">
+          <div>
+            <h2>Language</h2>
+          </div>
+          <div><button class="reset-language-button">Reset</button></div>
+        </div>
+        <input
+          type="text"
+          id="language-search"
+          class="search-box language-options"
+          placeholder="Type to search language..."
+        />
+        <div class="language-list" id="language-list">
+          <!-- Languages will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Tools</h2>
+        <div class="tools-group">
+          <div class="tool-item">
+            <span>Screen Reader</span>
+            <label class="toggle">
+              <input type="checkbox" id="screen-reader-toggle" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="tool-item">
+            <span>Image Captions</span>
+            <label class="toggle">
+              <input type="checkbox" id="image-caption-toggle" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Additional Conditions</h2>
+        <textarea
+          class="conditions-textarea"
+          placeholder="Describe any additional conditions or specific needs..."
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div class="button-container">
+        <button class="save-button">Save</button>
+        <button class="reset-button">Reset All</button>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

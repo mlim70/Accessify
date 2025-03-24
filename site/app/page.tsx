@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs"
 import {
   ChevronRight,
   Chrome,
@@ -10,10 +10,10 @@ import {
   Palette,
   Type,
 } from "lucide-react"
-import FeatureCard from "@/components/feature-card"
-import HeroSection from "@/components/hero-section"
-import Navbar from "@/components/navbar"
-import Footer from "@/components/footer"
+import FeatureCard from "@/components/features/FeatureCard"
+import HeroSection from "@/components/layout/HeroSection"
+import Navbar from "@/components/layout/Navbar"
+import Footer from "@/components/layout/Footer"
 
 export default function Home() {
   const [activeTab, setActiveTab] = React.useState("overview")

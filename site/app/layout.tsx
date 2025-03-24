@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import ClientSessionProvider from "./components/ClientSessionProvider";
+import ClientSessionProvider from "@/components/providers/ClientSessionProvider";
 
 export const metadata: Metadata = {
   title: "Accessify - Web Accessibility Made Easy",
