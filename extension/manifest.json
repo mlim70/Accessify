@@ -4,32 +4,41 @@
   "version": "1.0",
   "description": "Making the web accessible for people with disabilities.",
   "icons": {
-    "48": "icon.png"
+    "48": "assets/images/icon.png"
   },
-  "permissions": ["activeTab", "storage", "scripting", "tabs", "tts"],
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting",
+    "tabs",
+    "tts"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
   "content_scripts": [
     {
-      "matches": ["<all_urls>", "http://localhost:3000/*"],
+      "matches": ["<all_urls>"],
       "js": ["content.js"],
-      "run_at": "document_start"
+      "run_at": "document_start",
+      "all_frames": true
     }
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; media-src 'self' blob:;"
   },
   "action": {
-    "default_popup": "ui/popup.html",
-    "default_icon": "icon.png"
+    "default_popup": "popup/popup.html",
+    "default_icon": "assets/images/icon.png"
   },
   "web_accessible_resources": [
     {
       "resources": [
-        "fonts/OpenDyslexic-Regular.otf",
-        "fonts/OpenDyslexic-Bold.otf",
-        "generative-ai.umd.js"
+        "assets/fonts/OpenDyslexic-Regular.otf",
+        "assets/fonts/OpenDyslexic-Bold.otf",
+        "assets/js/generative-ai.umd.js"
       ],
-      "matches": ["<all_urls>"],
-      "js": ["content.js", "features/font-changer.js", "utils/translator.js"]
+      "matches": ["<all_urls>"]
     }
   ]
 }

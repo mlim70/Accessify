@@ -196,49 +196,56 @@ console.log(
   Object.keys(colorBlindFilters)
 );
 
-console.log("Content script initialized for email storage");
+console.log("Content script loaded and initialized");
 
-//modify the message listener to check authentication
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  console.log("Received message in content script:", request);
-  if (request.action === "applyColorBlindFilter") {
-    try {
-      console.log("Attempting to apply filter:", request.filterType);
-      applyColorBlindFilter(request.filterType);
-      console.log("Successfully applied filter: ", request.filterType);
-      sendResponse({ success: true });
-    } catch (error) {
-      console.error("Error applying colorblind filter:", error);
-      sendResponse({ success: false, error: error.message });
-    }
-  } else if (request.action === "applyDyslexiaTreatment") {
-    applyDyslexiaTreatment(request.dyslexiaType);
-    sendResponse({ success: true });
-  } else if (request.action === "translatePage") {
-    translatePage(request.targetLanguage);
-    sendResponse({ success: true });
-  } else if (request.action === "restore-original") {
-    if (additionalStyles) {
-      document.head.removeChild(additionalStyles);
-      additionalStyles = null;
+// Message listener
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    console.log("Received message in content script:", message);
+
+    // Handle ping message
+    if (message.action === 'ping') {
+        sendResponse({ status: 'ok' });
+        return true;
     }
 
-    if (originalDocument) {
-      restoreOriginalDocument();
+    // Handle other messages
+    switch (message.action) {
+        case 'applyColorBlindFilter':
+            applyColorBlindFilter(message.filterType);
+            sendResponse({ success: true });
+            break;
+
+        case 'applyDyslexiaTreatment':
+            applyDyslexiaTreatment(message.dyslexiaType);
+            sendResponse({ success: true });
+            break;
+
+        case 'translatePage':
+            translatePage(message.targetLanguage);
+            sendResponse({ success: true });
+            break;
+
+        case 'restore-original':
+            if (additionalStyles) {
+                document.head.removeChild(additionalStyles);
+                additionalStyles = null;
+            }
+            if (originalDocument) {
+                restoreOriginalDocument();
+            }
+            document.body.style.filter = "";
+            sendResponse({ success: true });
+            break;
+
+        case 'restore-language':
+            if (originalDocument) {
+                restoreOriginalDocument();
+            }
+            document.body.style.filter = "";
+            sendResponse({ success: true });
+            break;
     }
-    document.body.style.filter = "";
-  } else if (request.action === "restore-language") {
-    if (originalDocument) {
-      restoreOriginalDocument();
-    }
-    document.body.style.filter = "";
-  } else if (request.action === "sendToClaude") {
-    sendToClaude(request.prompt)
-      .then((response) => sendResponse({ success: true, response }))
-      .catch((error) => sendResponse({ success: false, error: error.message }));
-    return true;
-  }
-  return true;
+    return true;  // Will send response asynchronously
 });
 
 //translate text content
