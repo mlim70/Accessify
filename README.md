@@ -111,21 +111,105 @@ Accessify/
 └── README.md            // Project documentation and setup instructions
 ```
 
-## Environment Variables
+## APIs and AI Services
 
-The following environment variables are used in the project:
+### Translation Service
 
-- `PORT`: The port on which the server will run.
-- `GOOGLE_CLOUD_PROJECT_ID`: The Google Cloud project ID.
-- `GOOGLE_APPLICATION_CREDENTIALS`: The path to the Google Cloud service account key file.
-- `GOOGLE_APPLICATION_CREDENTIALS_JSON`: The base64-encoded JSON key for Google Cloud service account.
-- `GEMINI_API_KEY`: The API key for Google Generative AI.
-- `ANTHROPIC_API_KEY`: The API key for Anthropic.
-- `OPENAI_API`: The API key for OpenAI.
-- `NEXTAUTH_URL`: The URL of the Next.js application.
-- `NEXTAUTH_SECRET`: The secret used to encrypt session tokens.
-- `GOOGLE_CLIENT_ID`: The client ID for Google OAuth.
-- `GOOGLE_CLIENT_SECRET`: The client secret for Google OAuth.
+**File:** `backend/src/server.js`
+
+**Purpose:**  
+The translation service uses Google Cloud Translation API to provide real-time language translation capabilities. It handles requests from the Chrome extension to translate webpage content into various languages, supporting accessibility for non-native speakers.
+
+**Key Features:**
+- Multi-language support
+- Real-time translation
+- Error handling and logging
+- Response caching
+
+---
+
+### AI Enhancement Service
+
+**File:** `backend/src/server.js`
+
+**Purpose:**  
+This service combines multiple AI models to enhance webpage accessibility:
+
+1. **Claude (Anthropic)**
+   - Generates accessibility enhancements
+   - Processes HTML content
+   - Provides context-aware modifications
+   - Caches results for efficiency
+
+2. **Gemini (Google)**
+   - Generates pronunciation guides
+   - Identifies challenging words
+   - Provides phonetic assistance
+   - Optimized for dyslexia support
+
+3. **OpenAI Text-to-Speech**
+   - Converts text to natural-sounding speech
+   - Supports multiple voices
+   - Provides audio playback
+   - Handles streaming responses
+
+---
+
+### Content Script Integration
+
+**File:** `extension/content.js`
+
+**Purpose:**  
+The content script serves as the bridge between the Chrome extension and the backend services. It:
+- Intercepts webpage content
+- Applies accessibility modifications
+- Manages text-to-speech playback
+- Handles user interactions
+- Coordinates with multiple AI services
+
+---
+
+### API Endpoints
+
+**File:** `backend/src/server.js`
+
+**Available Endpoints:**
+1. `/api/translate`
+   - Translates text to target language
+   - Handles batch translation requests
+   - Returns translated content
+
+2. `/api/enhance-accessibility`
+   - Processes HTML with Claude
+   - Applies accessibility enhancements
+   - Caches results for performance
+
+3. `/api/pronunciation`
+   - Generates pronunciation guides
+   - Identifies challenging words
+   - Returns enhanced text
+
+4. `/api/tts`
+   - Converts text to speech
+   - Streams audio response
+   - Supports multiple voices
+
+5. `/api/create-user`
+   - Initializes user preferences
+   - Manages user accounts
+   - Stores accessibility settings
+
+6. `/api/check-email`
+   - Verifies user existence
+   - Retrieves user preferences
+   - Manages authentication state
+
+Each endpoint includes:
+- Input validation
+- Error handling
+- Response formatting
+- Performance optimization
+- Security measures
 
 ## Running the Application
 
