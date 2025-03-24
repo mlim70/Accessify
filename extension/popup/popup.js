@@ -10,7 +10,11 @@ window.addEventListener('beforeunload', function() {
   const stateObject = {
     colorBlindFilter: document.querySelector('#colorBlind').value,
     dyslexia: document.querySelector('#dyslexia').value,
-    // ... other state values
+    colorBlindFilter: document.querySelector('#colorBlind').value,
+    dyslexia: document.querySelector('#dyslexia').value,
+    language: document.querySelector('#language').value,
+    screenReader: document.querySelector('#screen-reader-toggle').checked,
+    imageCaption: document.querySelector('#image-caption-toggle').checked
   };
   
   // Save to chrome.storage
