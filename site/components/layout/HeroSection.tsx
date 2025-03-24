@@ -2,7 +2,7 @@
 
 import React from 'react'
 import LoginButton from '@/components/features/auth/LoginButton'
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/Button"
 import { Chrome } from "lucide-react"
 import { signOut, useSession } from 'next-auth/react'
 
