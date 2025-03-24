@@ -41,50 +41,56 @@ The Chrome extension is built using the following technologies:
 
 ```
 Accessify/
-├── backend/
+├── backend/                  // Backend server
 │   ├── src/
-│   │   ├── server.js         // Express server with API endpoints
-│   │   └── config/           // Configuration files
-│   ├── .env                  // Backend environment variables
-│   └── package.json          // Backend dependencies
+│   │   ├── server.js         // Express server handling API endpoints for:
+│   │   │                     // 1) translation, 2) user preferences, and 3) Gemini API integration
+│   │   └── config/
+│   ├── .env                  // Environment variables (API keys, database URLs)
+│   └── package.json          // Project metadata, scripts, and dependencies
 │
-├── site/                     // Next.js frontend
+├── site/                     // Next.js frontend application
 │   ├── app/
-│   │   ├── auth/            // Authentication pages
-│   │   │   ├── login/
-│   │   │   └── signup/
-│   │   └── page.js          // Main landing page
+│   │   ├── auth/
+│   │   │   ├── login/       // Login page with Google OAuth form validation and error handling
+│   │   │   └── signup/      // Signup page with Google OAuth user registration flow
+│   │   └── page.js          // Main landing page with Chrome Extension guide; login; feature showcase
 │   ├── components/
 │   │   ├── features/
 │   │   │   └── auth/
-│   │   │       └── LoginButton.tsx
+│   │   │       └── LoginButton.tsx  // Google OAuth integration with session management
 │   │   ├── layout/
-│   │   │   └── HeroSection.tsx
-│   │   └── ui/              // Reusable UI components
-│   │       ├── Button.tsx
-│   │       ├── Card.tsx
-│   │       ├── Checkbox.tsx
-│   │       ├── Input.tsx
-│   │       ├── Label.tsx
-│   │       └── Tabs.tsx
-│   ├── lib/                 // Utility functions
-│   ├── public/              // Static assets
-│   └── package.json         // Frontend dependencies
+│   │   │   └── HeroSection.tsx      // Landing page hero section with animated content
+│   │   └── ui/
+│   │       ├── Button.tsx   // Button component
+│   │       ├── Card.tsx     // Card container with to display feature details/usage
+│   │       ├── Checkbox.tsx // Accessible checkbox with custom styling
+│   │       ├── Input.tsx    // Form input component
+│   │       ├── Label.tsx    // Form label component
+│   │       └── Tabs.tsx     // Tab component to navigate between extension features, with animations
+│   ├── lib/                 // Utility functions and shared logic
+│   ├── public/              // Static assets (images, fonts)
+│   └── package.json         // Frontend dependencies and scripts
 │
-├── extension/               // Chrome extension
+├── extension/               // Chrome extension for accessibility features
 │   ├── popup/
-│   │   ├── popup.html      // Extension popup UI
-│   │   ├── popup.css       // Popup styles
-│   │   └── popup.js        // Popup functionality
-│   ├── content.js          // Content script for webpage modifications
-│   ├── manifest.json       // Extension configuration
-│   └── assets/            // Extension assets
+│   │   ├── popup.html      // Extension Popup UI with visually clean Accessibility Preferences
+│   │   ├── popup.css       // Styling for Popup UI
+│   │   └── popup.js        // Popup logic handling; sending to DynamoDB & API endpoints
+│   ├── content.js          // Content script implementing features:
+│   │                       // 1) Color blindness filters
+│   │                       // 2) Dyslexia treatments (font, spacing, word simplification)
+│   │                       // 3) Text-to-speech functionality
+│   │                       // 4) Page translation
+│   │                       // 5) Feature loading progress bar overlays
+│   ├── manifest.json       // Extension configuration and permissions
+│   └── assets/            // Extension icons and images
 │
-├── .env.local              // Root environment variables
-├── package.json           // Root dependencies
-├── .gitignore            // Git ignore rules
-├── amplify.yml           // AWS Amplify configuration
-└── README.md            // Project documentation
+├── .env.local              // Root environment variables for development
+├── package.json           // Root dependencies and project scripts
+├── .gitignore            // Git ignore rules for sensitive files
+├── amplify.yml           // AWS Amplify deployment configuration
+└── README.md            // Project documentation and setup instructions
 ```
 
 ## Environment Variables
