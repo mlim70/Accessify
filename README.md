@@ -3,9 +3,9 @@
 ## Overview
 
 **Accessify** is a project designed to enhance web accessibility for people with vision impairment. The project leverages various technologies to provide features like text-to-speech, translation, dyslexia-friendly fonts, and color blindness support.
-| ![Live-translation with Dyslexia and Color Accommodations](https://i.ibb.co/677d7TJc/original.png) |
-| ---------------------------------------------------------------------------------------------- |
-| ![Currently implemented features!](https://i.ibb.co/RpV8Rn1W/Screenshot-2025-03-24-201536.png)        |
+| <img src="https://i.ibb.co/677d7TJc/original.png" alt="Live-translation with Dyslexia and Color Accommodations" width="300"> |
+|:------------------------------------------------------------------------------------------------------------:|
+| <img src="https://i.ibb.co/RpV8Rn1W/Screenshot-2025-03-24-201536.png" alt="Currently implemented features!" width="300"> |
 
 
 
