@@ -136,20 +136,22 @@ The translation service uses Google Cloud Translation API to provide real-time l
 This service combines multiple AI models to enhance webpage accessibility:
 
 1. **Claude (Anthropic)**
-   - Generates accessibility enhancements
-   - Processes HTML content
+   - Using the user-inputted custom instructions:
+     1) Populates a prompt template tailoring to visibility enhancements (prompt engineering)
+     2) Processes current webpage HTML content
+     3) Supplements webpage with new, accessibility-enhanced HTML
    - Provides context-aware modifications
    - Caches results for efficiency
 
 2. **Gemini (Google)**
-   - Generates pronunciation guides
-   - Identifies challenging words
+   - Parses webpage for difficult-to-pronounce words to query for following step
+   - Generates the pronunciation guides for phonetic assistance 
    - Provides phonetic assistance
    - Optimized for dyslexia support
 
 3. **OpenAI Text-to-Speech**
    - Converts text to natural-sounding speech
-   - Supports multiple voices
+   - Supports multiple voices for user-preference
    - Provides audio playback
    - Handles streaming responses
 
