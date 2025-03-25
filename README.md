@@ -3,9 +3,10 @@
 ## Overview
 
 **Accessify** is a project designed to enhance web accessibility for people with vision impairment. The project leverages various technologies to provide features like text-to-speech, translation, dyslexia-friendly fonts, and color blindness support.
-Solarized dark             |  Solarized Ocean
-:-------------------------:|:-------------------------:
-![Hero Screen](https://ibb.co/BKYQ3pPN/tmp.webp)  |  ![Currently implemented features!](https://ibb.co/rG19DPgJ/tmp.webp)
+|      Solarized dark       |      Solarized Ocean       |
+|:-------------------------:|:--------------------------:|
+| ![Hero Screen](https://i.ibb.co/3YPjd3sz/Screenshot-2025-03-24-200606.png) | ![Currently implemented features!](https://i.ibb.co/RpV8Rn1W/Screenshot-2025-03-24-201536.png) |
+
 
 ## Table of Contents
 - [Overview](#overview)
