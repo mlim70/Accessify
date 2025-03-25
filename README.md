@@ -1,5 +1,26 @@
 # Accessify
 
+## Table of Contents
+- [Overview](#overview)
+- [Tech Stack](#tech-stack)
+  - [Frontend](#frontend)
+  - [Backend](#backend)
+  - [Chrome Extension](#chrome-extension)
+  - [Authentication & Security](#authentication--security)
+  - [Deployment & Infrastructure](#deployment--infrastructure)
+  - [Development Tools](#development-tools)
+- [Project Structure](#project-structure)
+- [APIs and AI | Modules & Functions](#apis-and-ai--modules--functions)
+  - [Translation Service](#translation-service)
+  - [AI Enhancement Service](#ai-enhancement-service)
+  - [Content Script Integration](#content-script-integration)
+  - [API Endpoints](#api-endpoints)
+- [Running the Application](#running-the-application)
+  - [Frontend & Backend](#frontend--backend)
+  - [Chrome Extension](#chrome-extension-1)
+- [Environment Variables](#environment-variables)
+- [Enjoy](#enjoy)
+- 
 ## Overview
 
 EmoryHax is a project designed to enhance web accessibility for people with vision impairment. The project leverages various technologies to provide features like text-to-speech, translation, dyslexia-friendly fonts, and color blindness support.
