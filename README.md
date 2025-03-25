@@ -74,7 +74,6 @@
 ### Development Tools
 > **ESLint** — Code quality and style enforcement  
 > **PostCSS** — CSS processing and optimization  
-> **Tailwind CSS** — Utility-first styling system  
 > **Nodemon** — Development server with auto-reload
 
 ## Project Structure
