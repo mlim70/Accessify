@@ -44,9 +44,10 @@
 ### Backend ![Node.js Badge](https://img.shields.io/badge/Node.js-339933?style=flat&logo=node.js&logoColor=white)
 > **Express** — Fast, unopinionated web framework for Node.js  
 > **AWS SDK** — AWS service integration for DynamoDB  
-> **Google Cloud Translation** — Multi-language translation capabilities  
-> **Google Generative AI** — Advanced AI for text generation and analysis  
-> **Anthropic Claude** — AI model for accessibility enhancements based on user-inputted custom prompts  
+> **Google Cloud Translation API** — Multi-language translation capabilities  
+> **Google Generative AI** — Advanced AI for text generation and analysis (Gemini AI API)
+> **Anthropic Claude AI** — AI model for accessibility enhancements based on user-inputted custom prompts (Anthropic AI API)
+> **OpenAI (OpenAI API)** — Text-to-speech capability & voice model selection
 
 ---
 
