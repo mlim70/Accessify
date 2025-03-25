@@ -1,5 +1,12 @@
 # Accessify
 
+## Overview
+
+EmoryHax is a project designed to enhance web accessibility for people with vision impairment. The project leverages various technologies to provide features like text-to-speech, translation, dyslexia-friendly fonts, and color blindness support.
+Solarized dark             |  Solarized Ocean
+:-------------------------:|:-------------------------:
+![Hero Screen]([https://...Dark.png](https://ibb.co/BKYQ3pPN))  |  ![Currently implemented features!]([https://...Ocean.png](https://ibb.co/rG19DPgJ))
+
 ## Table of Contents
 - [Overview](#overview)
 - [Tech Stack](#tech-stack)
@@ -18,12 +25,7 @@
 - [Running the Application](#running-the-application)
   - [Frontend & Backend](#frontend--backend)
   - [Chrome Extension](#chrome-extension-1)
-- [Environment Variables](#environment-variables)
 - [Enjoy](#enjoy)
-- 
-## Overview
-
-EmoryHax is a project designed to enhance web accessibility for people with vision impairment. The project leverages various technologies to provide features like text-to-speech, translation, dyslexia-friendly fonts, and color blindness support.
 
 ## Tech Stack
 
