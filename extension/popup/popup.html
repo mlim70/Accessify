@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <title>Accessibility Extension</title>
     <link rel="stylesheet" href="popup.css" />
+    <link rel="stylesheet" href="../util/select2.min.css" />
+    <style>
+      .select2-container {
+      width: 100% !important;
+      border-radius: 50%;
+      }
+    </style>
   </head>
   <body>
     <div class="header-container">
@@ -116,9 +123,10 @@
       </div>
 
       <div>
-        <h1>Select Font</h1>
+        <h1>Custom Font</h1>
         <select id="fontSelect" style="width: 100%"></select>
-        <button id="applyFont">Apply Font</button>
+        <button id="applyFont">Apply Custom Font</button>
+        <!-- <button id="resetFont">Reset Custom Font</button> -->
       </div>
 
       <div class="button-container">

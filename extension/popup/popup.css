@@ -327,6 +327,24 @@ h2 {
     transform: translateY(-1px);
 }
 
+#applyFont {
+    flex: 1;
+    padding: 3px 10px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 40%;
+    margin-top: 10px;
+}
+
+#applyFont:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
 .reset-button {
     flex: 1;
     padding: 12px 24px;

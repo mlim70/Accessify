@@ -656,6 +656,7 @@ function resetAll() {
 
 $(document).ready(function() {
     const fonts = [
+      { name: 'None', comment: '' },
       { name: 'Arial', comment: '' },
       { name: 'Comic Sans MS', comment: '' },
       { name: 'Courier New', comment: '' },
@@ -686,11 +687,28 @@ $(document).ready(function() {
   
     $('#applyFont').click(() => {
       const selectedFont = $('#fontSelect').val();
-      chrome.storage.sync.set({ preferredFont: selectedFont }, () => {
-        console.log('Font saved:', selectedFont);
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          chrome.tabs.reload(tabs[0].id);
+      if (selectedFont === 'None') {
+        // Reset the font to the original
+        chrome.storage.sync.remove('preferredFont', () => {
+          console.log('Font reset to original');
+          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            chrome.tabs.reload(tabs[0].id);
+            // if (tabs[0]) {
+            //   chrome.tabs.sendMessage(tabs[0].id, { action: 'resetFont' }, (response) => {
+            //     console.log('Font reset response:', response);
+            //   });
+            // }
+          });
         });
-      });
+      } else {
+        // Apply the selected font
+        chrome.storage.sync.set({ preferredFont: selectedFont }, () => {
+          console.log('Font saved:', selectedFont);
+          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            chrome.tabs.reload(tabs[0].id);
+          });
+        });
+      }
     });
+
   });

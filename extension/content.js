@@ -645,7 +645,13 @@ async function sendToClaude(prompt) {
 
 
 chrome.storage.sync.get('preferredFont', (data) => {
-  const preferredFont = data.preferredFont || 'Comic+Sans+MS';
+  const preferredFont = data.preferredFont;
+
+  if (!preferredFont) {
+    // If no preferred font is set, reload the page to reset to the original font
+    console.log('No preferred font set.');
+    return;
+  }
 
   // Create a link element to load the Google Web Font
   const link = document.createElement('link');
