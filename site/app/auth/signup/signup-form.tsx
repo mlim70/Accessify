@@ -1,11 +1,11 @@
 'use client'
 
 import { useState } from "react"
-import { Input } from "@/components/ui/Input"
-import { Label } from "@/components/ui/Label"
-import { Button } from "@/components/ui/Button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/Card"
-import { Checkbox } from "@/components/ui/Checkbox"
+import { Input } from "../../../components/ui/Input"
+import { Label } from "../../../components/ui/Label"
+import { Button } from "../../../components/ui/Button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../../components/ui/Card"
+import { Checkbox } from "../../../components/ui/Checkbox"
 import { EyeIcon, EyeOffIcon } from "lucide-react"
 
 export default function SignupForm() {
