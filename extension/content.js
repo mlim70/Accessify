@@ -1,7 +1,9 @@
 // Add this at the very top of content.js, before any other code
 console.log("Setting up email storage listener");
 
-// let isAuthenticated = false;
+const backend = 'ubuntu@ec2-3-89-254-147.compute-1.amazonaws.com';
+const portNum = 3001;
+const backendURL = `${backend}:${portNum}`;
 
 let currentAudio = null;
 
@@ -107,7 +109,7 @@ async function readSelectedText(text) {
     // Create and show speaker overlay
     const overlay = createSpeakerOverlay(text);
 
-    const response = await fetch("http://localhost:3001/api/tts", {
+    const response = await fetch(`${backendURL}/api/tts`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -252,7 +254,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 async function translateText(text, targetLanguage) {
   try {
     console.log(`Attempting to translate: "${text}" to ${targetLanguage}`);
-    const response = await fetch("http://localhost:3001/api/translate", {
+    const response = await fetch(`${backendURL}/api/translate`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -279,7 +281,7 @@ async function translateText(text, targetLanguage) {
 async function generatePronunciationHints(text) {
   try {
     console.log(`Attempting to generate hints for: "${text}"`);
-    const response = await fetch("http://localhost:3001/api/pronunciation", {
+    const response = await fetch(`${backendURL}/api/pronunciation`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -617,7 +619,7 @@ console.log("Content script initialization complete!");
 async function sendToClaude(prompt) {
   try {
     const html = document.documentElement.outerHTML;
-    const response = await fetch("http://localhost:3001/api/claude-query", {
+    const response = await fetch(`${backendURL}/api/claude-query`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

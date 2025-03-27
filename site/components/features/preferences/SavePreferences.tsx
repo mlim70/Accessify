@@ -2,6 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useState, FormEvent } from 'react';
+import { backendURL } from '../auth/LoginButton';
 
 export default function SavePreferences() {
   const { data: session } = useSession();
@@ -33,7 +34,7 @@ export default function SavePreferences() {
       return;
     }
     try {
-      const response = await fetch('http://localhost:3001/api/input', {
+      const response = await fetch(`${backendURL}/api/input`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

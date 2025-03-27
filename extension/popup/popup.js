@@ -1,3 +1,7 @@
+const backend = 'ubuntu@ec2-3-89-254-147.compute-1.amazonaws.com';
+const portNum = 3001;
+const backendURL = `${backend}:${portNum}`;
+
 document.addEventListener('DOMContentLoaded', function() {
   chrome.storage.local.get(['preferences'], function(result) {
     if (result.preferences) {
@@ -288,7 +292,7 @@ document.addEventListener('DOMContentLoaded', function() {
         userPreferences[imageCaptionToggle] = imageCaption;        
         
         userPreferences['emailAddress'] = emailValue;
-        fetch("http://localhost:3001/api/save-preferences", {
+        fetch(`${backendURL}/api/save-preferences`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -396,7 +400,7 @@ function addRegisterMessage() {
     warningText.style.fontSize = '16px';
     
     const signInLink = document.createElement('a');
-    signInLink.href = 'http://localhost:3000';
+    signInLink.href = 'https://accessify-extension.com/';
     signInLink.textContent = 'register';
     signInLink.style.color = '#0056b3';
     signInLink.style.fontWeight = 'bold';
@@ -455,7 +459,7 @@ function removeLoginMessage() {
 }
 
 async function preferences(email) {
-    const response = await fetch("http://localhost:3001/api/check-email", {
+    const response = await fetch(`${backendURL}/api/check-email`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

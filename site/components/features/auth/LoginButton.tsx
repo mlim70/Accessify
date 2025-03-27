@@ -4,13 +4,17 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 
+const backend = 'ubuntu@ec2-3-89-254-147.compute-1.amazonaws.com';
+const portNum = 3001;
+export const backendURL = `${backend}:${portNum}`;
+
 export default function LoginButton() {
   const { data: session } = useSession();
 
   useEffect(() => {
     if (session?.user?.email) {
       console.log("User email: ", session.user.email);
-      fetch("http://localhost:3001/api/create-user", {
+      fetch(`${backendURL}/api/create-user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
