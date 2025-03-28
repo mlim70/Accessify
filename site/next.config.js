@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
+  output: 'export',
+  images: {
+    unoptimized: true,
+  },
+  distDir: 'out',
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
