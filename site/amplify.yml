@@ -10,11 +10,8 @@ applications:
         build:
           commands:
             - npm run build
-            - cp -r public .next/standalone/
-            - cp -r .next/static .next/standalone/.next/
-            - cp -r .next/server .next/standalone/.next/
       artifacts:
-        baseDirectory: .next/standalone
+        baseDirectory: .next
         files:
           - "**/*"
       cache:
