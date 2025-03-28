@@ -2,7 +2,7 @@
 
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useEffect } from "react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 const backend = 'ubuntu@ec2-3-89-254-147.compute-1.amazonaws.com';
 const portNum = 3001;
