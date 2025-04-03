@@ -170,17 +170,25 @@ app.post("/api/pronunciation", async (req, res) => {
     const response = result.response.text();
 
     if (response.includes("None")) {
-      console.log("No revisions made");
+      console.log("No complex words found");
       return res.status(200).json({ revisedText: text });
     }
 
-    const challengingWords = response.split(",");
-    for (const word of challengingWords) {
-      prompt = `Generate a pronunciation guide using only the English alphabet on how to pronounce "${word}". Make it simple and clear. Only provide the pronunciation guide.`;
-      let result = await model.generateContent(prompt);
-      const pronunciation = result.response.text().replace("\n", "");
-      text = text.replace(word, `${word} (${pronunciation})`);
+    const wordsToProcess = response.split(",").map(word => word.trim());
+    for (const word of wordsToProcess) {
+      if (!word) continue;
+      
+      prompt = `Generate a simple pronunciation guide for "${word}" using only the English alphabet. Format it as a single word with hyphens between syllables. Example: "pronunciation" -> "pro-nun-see-ay-shun". Only provide the pronunciation guide, nothing else.`;
+      result = await model.generateContent(prompt);
+      const pronunciation = result.response.text().replace("\n", "").trim();
+      
+      // Only add pronunciation if it's different from the original word
+      if (pronunciation.toLowerCase() !== word.toLowerCase()) {
+        // Use a more compact format: word (pronunciation)
+        text = text.replace(new RegExp(word, 'g'), `${word} (${pronunciation})`);
+      }
     }
+    
     return res.status(200).json({ revisedText: text });
   } catch (error) {
     console.error("Error generating pronunciation guide:", error);
