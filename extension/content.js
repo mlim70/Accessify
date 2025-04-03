@@ -3,7 +3,7 @@ console.log("Setting up email storage listener");
 
 const backend = 'ec2-54-166-40-219.compute-1.amazonaws.com';
 const portNum = 443;
-const backendURL = `https://${backend}`;
+const backendURL = `https://${backend}:${portNum}`;
 
 let currentAudio = null;
 

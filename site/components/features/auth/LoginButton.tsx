@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 const backend = 'ec2-54-166-40-219.compute-1.amazonaws.com';
 const portNum = 443;
-const backendURL = `https://${backend}:${portNum}`;
+export const backendURL = `https://${backend}:${portNum}`;
 
 export default function LoginButton() {
   const { data: session } = useSession();

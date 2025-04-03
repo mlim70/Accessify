@@ -33,6 +33,7 @@ var credentials = {key: privateKey, cert: certificate};
 const app = express();
 const PORT = process.env.PORT || 443;
 app.use(cors(corsOptions));
+app.use(bodyParser.json({ limit: "50mb" }));
 //anthropic Claude
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -46,10 +47,6 @@ const translate = new Translate({
 
 //google AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-//CORS and body parser middleware
-app.use(cors());
-app.use(bodyParser.json({ limit: "50mb" }));
 
 //routes
 app.post("/api/input", async (req, res) => {
