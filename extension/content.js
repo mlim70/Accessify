@@ -1,9 +1,9 @@
 // Add this at the very top of content.js, before any other code
 console.log("Setting up email storage listener");
 
-const backend = 'ec2-54-166-40-219.compute-1.amazonaws.com';
+const backend = 'accessify-backend.com';
 const portNum = 443;
-const backendURL = `https://${backend}:${portNum}`;
+const backendURL = `https://${backend}`;
 
 let currentAudio = null;
 
