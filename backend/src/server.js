@@ -4,7 +4,16 @@ const Anthropic = require("@anthropic-ai/sdk");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const corsOptions = {
-  origin: ['https://accessify-extension.com', 'http://localhost', 'https://localhost'],
+  origin: [
+    'https://accessify-extension.com',
+    'http://localhost',
+    'https://localhost',
+    'chrome-extension://*',  // Allow all Chrome extensions
+    'https://accessify-backend.com'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
   optionsSuccessStatus: 200,
 };
 const express = require("express");
