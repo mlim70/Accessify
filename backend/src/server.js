@@ -4,7 +4,7 @@ const Anthropic = require("@anthropic-ai/sdk");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const corsOptions = {
-  origin: 'https://accessify-extension.com',
+  origin: ['https://accessify-extension.com', 'http://localhost', 'https://localhost'],
   optionsSuccessStatus: 200,
 };
 const express = require("express");
@@ -26,12 +26,12 @@ if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
   process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath;
 }
 
-var privateKey = fs.readFileSync('src/config/private-key.pem');
-var certificate = fs.readFileSync('src/config/certificate.pem');
+var privateKey = fs.readFileSync(path.join(__dirname, 'config', 'privkey.pem'));
+var certificate = fs.readFileSync(path.join(__dirname, 'config', 'fullchain.pem'));
 var credentials = {key: privateKey, cert: certificate};
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 443;
 app.use(cors(corsOptions));
 //anthropic Claude
 const anthropic = new Anthropic({
