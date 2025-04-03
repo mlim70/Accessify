@@ -1,9 +1,9 @@
 // Add this at the very top of content.js, before any other code
 console.log("Setting up email storage listener");
 
-const backend = 'ec2-3-89-254-147.compute-1.amazonaws.com';
-const portNum = 3001;
-const backendURL = `https://${backend}:${portNum}`;
+const backend = 'accessify-backend.com';
+const portNum = 443;
+const backendURL = `https://${backend}`;
 
 let currentAudio = null;
 
@@ -324,19 +324,23 @@ const applyOpenDyslexicFont = () => {
         @font-face {
             font-family: 'OpenDyslexic';
             src: url('${chrome.runtime.getURL(
-              "fonts/OpenDyslexic-Regular.otf"
+              "assets/fonts/OpenDyslexic-Regular.otf"
             )}') format('opentype');
             font-weight: normal;
             font-style: normal;
         }
-        
-        body, p, h1, h2, h3, h4, h5, h6, a, span, div, li, td, th, input, button, textarea, blockquote, label, figcaption {
+
+        @font-face {
             font-family: 'OpenDyslexic';
             src: url('${chrome.runtime.getURL(
-              "fonts/OpenDyslexic-Bold.otf"
+              "assets/fonts/OpenDyslexic-Bold.otf"
             )}') format('opentype');
             font-weight: bold;
             font-style: normal;
+        }
+        
+        body, p, h1, h2, h3, h4, h5, h6, a, span, div, li, td, th, input, button, textarea, blockquote, label, figcaption {
+            font-family: 'OpenDyslexic', sans-serif;
         }
         
         [class*="fa-"], 

@@ -4,7 +4,10 @@ const Anthropic = require("@anthropic-ai/sdk");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const corsOptions = {
-  origin: 'https://accessify-extension.com',
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
   optionsSuccessStatus: 200,
 };
 const express = require("express");
@@ -26,13 +29,14 @@ if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
   process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath;
 }
 
-var privateKey = fs.readFileSync('src/config/private-key.pem');
-var certificate = fs.readFileSync('src/config/certificate.pem');
+var privateKey = fs.readFileSync(path.join(__dirname, 'config', 'privkey.pem'));
+var certificate = fs.readFileSync(path.join(__dirname, 'config', 'fullchain.pem'));
 var credentials = {key: privateKey, cert: certificate};
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 443;
 app.use(cors(corsOptions));
+app.use(bodyParser.json({ limit: "50mb" }));
 //anthropic Claude
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -46,10 +50,6 @@ const translate = new Translate({
 
 //google AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-//CORS and body parser middleware
-app.use(cors());
-app.use(bodyParser.json({ limit: "50mb" }));
 
 //routes
 app.post("/api/input", async (req, res) => {
@@ -161,32 +161,47 @@ app.post("/api/translate", async (req, res) => {
 app.post("/api/pronunciation", async (req, res) => {
   try {
     let { text } = req.body;
+    console.log("Received text for pronunciation processing:", text);
+    
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     let prompt = `Which of the following words would someone with surface dyslexia struggle with pronouncing? (Only list the words separated by commas. If there are none, output "None". "${text}"`;
     let result = await model.generateContent(prompt);
     const response = result.response.text();
+    console.log("Received challenging words response:", response);
 
-    if (response.includes("None")) {
-      console.log("No revisions made");
-      return res.status(200).json({ revisedText: text });
-    }
+    // Extract only the comma-separated words, ignoring any explanatory text
+    const wordMatch = response.match(/[^,]+(?=,|$)/g) || [];
+    const challengingWords = wordMatch
+      .map(word => word.trim())
+      .filter(word => word && word !== "None" && word.length < 50); // Filter out long explanatory text
+    console.log("Processed challenging words:", challengingWords);
 
-    const challengingWords = response.split(",");
     for (const word of challengingWords) {
-      prompt = `Generate a pronunciation guide using only the English alphabet on how to pronounce "${word}". Only provide the pronunciation guide.`;
-      let result = await model.generateContent(prompt);
-      const pronunciation = result.response.text().replace("\n", "");
-      text = text.replace(word, `${word} (${pronunciation})`);
+      try {
+        prompt = `Generate a pronunciation guide using only the English alphabet on how to pronounce "${word}". Only provide the pronunciation guide.`;
+        result = await model.generateContent(prompt);
+        const pronunciation = result.response.text().replace("\n", "").trim();
+        console.log(`Received pronunciation for "${word}":`, pronunciation);
+        
+        if (pronunciation) {
+          // Escape special regex characters in the word
+          const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          text = text.replace(new RegExp(escapedWord, 'gi'), `${word} (${pronunciation})`);
+        }
+      } catch (wordError) {
+        console.error(`Error processing word "${word}":`, wordError);
+        // Continue with next word even if one fails
+        continue;
+      }
     }
+    
     return res.status(200).json({ revisedText: text });
   } catch (error) {
     console.error("Error generating pronunciation guide:", error);
-    res
-      .status(500)
-      .json({
-        error: "Error generating pronunciation guide:",
-        details: error.message,
-      });
+    res.status(500).json({
+      error: "Error generating pronunciation guide:",
+      details: error.message,
+    });
   }
 });
 

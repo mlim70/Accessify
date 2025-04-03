@@ -4,9 +4,9 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
-const backend = 'ec2-3-89-254-147.compute-1.amazonaws.com';
-const portNum = 3001;
-const backendURL = `https://${backend}:${portNum}`;
+const backend = 'accessify-backend.com';
+const portNum = 443;
+export const backendURL = `https://${backend}`;
 
 export default function LoginButton() {
   const { data: session } = useSession();
