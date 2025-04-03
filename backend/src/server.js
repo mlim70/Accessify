@@ -5,7 +5,8 @@ const corsOptions = {
   origin: 'https://accessify-extension.com',
   optionsSuccessStatus: 200,
 };
-app.use(cors(corsOptions));
+
+// app.use(cors(corsOptions));
 const bodyParser = require("body-parser");
 const { Translate } = require("@google-cloud/translate").v2;
 const UserInputService = require("./models/UserInput");
@@ -27,7 +28,7 @@ if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-
+app.use(cors(corsOptions));
 //anthropic Claude
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
