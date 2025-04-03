@@ -13,11 +13,10 @@ applications:
       artifacts:
         baseDirectory: .next
         files:
-          - '**/*'
+          - "**/*"
       cache:
         paths:
           - node_modules/**/*
-  
   - appRoot: backend
     frontend:
       phases:
@@ -30,7 +29,7 @@ applications:
       artifacts:
         baseDirectory: .
         files:
-          - '**/*'
+          - "**/*"
       cache:
         paths: []
     backend:
@@ -44,9 +43,9 @@ applications:
       artifacts:
         baseDirectory: .
         files:
-          - '**/*'
+          - "**/*"
         excludes:
           - node_modules/nodemon/**/*
       cache:
         paths:
-          - node_modules/**/*
+          - node_modules/**/* 

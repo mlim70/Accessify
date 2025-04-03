@@ -1,9 +1,9 @@
 // Add this at the very top of content.js, before any other code
 console.log("Setting up email storage listener");
 
-const backend = 'ubuntu@ec2-3-89-254-147.compute-1.amazonaws.com';
+const backend = 'ec2-3-89-254-147.compute-1.amazonaws.com';
 const portNum = 3001;
-const backendURL = `${backend}:${portNum}`;
+const backendURL = `http://${backend}:${portNum}`;
 
 let currentAudio = null;
 
@@ -254,6 +254,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 async function translateText(text, targetLanguage) {
   try {
     console.log(`Attempting to translate: "${text}" to ${targetLanguage}`);
+    console.log(`Making request to: ${backendURL}/api/translate`);
     const response = await fetch(`${backendURL}/api/translate`, {
       method: "POST",
       headers: {

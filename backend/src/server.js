@@ -1,6 +1,11 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const corsOptions = {
+  origin: 'https://accessify-extension.com',
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 const bodyParser = require("body-parser");
 const { Translate } = require("@google-cloud/translate").v2;
 const UserInputService = require("./models/UserInput");
@@ -279,6 +284,6 @@ app.post("/api/save-preferences", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server is running on port ${PORT} and listening on all interfaces`);
 });
