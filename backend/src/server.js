@@ -169,27 +169,28 @@ app.post("/api/pronunciation", async (req, res) => {
     const response = result.response.text();
     console.log("Received challenging words response:", response);
 
-    const challengingWords = response.split(",");
+    const challengingWords = response.split(",").map(word => word.trim()).filter(word => word && word !== "None");
+    console.log("Processed challenging words:", challengingWords);
+
     for (const word of challengingWords) {
-    prompt = `Generate a pronunciation guide using only the English alphabet on how to pronounce "${word}". Only provide the pronunciation guide.`;
-
-
-
-    let result = await model.generateContent(prompt);
-    const pronunciation = result.response.text().replace("\n", "");
-    text = text.replace(word, `${word} (${pronunciation})`);
-    console.log(`Received pronunciation for "${trimmedWord}":`, pronunciation);
-  }
-  return res.status(200).json({ revisedText: text });
-} catch (error) {
-  console.error("Error generating pronunciation guide:", error);
-  res
-    .status(500)
-    .json({
+      prompt = `Generate a pronunciation guide using only the English alphabet on how to pronounce "${word}". Only provide the pronunciation guide.`;
+      result = await model.generateContent(prompt);
+      const pronunciation = result.response.text().replace("\n", "").trim();
+      console.log(`Received pronunciation for "${word}":`, pronunciation);
+      
+      if (pronunciation) {
+        text = text.replace(new RegExp(word, 'gi'), `${word} (${pronunciation})`);
+      }
+    }
+    
+    return res.status(200).json({ revisedText: text });
+  } catch (error) {
+    console.error("Error generating pronunciation guide:", error);
+    res.status(500).json({
       error: "Error generating pronunciation guide:",
       details: error.message,
     });
-}
+  }
 });
 
 app.post("/api/tts", async (req, res) => {
