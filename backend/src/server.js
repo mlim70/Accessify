@@ -162,7 +162,10 @@ app.post("/api/pronunciation", async (req, res) => {
   try {
     let { text } = req.body;
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-    let prompt = `Which of the following words would someone with surface dyslexia struggle with pronouncing? (Only list the words separated by commas. If there are none, output "None". "${text}"`;
+    
+    // First, identify words that would benefit from pronunciation guides
+    let prompt = `List all words from the following text that are 6 or more letters long or contain complex letter combinations (like 'ough', 'tion', 'sion', 'ph', 'th', 'ch', 'sh', 'wh', 'gh', 'qu', 'wr', 'kn', 'gn', 'ps', 'sc', 'dg', 'dg', 'mb', 'mn', 'ng', 'nk', 'nt', 'pt', 'st', 'sw', 'tw', 'wh', 'wr', 'x', 'y', 'z'). Only list the words separated by commas. If there are none, output "None". Text: "${text}"`;
+    
     let result = await model.generateContent(prompt);
     const response = result.response.text();
 
@@ -173,7 +176,7 @@ app.post("/api/pronunciation", async (req, res) => {
 
     const challengingWords = response.split(",");
     for (const word of challengingWords) {
-      prompt = `Generate a pronunciation guide using only the English alphabet on how to pronounce "${word}". Only provide the pronunciation guide.`;
+      prompt = `Generate a pronunciation guide using only the English alphabet on how to pronounce "${word}". Make it simple and clear. Only provide the pronunciation guide.`;
       let result = await model.generateContent(prompt);
       const pronunciation = result.response.text().replace("\n", "");
       text = text.replace(word, `${word} (${pronunciation})`);
