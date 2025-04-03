@@ -163,10 +163,20 @@ app.post("/api/pronunciation", async (req, res) => {
     let { text } = req.body;
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     
+    // Set a timeout for the entire operation
+    const timeout = 10000; // 10 seconds
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Operation timed out')), timeout);
+    });
+
     // First, identify words that would benefit from pronunciation guides
     let prompt = `List all words from the following text that are 6 or more letters long or contain complex letter combinations (like 'ough', 'tion', 'sion', 'ph', 'th', 'ch', 'sh', 'wh', 'gh', 'qu', 'wr', 'kn', 'gn', 'ps', 'sc', 'dg', 'dg', 'mb', 'mn', 'ng', 'nk', 'nt', 'pt', 'st', 'sw', 'tw', 'wh', 'wr', 'x', 'y', 'z'). Only list the words separated by commas. If there are none, output "None". Text: "${text}"`;
     
-    let result = await model.generateContent(prompt);
+    let result = await Promise.race([
+      model.generateContent(prompt),
+      timeoutPromise
+    ]);
+    
     const response = result.response.text();
 
     if (response.includes("None")) {
@@ -175,29 +185,49 @@ app.post("/api/pronunciation", async (req, res) => {
     }
 
     const wordsToProcess = response.split(",").map(word => word.trim());
-    for (const word of wordsToProcess) {
-      if (!word) continue;
-      
-      prompt = `Generate a simple pronunciation guide for "${word}" using only the English alphabet. Format it as a single word with hyphens between syllables. Example: "pronunciation" -> "pro-nun-see-ay-shun". Only provide the pronunciation guide, nothing else.`;
-      result = await model.generateContent(prompt);
-      const pronunciation = result.response.text().replace("\n", "").trim();
-      
-      // Only add pronunciation if it's different from the original word
-      if (pronunciation.toLowerCase() !== word.toLowerCase()) {
-        // Use a more compact format: word (pronunciation)
-        text = text.replace(new RegExp(word, 'g'), `${word} (${pronunciation})`);
-      }
+    const processedWords = new Set(); // Track processed words to avoid duplicates
+    
+    // Process words in parallel with a limit
+    const batchSize = 3;
+    for (let i = 0; i < wordsToProcess.length; i += batchSize) {
+      const batch = wordsToProcess.slice(i, i + batchSize);
+      const batchPromises = batch.map(async (word) => {
+        if (!word || processedWords.has(word)) return null;
+        processedWords.add(word);
+        
+        try {
+          prompt = `Generate a simple pronunciation guide for "${word}" using only the English alphabet. Format it as a single word with hyphens between syllables. Example: "pronunciation" -> "pro-nun-see-ay-shun". Only provide the pronunciation guide, nothing else.`;
+          const result = await Promise.race([
+            model.generateContent(prompt),
+            timeoutPromise
+          ]);
+          const pronunciation = result.response.text().replace("\n", "").trim();
+          
+          if (pronunciation.toLowerCase() !== word.toLowerCase()) {
+            return { word, pronunciation };
+          }
+        } catch (error) {
+          console.error(`Error processing word "${word}":`, error);
+        }
+        return null;
+      });
+
+      const results = await Promise.all(batchPromises);
+      results.forEach(result => {
+        if (result) {
+          text = text.replace(new RegExp(result.word, 'g'), `${result.word} (${result.pronunciation})`);
+        }
+      });
     }
     
     return res.status(200).json({ revisedText: text });
   } catch (error) {
     console.error("Error generating pronunciation guide:", error);
-    res
-      .status(500)
-      .json({
-        error: "Error generating pronunciation guide:",
-        details: error.message,
-      });
+    // Return the original text if there's an error
+    return res.status(200).json({ 
+      revisedText: text,
+      error: "Some words could not be processed, but the text is still readable"
+    });
   }
 });
 
