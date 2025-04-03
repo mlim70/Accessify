@@ -1,14 +1,13 @@
 /** @type {import('tailwindcss').Config} */
-const config = {
-  darkMode: ["class"],
+module.exports = {
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
-    './lib/**/*.{ts,tsx}',
-    './**/*.{ts,tsx}',
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
+    './lib/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  darkMode: ["class"],
   theme: {
   	container: {
   		center: true,
@@ -19,11 +18,11 @@ const config = {
   	},
   	extend: {
   		colors: {
-  			border: 'hsl(var(--border))',
-  			input: 'hsl(var(--input))',
-  			ring: 'hsl(var(--ring))',
-  			background: 'hsl(var(--background))',
-  			foreground: 'hsl(var(--foreground))',
+  			border: '#e5e7eb',
+  			input: '#e5e7eb',
+  			ring: '#000000',
+  			background: '#ffffff',
+  			foreground: '#000000',
   			primary: {
   				DEFAULT: '#FF9900',
   				foreground: '#000000'
@@ -33,24 +32,24 @@ const config = {
   				foreground: '#ffffff'
   			},
   			destructive: {
-  				DEFAULT: 'hsl(var(--destructive))',
-  				foreground: 'hsl(var(--destructive-foreground))'
+  				DEFAULT: '#ef4444',
+  				foreground: '#ffffff'
   			},
   			muted: {
-  				DEFAULT: 'hsl(var(--muted))',
-  				foreground: 'hsl(var(--muted-foreground))'
+  				DEFAULT: '#f3f4f6',
+  				foreground: '#6b7280'
   			},
   			accent: {
   				DEFAULT: '#FF9900',
   				foreground: '#000000'
   			},
   			popover: {
-  				DEFAULT: 'hsl(var(--popover))',
-  				foreground: 'hsl(var(--popover-foreground))'
+  				DEFAULT: '#ffffff',
+  				foreground: '#000000'
   			},
   			card: {
-  				DEFAULT: 'hsl(var(--card))',
-  				foreground: 'hsl(var(--card-foreground))'
+  				DEFAULT: '#ffffff',
+  				foreground: '#000000'
   			},
   			chart: {
   				'1': 'hsl(var(--chart-1))',
@@ -61,9 +60,9 @@ const config = {
   			}
   		},
   		borderRadius: {
-  			lg: 'var(--radius)',
-  			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
+  			lg: '0.5rem',
+  			md: 'calc(0.5rem - 2px)',
+  			sm: 'calc(0.5rem - 4px)'
   		},
   		keyframes: {
   			'accordion-down': {
@@ -89,8 +88,6 @@ const config = {
   		}
   	}
   },
-  plugins: ["tailwindcss-animate"],
+  plugins: [require("tailwindcss-animate")],
 }
-
-export default config
 

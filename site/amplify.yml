@@ -6,7 +6,7 @@ applications:
         preBuild:
           commands:
             - npm ci
-            - npm install --save-dev @types/chrome
+            - npm install --save-dev @types/chrome tailwindcss postcss autoprefixer
         build:
           commands:
             - npm run build
@@ -17,6 +17,20 @@ applications:
       cache:
         paths:
           - node_modules/**/*
+          - .next/cache/**/*
+    customHeaders:
+      - pattern: "**/*"
+        headers:
+          - key: "Strict-Transport-Security"
+            value: "max-age=31536000; includeSubDomains"
+          - key: "X-Frame-Options"
+            value: "SAMEORIGIN"
+          - key: "X-XSS-Protection"
+            value: "1; mode=block"
+          - key: "X-Content-Type-Options"
+            value: "nosniff"
+          - key: "Referrer-Policy"
+            value: "origin-when-cross-origin"
   - appRoot: backend
     frontend:
       phases:
