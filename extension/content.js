@@ -3,7 +3,7 @@ console.log("Setting up email storage listener");
 
 const backend = 'ec2-3-89-254-147.compute-1.amazonaws.com';
 const portNum = 3001;
-const backendURL = `http://${backend}:${portNum}`;
+const backendURL = `https://${backend}:${portNum}`;
 
 let currentAudio = null;
 
@@ -120,11 +120,8 @@ async function readSelectedText(text) {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    console.log("Received response from OpenAI Text-to-Speech API");
-    console.log("Response:", response);
+    
     const audioBlob = await response.blob();
-    console.log("received audio blob");
-    console.log("Audio blob:", audioBlob);
     const audioUrl = URL.createObjectURL(audioBlob);
 
     const audio = new Audio(audioUrl);

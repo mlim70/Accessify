@@ -1,6 +1,6 @@
 const backend = 'ec2-3-89-254-147.compute-1.amazonaws.com';
 const portNum = 3001;
-const backendURL = `http://${backend}:${portNum}`;
+const backendURL = `https://${backend}:${portNum}`;
 
 document.addEventListener('DOMContentLoaded', function() {
   chrome.storage.local.get(['preferences'], function(result) {
