@@ -161,10 +161,13 @@ app.post("/api/translate", async (req, res) => {
 app.post("/api/pronunciation", async (req, res) => {
   try {
     let { text } = req.body;
+    console.log("Received text for pronunciation processing:", text);
+    
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     let prompt = `Which of the following words would someone with surface dyslexia struggle with pronouncing? (Only list the words separated by commas. If there are none, output "None". "${text}"`;
     let result = await model.generateContent(prompt);
     const response = result.response.text();
+    console.log("Received challenging words response:", response);
 
     const challengingWords = response.split(",");
     for (const word of challengingWords) {
@@ -175,6 +178,7 @@ app.post("/api/pronunciation", async (req, res) => {
     let result = await model.generateContent(prompt);
     const pronunciation = result.response.text().replace("\n", "");
     text = text.replace(word, `${word} (${pronunciation})`);
+    console.log(`Received pronunciation for "${trimmedWord}":`, pronunciation);
   }
   return res.status(200).json({ revisedText: text });
 } catch (error) {
