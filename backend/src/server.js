@@ -168,71 +168,30 @@ app.post("/api/pronunciation", async (req, res) => {
   try {
     let { text } = req.body;
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-    
-    // Set timeout for operations
-    const timeout = 30000; // 30 seconds
+    let prompt = `Which of the following words would someone with surface dyslexia struggle with pronouncing? (Only list the words separated by commas. If there are none, output "None". "${text}"`;
+    let result = await model.generateContent(prompt);
+    const response = result.response.text();
 
-    // Helper function to handle timeouts
-    const withTimeout = async (operation) => {
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Operation timed out')), timeout);
-      });
-      return await Promise.race([operation(), timeoutPromise]);
-    };
+    const challengingWords = response.split(",");
+    for (const word of challengingWords) {
+    prompt = `Generate a pronunciation guide using only the English alphabet on how to pronounce "${word}". Only provide the pronunciation guide.`;
 
-    // Simplified prompt for word identification
-    const wordIdentificationPrompt = `List complex words (6+ letters or containing 'ough', 'tion', 'sion', 'ph', 'th', 'ch', 'sh', 'wh', 'gh', 'qu') from: "${text}". Output as comma-separated list or "None".`;
-    
-    // Get complex words
-    const wordResult = await withTimeout(() => model.generateContent(wordIdentificationPrompt));
-    const response = wordResult.response.text();
 
-    if (response.includes("None")) {
-      return res.status(200).json({ revisedText: text });
-    }
 
-    const wordsToProcess = response.split(",").map(word => word.trim());
-    const processedWords = new Set();
-    
-    // Process words sequentially with increased rate limiting
-    for (const word of wordsToProcess) {
-      if (!word || processedWords.has(word)) continue;
-      processedWords.add(word);
-      
-      try {
-        // Simplified pronunciation prompt
-        const pronunciationPrompt = `Pronounce "${word}" with hyphens between syllables. Example: "pronunciation" -> "pro-nun-see-ay-shun". Output only the pronunciation.`;
-        
-        // Increased rate limiting delay to 2 seconds
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        const pronunciationResult = await withTimeout(() => 
-          model.generateContent(pronunciationPrompt)
-        );
-        
-        const pronunciation = pronunciationResult.response.text().replace("\n", "").trim();
-        
-        if (pronunciation.toLowerCase() !== word.toLowerCase()) {
-          // Use a more precise regex for word replacement
-          const wordRegex = new RegExp(`\\b${word}\\b`, 'g');
-          text = text.replace(wordRegex, `${word} (${pronunciation})`);
-        }
-      } catch (error) {
-        console.error(`Error processing word "${word}":`, error);
-        // Log the error but continue processing
-        continue;
-      }
-    }
-    
-    return res.status(200).json({ revisedText: text });
-  } catch (error) {
-    console.error("Error in pronunciation endpoint:", error);
-    // Return original text with error message
-    return res.status(200).json({ 
-      revisedText: text,
-      error: "Some words could not be processed, but the text is still readable"
-    });
+    let result = await model.generateContent(prompt);
+    const pronunciation = result.response.text().replace("\n", "");
+    text = text.replace(word, `${word} (${pronunciation})`);
   }
+  return res.status(200).json({ revisedText: text });
+} catch (error) {
+  console.error("Error generating pronunciation guide:", error);
+  res
+    .status(500)
+    .json({
+      error: "Error generating pronunciation guide:",
+      details: error.message,
+    });
+}
 });
 
 app.post("/api/tts", async (req, res) => {
