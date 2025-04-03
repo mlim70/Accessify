@@ -163,67 +163,65 @@ app.post("/api/pronunciation", async (req, res) => {
     let { text } = req.body;
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     
-    // Set a timeout for the entire operation
-    const timeout = 10000; // 10 seconds
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Operation timed out')), timeout);
-    });
+    // Set timeout for operations
+    const timeout = 10000; // 30 seconds
 
-    // First, identify words that would benefit from pronunciation guides
-    let prompt = `List all words from the following text that are 6 or more letters long or contain complex letter combinations (like 'ough', 'tion', 'sion', 'ph', 'th', 'ch', 'sh', 'wh', 'gh', 'qu', 'wr', 'kn', 'gn', 'ps', 'sc', 'dg', 'dg', 'mb', 'mn', 'ng', 'nk', 'nt', 'pt', 'st', 'sw', 'tw', 'wh', 'wr', 'x', 'y', 'z'). Only list the words separated by commas. If there are none, output "None". Text: "${text}"`;
+    // Helper function to handle timeouts
+    const withTimeout = async (operation) => {
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Operation timed out')), timeout);
+      });
+      return await Promise.race([operation(), timeoutPromise]);
+    };
+
+    // Simplified prompt for word identification
+    const wordIdentificationPrompt = `List complex words (6+ letters or containing 'ough', 'tion', 'sion', 'ph', 'th', 'ch', 'sh', 'wh', 'gh', 'qu') from: "${text}". Output as comma-separated list or "None".`;
     
-    let result = await Promise.race([
-      model.generateContent(prompt),
-      timeoutPromise
-    ]);
-    
-    const response = result.response.text();
+    // Get complex words
+    const wordResult = await withTimeout(() => model.generateContent(wordIdentificationPrompt));
+    const response = wordResult.response.text();
 
     if (response.includes("None")) {
-      console.log("No complex words found");
       return res.status(200).json({ revisedText: text });
     }
 
     const wordsToProcess = response.split(",").map(word => word.trim());
-    const processedWords = new Set(); // Track processed words to avoid duplicates
+    const processedWords = new Set();
     
-    // Process words in parallel with a limit
-    const batchSize = 3;
-    for (let i = 0; i < wordsToProcess.length; i += batchSize) {
-      const batch = wordsToProcess.slice(i, i + batchSize);
-      const batchPromises = batch.map(async (word) => {
-        if (!word || processedWords.has(word)) return null;
-        processedWords.add(word);
+    // Process words sequentially with rate limiting
+    for (const word of wordsToProcess) {
+      if (!word || processedWords.has(word)) continue;
+      processedWords.add(word);
+      
+      try {
+        // Simplified pronunciation prompt
+        const pronunciationPrompt = `Pronounce "${word}" with hyphens between syllables. Example: "pronunciation" -> "pro-nun-see-ay-shun". Output only the pronunciation.`;
         
-        try {
-          prompt = `Generate a simple pronunciation guide for "${word}" using only the English alphabet. Format it as a single word with hyphens between syllables. Example: "pronunciation" -> "pro-nun-see-ay-shun". Only provide the pronunciation guide, nothing else.`;
-          const result = await Promise.race([
-            model.generateContent(prompt),
-            timeoutPromise
-          ]);
-          const pronunciation = result.response.text().replace("\n", "").trim();
-          
-          if (pronunciation.toLowerCase() !== word.toLowerCase()) {
-            return { word, pronunciation };
-          }
-        } catch (error) {
-          console.error(`Error processing word "${word}":`, error);
+        // Add rate limiting delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        const pronunciationResult = await withTimeout(() => 
+          model.generateContent(pronunciationPrompt)
+        );
+        
+        const pronunciation = pronunciationResult.response.text().replace("\n", "").trim();
+        
+        if (pronunciation.toLowerCase() !== word.toLowerCase()) {
+          // Use a more precise regex for word replacement
+          const wordRegex = new RegExp(`\\b${word}\\b`, 'g');
+          text = text.replace(wordRegex, `${word} (${pronunciation})`);
         }
-        return null;
-      });
-
-      const results = await Promise.all(batchPromises);
-      results.forEach(result => {
-        if (result) {
-          text = text.replace(new RegExp(result.word, 'g'), `${result.word} (${result.pronunciation})`);
-        }
-      });
+      } catch (error) {
+        console.error(`Error processing word "${word}":`, error);
+        // Log the error but continue processing
+        continue;
+      }
     }
     
     return res.status(200).json({ revisedText: text });
   } catch (error) {
-    console.error("Error generating pronunciation guide:", error);
-    // Return the original text if there's an error
+    console.error("Error in pronunciation endpoint:", error);
+    // Return original text with error message
     return res.status(200).json({ 
       revisedText: text,
       error: "Some words could not be processed, but the text is still readable"
