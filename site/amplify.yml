@@ -7,6 +7,10 @@ applications:
           commands:
             - npm ci
             - npm install --save-dev @types/chrome tailwindcss postcss autoprefixer
+            - cd ..
+            - echo "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" >> .env.local
+            - echo "GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET" >> .env.local
+            - cd site
         build:
           commands:
             - npm run build
