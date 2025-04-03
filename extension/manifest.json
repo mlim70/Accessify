@@ -15,7 +15,7 @@
   ],
   "host_permissions": [
     "<all_urls>",
-    "https://ec2-54-166-40-219.compute-1.amazonaws.com/*"
+    "https://accessify-backend.com/*"
   ],
   "content_scripts": [
     {
@@ -26,7 +26,7 @@
     }
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; media-src 'self' blob:; connect-src 'self' https://ec2-54-166-40-219.compute-1.amazonaws.com;"
+    "extension_pages": "script-src 'self'; object-src 'self'; media-src 'self' blob:; connect-src 'self' https://accessify-backend.com;"
   },
   "action": {
     "default_popup": "popup/popup.html",
