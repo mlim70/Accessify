@@ -26,8 +26,8 @@ if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
   process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath;
 }
 
-var privateKey = fs.readFileSync('config/private-key.pem');
-var certificate = fs.readFileSync('config/certificate.pem');
+var privateKey = fs.readFileSync('src/config/private-key.pem');
+var certificate = fs.readFileSync('src/config/certificate.pem');
 var credentials = {key: privateKey, cert: certificate};
 
 const app = express();
