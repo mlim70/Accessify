@@ -32,9 +32,7 @@ var credentials = {key: privateKey, cert: certificate};
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-
 app.use(cors(corsOptions));
-
 //anthropic Claude
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
