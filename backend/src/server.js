@@ -164,7 +164,7 @@ app.post("/api/pronunciation", async (req, res) => {
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     
     // Set timeout for operations
-    const timeout = 10000; // 30 seconds
+    const timeout = 30000; // 30 seconds
 
     // Helper function to handle timeouts
     const withTimeout = async (operation) => {
@@ -188,7 +188,7 @@ app.post("/api/pronunciation", async (req, res) => {
     const wordsToProcess = response.split(",").map(word => word.trim());
     const processedWords = new Set();
     
-    // Process words sequentially with rate limiting
+    // Process words sequentially with increased rate limiting
     for (const word of wordsToProcess) {
       if (!word || processedWords.has(word)) continue;
       processedWords.add(word);
@@ -197,8 +197,8 @@ app.post("/api/pronunciation", async (req, res) => {
         // Simplified pronunciation prompt
         const pronunciationPrompt = `Pronounce "${word}" with hyphens between syllables. Example: "pronunciation" -> "pro-nun-see-ay-shun". Output only the pronunciation.`;
         
-        // Add rate limiting delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Increased rate limiting delay to 2 seconds
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
         const pronunciationResult = await withTimeout(() => 
           model.generateContent(pronunciationPrompt)
