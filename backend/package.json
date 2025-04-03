@@ -8,6 +8,7 @@
     "dev": "nodemon src/server.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
     "@aws-sdk/client-dynamodb": "^3.772.0",
     "@aws-sdk/lib-dynamodb": "^3.772.0",
     "@google-cloud/translate": "^9.0.1",
