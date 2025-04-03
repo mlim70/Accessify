@@ -169,17 +169,29 @@ app.post("/api/pronunciation", async (req, res) => {
     const response = result.response.text();
     console.log("Received challenging words response:", response);
 
-    const challengingWords = response.split(",").map(word => word.trim()).filter(word => word && word !== "None");
+    // Extract only the comma-separated words, ignoring any explanatory text
+    const wordMatch = response.match(/[^,]+(?=,|$)/g) || [];
+    const challengingWords = wordMatch
+      .map(word => word.trim())
+      .filter(word => word && word !== "None" && word.length < 50); // Filter out long explanatory text
     console.log("Processed challenging words:", challengingWords);
 
     for (const word of challengingWords) {
-      prompt = `Generate a pronunciation guide using only the English alphabet on how to pronounce "${word}". Only provide the pronunciation guide.`;
-      result = await model.generateContent(prompt);
-      const pronunciation = result.response.text().replace("\n", "").trim();
-      console.log(`Received pronunciation for "${word}":`, pronunciation);
-      
-      if (pronunciation) {
-        text = text.replace(new RegExp(word, 'gi'), `${word} (${pronunciation})`);
+      try {
+        prompt = `Generate a pronunciation guide using only the English alphabet on how to pronounce "${word}". Only provide the pronunciation guide.`;
+        result = await model.generateContent(prompt);
+        const pronunciation = result.response.text().replace("\n", "").trim();
+        console.log(`Received pronunciation for "${word}":`, pronunciation);
+        
+        if (pronunciation) {
+          // Escape special regex characters in the word
+          const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          text = text.replace(new RegExp(escapedWord, 'gi'), `${word} (${pronunciation})`);
+        }
+      } catch (wordError) {
+        console.error(`Error processing word "${word}":`, wordError);
+        // Continue with next word even if one fails
+        continue;
       }
     }
     
