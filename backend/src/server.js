@@ -1,20 +1,20 @@
 require("dotenv").config();
-const express = require("express");
+
+const Anthropic = require("@anthropic-ai/sdk");
+const bodyParser = require("body-parser");
 const cors = require("cors");
 const corsOptions = {
   origin: 'https://accessify-extension.com',
   optionsSuccessStatus: 200,
 };
-
-// app.use(cors(corsOptions));
-const bodyParser = require("body-parser");
-const { Translate } = require("@google-cloud/translate").v2;
-const UserInputService = require("./models/UserInput");
-const Anthropic = require("@anthropic-ai/sdk");
-const { generateAccessibilityPrompt } = require("./services/claude-prompt");
+const express = require("express");
 const fs = require("fs");
-const path = require("path");
+const { generateAccessibilityPrompt } = require("./services/claude-prompt");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+var https = require('https');
+const UserInputService = require("./models/UserInput");
+const path = require("path");
+const { Translate } = require("@google-cloud/translate").v2;
 
 if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
   const credentialsPath = path.join(__dirname, "config", "service-account-key.json");
@@ -25,6 +25,10 @@ if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
   fs.writeFileSync(credentialsPath, credentialsJson);
   process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath;
 }
+
+var privateKey = fs.readFileSync('src/config/private-key.pem');
+var certificate = fs.readFileSync('src/config/certificate.pem');
+var credentials = {key: privateKey, cert: certificate};
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -285,6 +289,6 @@ app.post("/api/save-preferences", async (req, res) => {
   }
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+const httpsServer = https.createServer(credentials, app).listen(PORT, () => {
   console.log(`Server is running on port ${PORT} and listening on all interfaces`);
 });
